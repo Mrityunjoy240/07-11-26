@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import UTC, datetime
 
 import redis.asyncio as aioredis
 
@@ -62,9 +62,14 @@ class RedisSessionStore(SessionStore):
 
     async def touch(self, session_id: str) -> None:
         r = await self._get_redis()
-        await r.expire(f"session:{session_id}", settings.redis_session_ttl)
+        raw = await r.get(f"session:{session_id}")
+        if raw is None:
+            return
+        data = json.loads(raw)
+        data["last_active"] = datetime.now(UTC).isoformat()
+        await r.set(f"session:{session_id}", json.dumps(data), ex=settings.redis_session_ttl)
 
     async def close(self) -> None:
         if self._redis:
-            await self._redis.close()
+            await self._redis.aclose()
             self._redis = None

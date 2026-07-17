@@ -18,6 +18,49 @@ Everything below — every interface, every module, every migration phase — ex
 
 That is the only metric that matters.
 
+### The Sentence
+
+> **The purpose of this architecture is not to answer every question. The purpose is to help every student make the best possible admission decision with the least amount of confusion, anxiety, and effort.**
+
+## Engineering Principles
+
+These principles govern every architectural decision. A change that violates a principle must be rejected, even if it saves time or code.
+
+```
+Correctness over cleverness.
+   No trick code. No premature optimization. Get the facts right first.
+
+Architecture over patches.
+   If a fix requires violating the layer boundaries, fix the architecture instead.
+
+Understanding over keyword matching.
+   The system must infer intent, not match keywords.
+
+Reasoning over prompting.
+   Make the model reason with tools and structure, not brute-force prompt instructions.
+
+Structured knowledge over hallucination.
+   Facts live in structured stores, never in LLM parameters. The LLM reads facts, it does not remember them.
+
+Deterministic behavior where possible.
+   If a fee lookup can be computed exactly, compute it exactly. Do not ask an LLM.
+
+LLM only when reasoning is required.
+   Classification, lookup, formatting — use deterministic code. Counseling, recommendation, planning — use LLM.
+
+Every module has one responsibility.
+   A module that does two things does neither well. Split it.
+
+Every feature must be testable.
+   If you cannot write a unit test for it, the architecture is wrong. Fix the architecture, not the test.
+
+Every architectural change must reduce complexity.
+   If the change adds more code than it removes, reconsider the approach.
+
+Every dependency must be replaceable.
+   Any third-party provider (LLM, STT, TTS, vector store, database) can fail or be replaced. The system must survive the swap.
+```
+
 ## What This System IS
 
 This is an **AI Admission Counselor** that happens to communicate through voice, chat, WhatsApp, web, and future channels.
@@ -103,6 +146,8 @@ Every layer of the architecture should answer exactly one question. Nothing more
 | **Channel Adapter** | How do I normalize input from this channel? |
 | **Conversation Layer** | What did the student say? (explicit + implicit) |
 | **Reasoning Layer** | What does the student actually need? |
+| **Decision Engine** | What should I do about it? |
+| **College Brain** | How does this college actually work? |
 | **Knowledge Layer** | What facts are true? |
 | **Planning Layer** | What should I say next? |
 | **Workflow Layer** | What process should I guide them through? |
@@ -180,6 +225,108 @@ If this system were deployed tomorrow, would a student who spoke to it for 15 mi
 If the answer is "almost" — we are on the right track.
 
 If the answer is "no, it felt like talking to a chatbot" — the architecture has failed, regardless of how clean the code is.
+
+## Success Metrics
+
+### Product Metrics (Primary)
+
+These are the metrics that determine whether the system is succeeding as a product.
+
+| Metric | Target | Measurement |
+|--------|--------|-------------|
+| **Counseling completion rate** | >80% | Student completes full admission cycle without human intervention |
+| **Student satisfaction** | >90% | Post-interaction survey (NPS or 5-star) |
+| **Recommendation confidence** | >90% | Branch recommendation matches counselor's recommendation for same profile |
+| **Hallucination rate** | <0.1% | Any incorrect factual claim about college, fees, placement, or policies |
+| **Wrong institution reference** | 0% | Never confuse BCREC with another college |
+| **Language consistency** | >99% | Response language matches user's language |
+| **Cross-session memory** | >90% | Student recognized on return, previous context used naturally |
+| **Human handoff rate** | <5% | Escalation to human counselor |
+| **Handoff quality** | >90% | Human counselor agrees handoff was necessary and summary was accurate |
+| **Conversation length** | 10-20 min | Average counseling session duration |
+
+### Technical Metrics (Secondary)
+
+These support the product metrics but are not goals in themselves.
+
+| Metric | Target | Why It Matters |
+|--------|--------|----------------|
+| End-to-end latency (voice) | <3s p95 | Long pauses break conversation flow |
+| End-to-end latency (text) | <1.5s p95 | Users expect fast web responses |
+| Voice pipeline uptime | >99.5% | Phone calls must connect reliably |
+| Cost per conversation | <$0.10 | College budget constraint |
+| Provider failover time | <30s | LLM/STT/TTS provider failure must be invisible to user |
+
+### Why Metrics Matter
+
+Without measurable goals, different people optimize for different things:
+
+- Engineers optimize for latency
+- Product optimizes for features
+- Business optimizes for cost
+- AI researchers optimize for model quality
+
+The product metrics above align everyone. Every change is measured against: *"Does this improve counseling completion rate? Does it reduce hallucination rate?"* If the answer to both is "no", the change is not a priority.
+
+## AI Growth Roadmap — Maturity Levels
+
+This system will not start at Level 6. It must evolve. Each level builds on the previous one.
+
+```
+Level 1: FAQ
+   • Answers frequently asked questions
+   • No conversation memory
+   • No student profile
+   • No counseling
+   • Channel: web chat only
+   ═══ We are here today
+
+Level 2: Memory
+   • Remembers conversation within session
+   • Extracts basic student profile (rank, PCM)
+   • Simple follow-up resolution
+   • Channel: web + voice (telephone)
+   ═══ Current V2/V3 capability
+
+Level 3: Counselor
+   • Multi-turn counseling with reasoning
+   • Student profile persists across sessions
+   • Branch recommendations with trade-offs
+   • Emotional state detection
+   • Goal tracking
+   • Multi-language
+   • Channels: web + voice + WhatsApp
+   ═══ Target by end of Year 1
+
+Level 4: Planner
+   • Workflow engine operational
+   • Can guide through admission process step by step
+   • Proactive follow-up ("Did you apply? Need help?")
+   • Scholarship recommendation
+   • Human handoff when confidence drops
+   • Channels: all
+   ═══ Target by end of Year 2
+
+Level 5: Advisor
+   • Proactive outreach (deadline reminders)
+   • Career trajectory prediction
+   • Alumni connection suggestions
+   • Cross-channel session continuity
+   • Student can start on web → continue on phone → follow up on WhatsApp
+   ═══ Target by end of Year 3
+
+Level 6: Autonomous Admission Assistant
+   • End-to-end admission processing without human intervention
+   • Document verification
+   • Fee payment assistance
+   • Enrollment confirmation
+   • Follow-up with incomplete applications
+   • 95%+ student satisfaction
+   • <0.01% error rate
+   ═══ Target by Year 5
+```
+
+**Every architectural decision must not block reaching Level 6.** Even if we are at Level 2 today, the architecture must support Level 6 without redesign.
 
 ---
 
@@ -415,6 +562,8 @@ Every layer answers exactly one question:
 | **Channel Adapter** | How do I normalize this channel's input? |
 | **Conversation Engine** | What did the student say and what is their state? |
 | **Reasoning Engine** | What does the student actually need? |
+| **Decision Engine** | What should I do about it? |
+| **College Brain** | How does this college actually work? |
 | **Planning Engine** | What should I say next? |
 | **Specialist Agents** | What facts and recommendations apply to this domain? |
 | **Workflow Engine** | What process should I guide them through? |
@@ -576,6 +725,188 @@ Violations of this rule in the current codebase:
 - `livekit_agent.py` (Channel Adapter) contains the system prompt — a Knowledge Layer concern
 - `groq_service.py` (Conversation Engine) opens SQLite connections — a Storage Layer concern
 
+### Critical New Layers
+
+#### Decision Engine
+
+The Decision Engine sits between Reasoning and Planning. It answers one question:
+
+> **What should I do about what the student needs?**
+
+This is a separate concern because:
+
+- Reasoning determines facts: "Student has 50k rank, 76% PCM, interested in CS."
+- Decision determines action: "Recommend CSE as first choice, IT as safe choice, start admission workflow."
+
+A real admission counselor does not just reason about the student — they *decide* what to do. A junior counselor might reason the same way as a senior one, but the senior makes better *decisions*.
+
+**Decision Engine logic:**
+
+```
+Input: ReasoningResult
+  • Student profile (rank, PCM, interest, goals, emotion)
+  • Available options (branches, scholarships, hostels)
+  • Constraints (budget, cutoff trends, eligibility rules)
+  • Conversation stage (discovery, evaluation, decision, application)
+
+Processing:
+  • Score each option on multiple axes:
+      - Rank match (does this branch historically accept this rank?)
+      - Interest match (does this branch align with stated interest?)
+      - Career match (placement rate, package, growth)
+      - Financial match (fee vs budget, scholarship availability)
+  • Weight scores based on student profile:
+      - If placement is priority → placement weight = 0.5
+      - If budget is priority → fee weight = 0.4
+      - If unsure → balance all weights equally
+  • Select top options and generate trade-off analysis
+  • Attach confidence score to each recommendation
+
+Output: Decision
+  • Recommended action: "Recommend CSE, then IT"
+  • Alternatives: "ECE as backup if CSE fills"
+  • Confidence: 94%
+  • Confidence breakdown:
+      - Rank match: 85% (50k rank, CSE cutoff 35k — competitive)
+      - Interest match: 95% (explicit interest in CS)
+      - Career match: 92% (CSE placement 93.6%)
+      - Financial match: 90% (within budget, scholarship available)
+  • Next action: "Start admission workflow"
+```
+
+**Why this cannot live in the LLM prompt:**
+The decision logic involves weighted scoring, constraint satisfaction, and confidence calculation. These are algorithmic, not linguistic. An LLM prompt cannot reliably compute weighted scores or maintain internal consistency across multiple axes.
+
+#### Confidence
+
+Every decision the system makes must include a **system confidence score** — not just LLM token probability, but a holistic confidence based on:
+
+| Factor | Source | Weight |
+|--------|--------|--------|
+| Profile completeness | How many fields are filled vs missing | 0.3 |
+| Data freshness | How recent are the cutoff/placement numbers | 0.1 |
+| LLM confidence | Normalized token probability from the model | 0.2 |
+| Knowledge coverage | Is the relevant data in our knowledge base? | 0.2 |
+| Historical accuracy | How often have similar recommendations been correct? | 0.2 |
+
+**Confidence thresholds:**
+
+| Confidence Range | Behavior |
+|-----------------|----------|
+| >90% | Proceed autonomously. Full recommendation with trade-offs. |
+| 70-90% | Proceed but qualify: "Based on current data, CSE is a good fit. However, last year's cutoff varied by round." |
+| 50-70% | Probe for more information before deciding: "I can give you a general recommendation, but it would help if I knew your specific interest area." |
+| <50% | Do not decide. Hand off to human counselor with context summary. |
+
+**Confidence is not optional.** Without it, the system cannot know when to escalate. Every human counselor has a sense of "how sure am I about this?" The AI must too.
+
+#### College Brain
+
+Knowledge is not intelligence. The College Brain is a layer that understands **how this college actually works** — not just what facts are true.
+
+**What the College Brain knows:**
+
+```
+Domain Knowledge (the "what"):
+  • Fee structures for every branch
+  • Placement data by company and year
+  • HOD names and contact info
+  ← This is the Knowledge Layer
+
+Procedural Knowledge (the "how"):
+  • How WBJEE counseling works
+  • How MAKAUT affiliation affects syllabus
+  • How scholarship applications are processed
+  • How fee refunds work after withdrawal
+  • How hostel allocation works
+  • How branch change works after first year
+  • How backlog exams are scheduled
+  • How document verification works
+  ← This is the College Brain
+
+Tacit Knowledge (the "why"):
+  • Which branches have the best peer culture for research
+  • Which companies recruit which branches most aggressively
+  • What students from specific boards typically struggle with
+  • What scholarship schemes are commonly underutilized
+  • What hidden costs students often miss
+  ← This is also the College Brain (hardest to build)
+```
+
+**Implementation:**
+The College Brain is not a single module. It is a collection of:
+
+1. **Procedural rules** (deterministic: "If rank < cutoff, eligible")
+2. **Workflow definitions** (state machines: admission process steps)
+3. **Embedded policy documents** (vector search over official PDFs)
+4. **LLM-accessible tools** (functions the LLM can call for procedural questions)
+5. **Decision heuristics** (scoring rules for recommendations)
+
+The College Brain draws from the Knowledge Layer but is not the same thing. The Knowledge Layer stores data. The College Brain knows what to *do* with it.
+
+### Ownership Boundaries
+
+Every module has exactly one owner — a responsibility that no other module may duplicate or override.
+
+```
+Module                Owns                      Does NOT Own
+──────────────────────────────────────────────────────────────────
+Voice Adapter         Audio in/out              Language detection
+Channel Adapter       Channel normalization     Session management
+Conversation Engine   Language, state, memory   LLM selection
+Reasoning Engine      LLM routing, tool exec    Response formatting
+Decision Engine       Option scoring, ranking   Knowledge retrieval
+College Brain         Procedural college rules  Fact storage
+Planning Engine       Response structure        Workflow state
+Workflow Engine       Multi-step process mgmt   Decision making
+Knowledge Layer       Fact storage, graph       LLM calling
+Profile Layer         Student identity          Conversation memory
+Safety Layer          Content filtering         Intent classification
+Cache Layer           Hot data TTL              Data source of truth
+```
+
+A violation example: if the Conversation Engine starts modifying the student profile (Profile Layer's job), profile data will become inconsistent because two modules write to it without coordination. The rule is: **a module may read from any layer below it, but may only write to its own layer.**
+
+### Evolution Requirements
+
+This architecture must survive the following without redesign:
+
+```
+New departments added:
+  → Add to Knowledge Graph data. College Brain rules extend automatically.
+
+New regulations (NEP 2020, MAKAUT policy changes):
+  → Update procedural rules in College Brain. No pipeline changes.
+
+New fee structures introduced:
+  → Update graph data. Cache invalidates automatically.
+
+New admission policies (entrance exam changes):
+  → Update cutoffs, eligibility rules in College Brain.
+
+New campuses added:
+  → New graph namespace. College Brain learns campus-specific rules.
+
+New languages needed:
+  → Add language model to Language Detector. Prompt translations in Prompt Store.
+
+New AI models released:
+  → Implement LLMProvider interface. Router picks best model per task.
+
+New telephony provider (LiveKit → Dograh → future):
+  → Implement VoiceAdapter interface. Conversation Engine unchanged.
+
+New channels (kiosk, CRM, mobile app):
+  → Implement Channel Adapter. Event bus handles routing.
+
+Scaling from 1 to 10 colleges:
+  → Tenant-aware Knowledge Graph. College Brain parameterized by college ID.
+```
+
+**The test for every architectural decision:**
+
+> If I have to touch more than two modules to accommodate a change in college policy, the architecture is wrong.
+
 ---
 
 ## 5. Future Architecture — Complete Design
@@ -614,40 +945,56 @@ Violations of this rule in the current codebase:
               └────────────┬─────────────┘
                            │
               ┌────────────▼─────────────┐
-              │   CONVERSATION ENGINE    │
-              │   (stateless workers)    │
-              │                          │
-              │ ┌──────────────────────┐ │
-              │ │   SUPERVISOR AGENT   │ │
-              │ │  observe → plan →    │ │
-              │ │  act → remember      │ │
-              │ └────────┬──┬──┬───────┘ │
-              │          │  │  │          │
-              │ ┌────────▼──▼──▼───────┐ │
-              │ │  SPECIALIST AGENTS    │ │
-              │ │ Fees · Placement     │ │
-              │ │ Admission · Counselling│ │
-              │ │ College Info · Profile│ │
-              │ └──────────────────────┘ │
-              └────────────┬─────────────┘
-                           │
-              ┌────────────▼─────────────┐
-              │     REASONING ENGINE     │
-              │                          │
-              │ ┌──────┐ ┌──────┐ ┌────┐ │
-              │ │LLM   │ │ Tool │ │Wkfl│ │
-              │ │Router│ │Exec. │ │Eng.│ │
-              │ └──────┘ └──────┘ └────┘ │
-              └────────────┬─────────────┘
-                           │
-              ┌────────────▼─────────────┐
-              │      KNOWLEDGE LAYER     │
-              │                          │
-              │  Graph  Vector  Document │
-              │  (Neo4j)(Pinecone) (S3)  │
-              │         │ Cache (Redis)  │
-              │         │ CMS (Staff UI) │
-              └────────────┬─────────────┘
+               │   CONVERSATION ENGINE    │
+               │   (stateless workers)    │
+               │                          │
+               │ ┌──────────────────────┐ │
+               │ │   SUPERVISOR AGENT   │ │
+               │ │  observe → plan →    │ │
+               │ │  act → remember      │ │
+               │ └────────┬──┬──┬───────┘ │
+               │          │  │  │          │
+               │ ┌────────▼──▼──▼───────┐ │
+               │ │  SPECIALIST AGENTS    │ │
+               │ │ Fees · Placement     │ │
+               │ │ Admission · Counselling│ │
+               │ │ College Info · Profile│ │
+               │ └──────────────────────┘ │
+               └────────────┬─────────────┘
+                            │
+               ┌────────────▼─────────────┐
+               │     DECISION ENGINE      │
+               │   What should I do?      │
+               │   Score · Rank · Decide  │
+               │   with Confidence        │
+               └────────────┬─────────────┘
+                            │
+               ┌────────────▼─────────────┐
+               │     REASONING ENGINE     │
+               │                          │
+               │ ┌──────┐ ┌──────┐ ┌────┐ │
+               │ │LLM   │ │ Tool │ │Wkfl│ │
+               │ │Router│ │Exec. │ │Eng.│ │
+               │ └──────┘ └──────┘ └────┘ │
+               └────────────┬─────────────┘
+                            │
+               ┌────────────▼─────────────┐
+               │      COLLEGE BRAIN       │
+               │  How this college works  │
+               │  · Procedural rules      │
+               │  · Workflow definitions  │
+               │  · Policy understanding  │
+               │  · Decision heuristics   │
+               └────────────┬─────────────┘
+                            │
+               ┌────────────▼─────────────┐
+               │      KNOWLEDGE LAYER     │
+               │                          │
+               │  Graph  Vector  Document │
+               │  (Neo4j)(Pinecone) (S3)  │
+               │         │ Cache (Redis)  │
+               │         │ CMS (Staff UI) │
+               └────────────┬─────────────┘
                            │
               ┌────────────▼─────────────┐
               │       STORAGE LAYER      │
@@ -1112,14 +1459,25 @@ Step 5: Enrollment Confirmation
 | `engine/follow_up.py` | Cross-domain follow-up resolution. Recency-based context. |
 | `engine/hallucination_guard.py` | Entity verification against knowledge. Reject fabricated data. |
 
-### 6.4 Specialist Agents
+### 6.4 Decision Engine
 
 | Module | Responsibility |
 |--------|---------------|
-| `agents/base.py` | Abstract Agent base class. Task processing protocol. |
-| `agents/fees.py` | Fee structures, payment plans, installments, scholarships. |
-| `agents/placement.py` | Placement stats, recruiters, packages, preparation advice. |
-| `agents/admission.py` | Eligibility, cutoffs, documents, process, deadlines. |
+| `decision/scorer.py` | Score each option (branch, scholarship, etc.) on multiple weighted axes. |
+| `decision/ranker.py` | Rank options by composite score. Generate trade-off analysis. |
+| `decision/confidence.py` | Compute system confidence per recommendation. Profile completeness, data freshness, LLM confidence, knowledge coverage, historical accuracy. |
+| `decision/thresholds.py` | Confidence threshold configuration. Autonomous vs qualified vs probe vs handoff. |
+
+### 6.5 College Brain
+
+| Module | Responsibility |
+|--------|---------------|
+| `brain/procedures.py` | Deterministic procedural rules: eligibility calculation, cutoff comparison, fee computation. |
+| `brain/policies.py` | Policy document ingestion and query. Vector search over official PDFs (MAKAUT rules, AICTE approvals, scholarship schemes). |
+| `brain/heuristics.py` | Decision heuristics for recommendations: branch ranking logic, scholarship matching, hostel allocation rules. |
+| `brain/workflows.py` | Workflow definitions (shared with Workflow Engine). Admission process, scholarship application, hostel booking, backlog process. |
+
+### 6.6 Specialist Agents
 | `agents/counselling.py` | Branch recommendations, career guidance, interest-based advising. |
 | `agents/college_info.py` | HODs, faculty, facilities, hostel, safety, contact info. |
 | `agents/profile.py` | Continuous profile extraction from conversation. |
@@ -1219,10 +1577,14 @@ class ResponseEnvelope:
     tokens_used: int | None
     cost: float | None
     
+    # Confidence
+    confidence: float | None             # System confidence score (0-1)
+    confidence_breakdown: dict | None    # Per-factor confidence for transparency
+    
     # Actions
     suggested_actions: list[dict] | None   # Buttons, quick replies (web/whatsapp)
     should_end_session: bool               # Goodbye, session complete
-    should_escalate: bool                  # Human handoff needed
+    should_escalate: bool                  # Human handoff needed (True if confidence < threshold)
     escalate_reason: str | None
 ```
 
@@ -1260,7 +1622,8 @@ class AgentResult:
     agent_name: str
     
     response: str                        # The agent's response text
-    confidence: float                    # How confident the agent is (0-1)
+    confidence: float                    # System confidence score (0-1)
+    confidence_breakdown: dict           # {"rank_match": 0.85, "interest_match": 0.95, ...}
     
     profile_updates: dict               # New profile information discovered
     state_updates: dict                 # Updates to conversation state
@@ -1465,23 +1828,31 @@ Student                             Supervisor                    Profile Agent 
   │                                      │   board=WBCHSE             │                  │                │
   │                                      │ emotion: still anxious     │                  │                │
   │                                      │                            │                  │                │
-  │                                      │ PLAN: COUNSEL              │                  │                │
-  │                                      │ Eligible for admission     │                  │                │
-  │                                      │ Recommend branches         │                  │                │
-  │                                      │ based on rank+interest     │                  │                │
-  │                                      │                            │                  │                │
-  │                                      │───────────────AgentTask──>│                  │                │
-  │                                      │                            │                  │                │
-  │                                      │<──────────────AgentResult─│                  │                │
-  │                                      │                            │   recommend      │                │
-  │                                      │                            │   branches ───>  │                │
-  │                                      │                            │                  │                │
-  │                                      │ REMEMBER                   │                  │                │
-  │                                      │ profile: rank=35000        │                  │                │
-  │                                      │ goal: get_admission        │                  │                │
-  │                                      │ stage: evaluation          │                  │                │
-  │                                      │                            │                  │                │
-  │ "With 35000 rank, you can            │                            │                  │                │
+│                                      │ PLAN: COUNSEL              │                  │                │
+│                                      │ Eligible for admission     │                  │                │
+│                                      │ Recommend branches         │                  │                │
+│                                      │ based on rank+interest     │                  │                │
+│                                      │                            │                  │                │
+│                                      │───────────────AgentTask──>│                  │                │
+│                                      │                            │                  │                │
+│                                      │<──────────────AgentResult─│                  │                │
+│                                      │   confidence: 0.88         │   recommend      │                │
+│                                      │   breakdown: {...}         │   branches ───>  │                │
+│                                      │                            │                  │                │
+│                                      │ DECIDE                     │                  │                │
+│                                      │ ┌─ Confidence: 88%        │                  │                │
+│                                      │ │  (rank=85%, interest=95%,│                  │                │
+│                                      │ │   career=90%, finance=80%)│                 │                │
+│                                      │ │  Above 70% → proceed    │                  │                │
+│                                      │ │  with qualified rec.    │                  │                │
+│                                      │ └─────────────────────────│                  │                │
+│                                      │                            │                  │                │
+│                                      │ REMEMBER                   │                  │                │
+│                                      │ profile: rank=35000        │                  │                │
+│                                      │ goal: get_admission        │                  │                │
+│                                      │ stage: evaluation          │                  │                │
+│                                      │                            │                  │                │
+│ "With 35000 rank, you can            │                            │                  │                │
   │  get CSE, IT, or ECE at BCREC.       │                            │                  │                │
   │  What are you interested in?         │                            │                  │                │
   │  Computers? Electronics?"            │                            │                  │                │
@@ -1741,9 +2112,24 @@ bcrec-ai/
 │   │   ├── profile.py             # Student profile extraction
 │   │   └── escalation.py          # Human handoff
 │   │
+│   ├── decision/                  # Decision Engine
+│   │   ├── __init__.py
+│   │   ├── scorer.py              # Multi-axis option scoring
+│   │   ├── ranker.py              # Rank options, trade-off analysis
+│   │   ├── confidence.py          # System confidence computation
+│   │   └── thresholds.py          # Confidence thresholds config
+│   │
+│   ├── brain/                     # College Brain
+│   │   ├── __init__.py
+│   │   ├── procedures.py          # Deterministic procedural rules
+│   │   ├── policies.py            # Policy document ingestion + query
+│   │   ├── heuristics.py          # Decision heuristics for recommendations
+│   │   └── workflows.py           # Workflow definitions
+│   │
 │   ├── reasoning/                 # Reasoning Engine
 │   │   ├── __init__.py
 │   │   ├── router.py              # LLM tier selection
+│   │   ├── confidence.py          # LLM token confidence + normalization
 │   │   ├── providers/             # LLM Provider implementations
 │   │   │   ├── __init__.py
 │   │   │   ├── base.py            # ABC for LLM providers

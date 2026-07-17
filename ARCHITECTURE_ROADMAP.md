@@ -22,6 +22,23 @@ That is the only metric that matters.
 
 > **The purpose of this architecture is not to answer every question. The purpose is to help every student make the best possible admission decision with the least amount of confusion, anxiety, and effort.**
 
+> **Every conversation should leave the student in a better decision-making state than before they started.**
+
+These two sentences define product success. Not query volume. Not response speed. Not feature count. The student's decision quality improves after every interaction. If that isn't happening, nothing else matters.
+
+## How This Architecture Evolves
+
+The long-term trajectory of this architecture is toward a system where the LLM is **one component among many**, not the center of the system.
+
+```
+Current:  LLM → Everything (monolithic)
+Target:   Channel → Conversation → Understanding → Reasoning → Decision →
+          Planner → Capability Registry → College Brain → Knowledge → Workflow →
+          Memory → Response
+```
+
+At Level 6 maturity, the LLM handles only the parts that require reasoning (counselling, recommendations, explanations). Everything else (classification, lookup, scoring, workflow, formatting) is deterministic. This document describes how to get there.
+
 ## Engineering Principles
 
 These principles govern every architectural decision. A change that violates a principle must be rejected, even if it saves time or code.
@@ -906,6 +923,110 @@ Scaling from 1 to 10 colleges:
 **The test for every architectural decision:**
 
 > If I have to touch more than two modules to accommodate a change in college policy, the architecture is wrong.
+
+### Future-Growth Patterns
+
+These patterns are not required today but the architecture must not block them.
+
+#### Capability Registry (Future)
+
+Today the system has a fixed set of skills: admission, fees, placement, hostel, scholarship. As the system grows, capabilities will expand to: loans, complaints, events, attendance, examinations, certificates, research, faculty communication.
+
+Instead of hardcoding `if admission: ... elif hostel: ...`, each capability is a registered module:
+
+```
+Capability Registry:
+  admission       → handler + tools + prompts + workflows
+  fees            → handler + tools + prompts + workflows
+  placement       → handler + tools + prompts + workflows
+  scholarship     → handler + tools + prompts + workflows
+  hostel          → handler + tools + prompts + workflows
+  loans           → handler + tools + prompts + workflows    (future)
+  examination     → handler + tools + prompts + workflows    (future)
+  certificates    → handler + tools + prompts + workflows    (future)
+```
+
+The Planner queries the registry: "This student needs admission and scholarship help. Which capabilities match?" The registry returns the relevant handlers. New capabilities are added by registering them, not by modifying pipeline code.
+
+#### Memory System Evolution (Future)
+
+Today memory is a single conversation history. Eventually it must separate into:
+
+```
+Working Memory (short-term, ~5 min):
+  • Current turn context
+  • Active intent
+  • Last 3 exchanges
+  • Immediate emotional state
+  → Lives in Redis. Volatile. Lost after session.
+
+Profile Memory (medium-term, ~90 days):
+  • Student identity (rank, PCM, board, category, interest)
+  • Cross-session goals
+  • Historical preferences
+  • Past recommendations
+  → Lives in PostgreSQL. Persists across sessions.
+
+Long-term Memory (permanent):
+  • Aggregate patterns ("students with this rank profile typically choose...")
+  • Decision outcomes ("recommendation X led to admission Y")
+  • Counselor corrections ("override branch recommendation for this profile type")
+  → Lives in PostgreSQL + Vector Store. Grows over time.
+```
+
+Each memory type has different access patterns, TTLs, and consistency requirements. A single memory store cannot serve all three.
+
+#### Learning Loop (Future)
+
+The system must improve without manual prompt engineering for every edge case.
+
+```
+Conversation
+  ↓
+Outcome (applied? enrolled? satisfied?)
+  ↓
+Feedback (explicit rating + implicit signals)
+  ↓
+Failure Classification (hallucination? wrong recommendation? misunderstood intent?)
+  ↓
+Knowledge Update (fill gap in graph, update document, fix procedure)
+  ↓
+Evaluation (regression test with new data)
+  ↓
+Deployment (if passes)
+```
+
+This loop requires:
+1. **Outcome tracking** — did the student follow the recommendation?
+2. **Feedback capture** — post-conversation rating, handoff reason, counselor correction
+3. **Failure classification** — automated categorization of where the system went wrong
+4. **Knowledge update automation** — suggest graph/document updates for human approval
+5. **Regression testing** — verify fix didn't break other cases
+
+The architecture must support adding these components without redesigning the pipeline.
+
+#### Event Bus as Backbone (Future)
+
+The current architecture is designed around request-response. The future architecture is event-driven.
+
+```
+Current:
+  Request → Process → Response
+
+Future:
+  Student speaks → STT → ConversationUpdated → ProfileUpdated →
+  RecommendationNeeded → DecisionMade → ReminderScheduled →
+  AnalyticsUpdated → CRMUpdated
+```
+
+No component directly calls another. Everything publishes and subscribes. This enables:
+- Decoupled development (each event handler is independent)
+- Async operations (reminders, follow-ups, analytics)
+- Multiple consumers (same event → analytics + CRM + monitoring)
+- Retry and dead-letter handling
+- Audit trail (every event is logged)
+
+The event bus (Redis Streams) is already in the architecture. The migration from request-response to event-driven happens organically as complexity grows.
 
 ---
 
@@ -2905,7 +3026,26 @@ API versioning via URL prefix: `/api/v1/query`, `/api/v2/query`
 | Migration pattern | Strangler Fig | Big Bang rewrite | Risk mitigation + continuous value delivery |
 | Agent architecture | Supervisor + Specialists | Flat pipeline, Single agent | Scalable reasoning + specialized quality |
 
-## Appendix B: Acronyms
+## Appendix C: Document Structure Recommendation
+
+This document (~3000+ lines) serves as the comprehensive reference but is too large for daily use. Before beginning Phase 1 implementation, split into four living documents:
+
+| Document | Audience | Contents | Update Cadence |
+|----------|----------|----------|----------------|
+| **Product Vision** (~40 pages) | All stakeholders | Philosophy, goals, success metrics, maturity roadmap, interaction model, what we build vs what we don't | Quarterly |
+| **Architecture Specification** (~80 pages) | Engineering team | Layers, interfaces, data flow, module boundaries, one-question-per-layer, decision engine, confidence, college brain | Per phase |
+| **Implementation Guide** (~60 pages) | Engineers actively coding | Folder structure, coding conventions, migration plans, development phases, step-by-step implementation instructions | Per phase |
+| **Operations Runbook** (~40 pages) | DevOps / on-call | Deployment, monitoring, rollback, disaster recovery, scaling, incident response, alert thresholds | Per release |
+
+**Why split:**
+- Engineers need to find the interface definition for `ResponseEnvelope` without reading product philosophy
+- Stakeholders need to understand the vision without reading migration plans
+- Documents become independently maintainable — a product vision change doesn't require editing deployment instructions
+- Each document has a clear owner (product → vision, architect → spec, tech lead → implementation, DevOps → runbook)
+
+**How to sync:** The Architecture Specification is the source of truth. If a change is made there, update the other three documents within the same sprint.
+
+## Appendix D: Acronyms
 
 | Acronym | Meaning |
 |---------|---------|

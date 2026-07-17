@@ -1,0 +1,22 @@
+fastapi
+uvicorn[standard]
+groq
+python-dotenv
+pydantic
+pydantic-settings
+numpy
+requests
+python-multipart
+python-jose[cryptography]
+passlib[bcrypt]
+slowapi
+httpx
+websockets
+pydub
+sarvamai
+aiofiles
+pypdf
+pandas
+openpyxl
+cachetools
+fasttext-wheel  # Windows-compatible fasttext for language detection

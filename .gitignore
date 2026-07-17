@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+*.env
+local.env
+
+# Runtime data
+chroma_db/
+data/
+logs/
+uploads/
+temp_audio/
+
+# IDE
+.mimocode/
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Audio
+*.wav
+*.mp3
+
+# Node
+node_modules/
+frontend/node_modules/
+next_gen/frontend/node_modules/
+dist/
+frontend/dist/
+next_gen/frontend/dist/
+
+# SQLite
+*.db
+*.sqlite
+
+# Vector store
+chroma_db/
+
+# Backups
+backups/
+
+# Config
+config/.env
+
+# Problematic Windows reserved names
+nul
+NUL
+nul.*
+NUL.*

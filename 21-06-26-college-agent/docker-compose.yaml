@@ -1,0 +1,195 @@
+services:
+  # ============================================================
+  # OUR BACKEND: FastAPI RAG + Multilingual Chatbot
+  # ============================================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: college-agent-backend
+    env_file: .env
+    environment:
+      - PYTHONPATH=/app
+    ports:
+      - "8080:8000"
+    volumes:
+      - ./backend/chroma_db:/app/chroma_db
+      - ./backend/temp_audio:/app/temp_audio
+      - ./backend/logs:/app/logs
+      - ./backend/backups:/app/backups
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/tts').read()"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - college-agent-network
+    restart: unless-stopped
+
+  # ============================================================
+  # DOGRAH: Open-Source Voice Agent Platform
+  # Forked & white-labeled for college telephony
+  # ============================================================
+  postgres:
+    image: pgvector/pgvector:pg17
+    container_name: dograh-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - dograh_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+    networks:
+      - college-agent-network
+    restart: unless-stopped
+
+  redis:
+    image: redis:7
+    container_name: dograh-redis
+    ports:
+      - "6379:6379"
+    command: >
+      --requirepass ${REDIS_PASSWORD:-redissecret}
+    volumes:
+      - dograh_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redissecret}", "ping"]
+      interval: 3s
+      timeout: 10s
+      retries: 10
+    networks:
+      - college-agent-network
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio
+    container_name: dograh-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+      MINIO_API_CORS_ALLOW_ORIGIN: "*"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - dograh_minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - college-agent-network
+    restart: unless-stopped
+
+  dograh-api:
+    image: ${DOGRAH_REGISTRY:-ghcr.io/dograh-hq}/dograh-api:${DOGRAH_VERSION:-latest}
+    container_name: dograh-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      ENVIRONMENT: "${ENVIRONMENT:-local}"
+      DEPLOYMENT_MODE: "oss"
+      LOG_LEVEL: "INFO"
+
+      BACKEND_API_ENDPOINT: "${BACKEND_API_ENDPOINT:-http://localhost:8000}"
+
+      DATABASE_URL: "postgresql+asyncpg://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/postgres"
+      REDIS_URL: "redis://:${REDIS_PASSWORD:-redissecret}@redis:6379"
+
+      ENABLE_AWS_S3: "false"
+      MINIO_ENDPOINT: "minio:9000"
+      MINIO_PUBLIC_ENDPOINT: "${MINIO_PUBLIC_ENDPOINT:-http://localhost:9000}"
+      MINIO_ACCESS_KEY: "minioadmin"
+      MINIO_SECRET_KEY: "minioadmin"
+      MINIO_BUCKET: "voice-audio"
+      MINIO_SECURE: "false"
+
+      FASTAPI_WORKERS: "${FASTAPI_WORKERS:-1}"
+      FORWARDED_ALLOW_IPS: "*"
+
+      OSS_JWT_SECRET: "${OSS_JWT_SECRET:?OSS_JWT_SECRET must be set}"
+
+      ENABLE_TELEMETRY: "${ENABLE_TELEMETRY:-false}"
+      POSTHOG_API_KEY: ""
+      POSTHOG_HOST: ""
+
+      TURN_HOST: "${TURN_HOST:-}"
+      TURN_SECRET: "${TURN_SECRET:-}"
+      FORCE_TURN_RELAY: "${FORCE_TURN_RELAY:-false}"
+    ports:
+      - "8001:8000"
+    volumes:
+      - dograh_shared_tmp:/tmp
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health').read()\""]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - college-agent-network
+    restart: unless-stopped
+
+  dograh-ui:
+    image: ${DOGRAH_REGISTRY:-ghcr.io/dograh-hq}/dograh-ui:${DOGRAH_VERSION:-latest}
+    container_name: dograh-ui
+    depends_on:
+      dograh-api:
+        condition: service_healthy
+    environment:
+      HOSTNAME: "0.0.0.0"
+      BACKEND_URL: "${BACKEND_URL:-http://dograh-api:8000}"
+      NODE_ENV: "oss"
+      ENABLE_TELEMETRY: "${ENABLE_TELEMETRY:-false}"
+      POSTHOG_KEY: ""
+      POSTHOG_HOST: ""
+    ports:
+      - "3010:3010"
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:3010 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - college-agent-network
+    restart: unless-stopped
+
+  # Cloudflare tunnel for local dev (optional)
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: dograh-cloudflared
+    command: tunnel --no-autoupdate --url http://dograh-api:8000 --metrics 0.0.0.0:2000
+    ports:
+      - "2000:2000"
+    profiles:
+      - tunnel
+    networks:
+      - college-agent-network
+    restart: unless-stopped
+
+volumes:
+  dograh_postgres_data:
+  dograh_redis_data:
+  dograh_minio_data:
+  dograh_shared_tmp:
+
+networks:
+  college-agent-network:
+    driver: bridge

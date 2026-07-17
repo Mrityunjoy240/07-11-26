@@ -1,0 +1,22 @@
+2026-07-13 18:55:29,345 [WARNING] src.main: GROQ_API_KEY not set. LLM features disabled.
+2026-07-13 18:55:29,346 [ERROR] src.retrieval.vector: Failed to initialize ChromaDB: No module named 'langchain_chroma'
+INFO:     Started server process [3292]
+INFO:     Waiting for application startup.
+2026-07-13 18:55:29,543 [INFO] src.main: BCREC AI Receptionist started
+2026-07-13 18:55:29,544 [INFO] src.main: LLM provider: none
+2026-07-13 18:55:29,544 [INFO] src.main: TTS available: True
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:41724 - "GET / HTTP/1.1" 200 OK
+INFO:     152.59.162.85:0 - "GET / HTTP/1.1" 200 OK
+INFO:     2409:40e1:1109:3ef9:e060:a0c8:1991:746:0 - "GET / HTTP/1.1" 200 OK
+INFO:     2409:40e1:1109:3ef9:e060:a0c8:1991:746:0 - "GET /assets/index-CBjeNuJN.js HTTP/1.1" 200 OK
+INFO:     2409:40e1:1109:3ef9:e060:a0c8:1991:746:0 - "POST /api/query HTTP/1.1" 200 OK
+INFO:     2409:40e1:1109:3ef9:e060:a0c8:1991:746:0 - "POST /api/query HTTP/1.1" 200 OK
+INFO:     2409:40e1:1109:3ef9:e060:a0c8:1991:746:0 - "POST /api/query HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60812 - "GET / HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+2026-07-13 19:00:21,211 [INFO] src.main: BCREC AI Receptionist shutting down
+INFO:     Application shutdown complete.
+INFO:     Finished server process [3292]

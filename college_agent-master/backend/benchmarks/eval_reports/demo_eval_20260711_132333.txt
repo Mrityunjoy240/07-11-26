@@ -1,0 +1,468 @@
+================================================================================
+  DEMO READINESS EVALUATION REPORT
+  Questions: 142, Hallucinations: 142, Errors: 0, With Context: 0
+  Hallucination rate: 100.0%
+  Retrieval Recall@30: 0.0%
+  Estimated accuracy (KB-answerable): 0/92 = 0.0%
+  Average latency: 10561ms
+
+  By Category:
+    admission       n=17 ctx= 0 hall=17 lat=17005ms
+    ambiguous       n= 6 ctx= 0 hall= 6 lat=9675ms
+    campus          n= 8 ctx= 0 hall= 8 lat=24565ms
+    contact         n= 2 ctx= 0 hall= 2 lat=25160ms
+    courses         n= 2 ctx= 0 hall= 2 lat=844ms
+    departments     n=10 ctx= 0 hall=10 lat=6074ms
+    eligibility     n= 2 ctx= 0 hall= 2 lat=839ms
+    facilities      n= 1 ctx= 0 hall= 1 lat=364ms
+    faculty         n=15 ctx= 0 hall=15 lat=4213ms
+    fees            n=19 ctx= 0 hall=19 lat=1564ms
+    followup        n= 2 ctx= 0 hall= 2 lat=8366ms
+    hostel          n=16 ctx= 0 hall=16 lat=3815ms
+    international   n= 1 ctx= 0 hall= 1 lat=36148ms
+    multi_turn      n= 8 ctx= 0 hall= 8 lat=4352ms
+    online          n= 1 ctx= 0 hall= 1 lat=27239ms
+    placement       n=10 ctx= 0 hall=10 lat=19358ms
+    policies        n= 4 ctx= 0 hall= 4 lat=31824ms
+    refund          n= 2 ctx= 0 hall= 2 lat=43602ms
+    scholarship     n= 5 ctx= 0 hall= 5 lat=13579ms
+    unknown         n= 5 ctx= 0 hall= 5 lat=8587ms
+    why_bcrec       n= 6 ctx= 0 hall= 6 lat=8908ms
+
+  By Language:
+    BANGLISH   n=12 ctx= 0 hall=12 lat=4794ms
+    BN         n=18 ctx= 0 hall=18 lat=8092ms
+    EN         n=80 ctx= 0 hall=80 lat=11597ms
+    HI         n=20 ctx= 0 hall=20 lat=14083ms
+    HINGLISH   n=12 ctx= 0 hall=12 lat=7256ms
+
+  Failed/Hallucinated:
+    #  1 [EN      /departments ] hall=YES ctx=   0
+      Q: What departments are available at BCREC?
+      A: BCREC offers B.Tech in: Computer Science and Engineering (CSE) - 180 seats; Information Technology (IT) - 60 seats; Elec
+    #  2 [EN      /departments ] hall=YES ctx=   0
+      Q: Which branches are offered for B.Tech?
+      A: BCREC offers B.Tech in: Computer Science and Engineering (CSE) - 180 seats; Information Technology (IT) - 60 seats; Elec
+    #  3 [EN      /departments ] hall=YES ctx=   0
+      Q: Does BCREC offer MCA and MBA programs?
+      A: BCREC MCA aur MBA programs nahi deti. Aap B.Tech aur M.Tech programs ke liye apply kar sakte hain. Kya aap B.Tech ke liy
+    #  4 [EN      /departments ] hall=YES ctx=   0
+      Q: Is there a Data Science program?
+      A: CSE (Data Science) (DS) — 60 seats.
+    #  5 [EN      /departments ] hall=YES ctx=   0
+      Q: Tell me about the CSE department
+      A: CSE at BCREC is NBA accredited and has a strong focus on emerging fields like AI/ML and IoT. The department has a dedica
+    #  6 [EN      /fees        ] hall=YES ctx=   0
+      Q: What is the fee for B.Tech CSE?
+      A: The total fee for Computer Science and Engineering is six lakh seventeen thousand seven hundred rupees. Admission and se
+    #  7 [EN      /fees        ] hall=YES ctx=   0
+      Q: AIML course fee
+      A: The total fee for CSE (Artificial Intelligence and Machine Learning) is five lakh sixty-seven thousand one hundred rupee
+    #  8 [EN      /fees        ] hall=YES ctx=   0
+      Q: How much does MBA cost?
+      A: Dr. B.C. Roy Engineering College does not offer an MBA program. We only provide B.Tech, M.Tech, and Ph.D. courses. If yo
+    #  9 [EN      /fees        ] hall=YES ctx=   0
+      Q: MCA total fee
+      A: The total fee for MCA is two lakh fourteen thousand six hundred rupees. Admission and semester fees are separate.
+    # 10 [EN      /fees        ] hall=YES ctx=   0
+      Q: What is the admission fee for CSE?
+      A: The admission fee for Computer Science and Engineering is ninety-nine thousand two hundred twenty-five rupees. Semester 
+    # 11 [EN      /fees        ] hall=YES ctx=   0
+      Q: Fee structure for Mechanical Engineering
+      A: BCREC B.Tech fees vary by branch. CSE, IT, ECE: six lakh seventeen thousand seven hundred rupees total. EE, AIML, DS, CY
+    # 12 [EN      /fees        ] hall=YES ctx=   0
+      Q: Is there any hidden charge in fees?
+      A: BCREC B.Tech fees vary by branch. CSE, IT, ECE: six lakh seventeen thousand seven hundred rupees total. EE, AIML, DS, CY
+    # 13 [EN      /hostel      ] hall=YES ctx=   0
+      Q: Hostel fee details
+      A: Yes, hostel accommodation is available at BCREC. There are 5 hostels — 3 for boys and 2 for girls — with a total capacit
+    # 14 [EN      /hostel      ] hall=YES ctx=   0
+      Q: Is hostel compulsory?
+      A: Yes, hostel accommodation is available at BCREC. There are 5 hostels — 3 for boys and 2 for girls — with a total capacit
+    # 15 [EN      /hostel      ] hall=YES ctx=   0
+      Q: What is the mess charge per month?
+      A: Yes, BCREC has a canteen facility with good food arrangements for students.
+    # 16 [EN      /hostel      ] hall=YES ctx=   0
+      Q: How many hostels are there in BCREC?
+      A: BCREC mein total 7 hostels hain — 5 boys ke aur 2 girls ke — jo 1500 se jyada students ko accommodate kar sakte hain. Ho
+    # 17 [EN      /placement   ] hall=YES ctx=   0
+      Q: What is the placement rate at BCREC?
+      A: I'm sorry, I'm having trouble connecting. Please call 0343-2501353.
+    # 18 [EN      /placement   ] hall=YES ctx=   0
+      Q: Which companies visit BCREC for placement?
+      A: I'm sorry, I'm having trouble connecting. Please call 0343-2501353.
+    # 19 [EN      /placement   ] hall=YES ctx=   0
+      Q: Highest package offered last year
+      A: Highest package offered last year was 9 LPA off-campus, and on-campus placements reached up to 7 LPA.
+    # 20 [EN      /placement   ] hall=YES ctx=   0
+      Q: CSE placement percentage
+      A: CSE has excellent placements! Placement rate is 90% with an average package of 4.25 LPA.
+    # 21 [EN      /admission   ] hall=YES ctx=   0
+      Q: How can I apply for B.Tech admission?
+      A: B.Tech admission is through WBJEE or JEE Main. Eligibility is Passed 10+2 (H.S.) or equivalent with PCM. Qualified WBJEE
+    # 22 [EN      /admission   ] hall=YES ctx=   0
+      Q: What is the eligibility for B.Tech?
+      A: BCREC offers B.Tech in: Computer Science and Engineering (CSE) - 180 seats; Information Technology (IT) - 60 seats; Elec
+    # 23 [EN      /admission   ] hall=YES ctx=   0
+      Q: Documents required for admission
+      A: Required documents for admission include entrance: WBJEE/JEE-Main Rank Card, WBJEE/JEE-Main Admit Card.
+    # 24 [EN      /admission   ] hall=YES ctx=   0
+      Q: Can I track my application status?
+      A: I'm sorry, I'm having trouble connecting. Please call 0343-2501353.
+    # 25 [EN      /faculty     ] hall=YES ctx=   0
+      Q: How many faculty members are there?
+      A: I'm sorry, I'm having trouble connecting. Please call 0343-2501353.
+    # 26 [EN      /faculty     ] hall=YES ctx=   0
+      Q: Who is the principal of BCREC?
+      A: The principal of BCREC is Dr. Sanjay S. Pawar. Their phone is 0343-2501353.
+    # 27 [EN      /faculty     ] hall=YES ctx=   0
+      Q: Who is the vice principal?
+      A: The vice principal of BCREC is Prof. (Dr.) K. M. Hossain.
+    # 28 [EN      /faculty     ] hall=YES ctx=   0
+      Q: Who is the HOD of CSE?
+      A: The HOD of Computer Science and Engineering is Dr. Pabitra Kumar Dey. Email: pabitra.dey@bcrec.ac.in.
+    # 29 [EN      /faculty     ] hall=YES ctx=   0
+      Q: Who is the HOD of AIML?
+      A: The HOD of CSE (Artificial Intelligence and Machine Learning) is Dr. Gour Sundar Mitra Thakur. Email: gour.mitrathakur@b
+    # 30 [EN      /faculty     ] hall=YES ctx=   0
+      Q: HOD of IT department
+      A: The HOD of Information Technology is Dr. Dinesh Kumar Pradhan. Email: dinesh.pradhan@bcrec.ac.in.
+    # 31 [EN      /campus      ] hall=YES ctx=   0
+      Q: What is the campus size?
+      A: I'm sorry, I'm having trouble connecting. Please call 0343-2501353.
+    # 32 [EN      /campus      ] hall=YES ctx=   0
+      Q: Is Wi-Fi available in the campus?
+      A: Yes, Wi-Fi is available across the entire BCREC campus.
+    # 33 [EN      /scholarship ] hall=YES ctx=   0
+      Q: What scholarships are available?
+      A: BCREC offers B.Tech in: Computer Science and Engineering (CSE) - 180 seats; Information Technology (IT) - 60 seats; Elec
+    # 34 [EN      /scholarship ] hall=YES ctx=   0
+      Q: Do you offer Tuition Fee Waiver?
+      A: BCREC B.Tech fees vary by branch. CSE, IT, ECE: six lakh seventeen thousand seven hundred rupees total. EE, AIML, DS, CY
+    # 35 [EN      /why_bcrec   ] hall=YES ctx=   0
+      Q: Why should I choose BCREC?
+      A: I'm sorry, I'm having trouble connecting. Please call 0343-2501353.
+    # 36 [EN      /why_bcrec   ] hall=YES ctx=   0
+      Q: Is BCREC NBA accredited?
+      A: BCREC is NAAC B+ grade (CGPA 2.83) and has NBA accreditation for CSE, ECE, IT, EE, ME.
+    # 37 [EN      /international] hall=YES ctx=   0
+      Q: Can international students apply?
+      A: Yes, international students can apply to BCREC. The college accepts applications from abroad, but specific processes (li
+    # 38 [EN      /policies    ] hall=YES ctx=   0
+      Q: What happens if I fail a semester?
+      A: Don't worry, backlogs are common. Failing a semester: Students may reappear in supplementary exams or repeat courses as 
+    # 39 [EN      /policies    ] hall=YES ctx=   0
+      Q: Is laptop compulsory?
+      A: I'm sorry, I'm having trouble connecting. Please call 0343-2501353.
+    # 40 [EN      /refund      ] hall=YES ctx=   0
+      Q: Is caution money refundable?
+      A: I'm sorry, I'm having trouble connecting. Please call 0343-2501353.
+    # 41 [EN      /unknown     ] hall=YES ctx=   0
+      Q: What is the weather like in Durgapur?
+      A: I can only answer questions about Dr. B.C. Roy Engineering College, such as admissions, courses, fees, placements, and c
+    # 42 [EN      /unknown     ] hall=YES ctx=   0
+      Q: Can you book a cab for me?
+      A: I'm sorry, I'm having trouble connecting. Please call 0343-2501353.
+    # 43 [EN      /unknown     ] hall=YES ctx=   0
+      Q: Who won the 2024 T20 World Cup?
+      A: I can only answer questions about Dr. B.C. Roy Engineering College, such as admissions, courses, fees, placements, and c
+    # 44 [EN      /unknown     ] hall=YES ctx=   0
+      Q: Tell me a joke
+      A: I can only answer questions about Dr. B.C. Roy Engineering College, such as admissions, courses, fees, placements, and c
+    # 45 [EN      /unknown     ] hall=YES ctx=   0
+      Q: What is the stock price of Apple?
+      A: I am not completely sure about that information, but I can connect you with the admission office. Please call 0343-25013
+    # 46 [EN      /campus      ] hall=YES ctx=   0
+      Q: Does BCREC have a library?
+      A: I'm sorry, I'm having trouble connecting. Please call 0343-2501353.
+    # 47 [EN      /campus      ] hall=YES ctx=   0
+      Q: Tell me about the laboratories
+      A: I'm sorry, I'm having trouble connecting. Please call 0343-2501353.
+    # 48 [EN      /facilities  ] hall=YES ctx=   0
+      Q: What facilities are available on campus?
+      A: BCREC offers B.Tech in: Computer Science and Engineering (CSE) - 180 seats; Information Technology (IT) - 60 seats; Elec
+    # 49 [EN      /placement   ] hall=YES ctx=   0
+      Q: Top recruiters at BCREC
+      A: I'm sorry, I'm having trouble connecting. Please call 0343-2501353.
+    # 50 [EN      /placement   ] hall=YES ctx=   0
+      Q: Average package at BCREC
+      A: BCREC's overall placement rate is 91% with an average package of Rs. 3.78 LPA. Top recruiters include TCS, Infosys, and 
+    # 51 [EN      /admission   ] hall=YES ctx=   0
+      Q: Is there lateral entry for B.Tech?
+      A: BCREC offers B.Tech in: Computer Science and Engineering (CSE) - 180 seats; Information Technology (IT) - 60 seats; Elec
+    # 52 [EN      /admission   ] hall=YES ctx=   0
+      Q: What is the management quota percentage?
+      A: Eligibility for B.Tech is Passed 10+2 (H.S.) or equivalent with PCM. Qualified WBJEE or JEE Main. 50% marks may be WBJEE
+    # 53 [EN      /admission   ] hall=YES ctx=   0
+      Q: Do you accept JEE Main scores?
+      A: Haan, BCREC mein JEE Main scores ke sath-sath WBJEE scores ke liye bhi admission hoti hai. Aapko 10+2 mein PCM ke sath 5
+    # 54 [EN      /refund      ] hall=YES ctx=   0
+      Q: What is the refund policy?
+      A: I’m sorry, the exact refund policy details aren’t in my current knowledge base. For precise information, please contact 
+    # 55 [EN      /policies    ] hall=YES ctx=   0
+      Q: What is the dress code?
+      A: I'm sorry, I'm having trouble connecting. Please call 0343-2501353.
+    # 56 [EN      /contact     ] hall=YES ctx=   0
+      Q: What is the college portal?
+      A: I'm sorry, I'm having trouble connecting. Please call 0343-2501353.
+    # 57 [EN      /contact     ] hall=YES ctx=   0
+      Q: How can I contact the admission office?
+      A: BCREC can be reached at 0343-2501353, 0343-2502449, 0343-2503985 or email info@bcrec.ac.in.
+    # 58 [EN      /why_bcrec   ] hall=YES ctx=   0
+      Q: When was BCREC established?
+      A: BCREC was established in August 2000. It became autonomous from the 2024-25 session.
+    # 59 [EN      /why_bcrec   ] hall=YES ctx=   0
+      Q: What is the NAAC grade of BCREC?
+      A: BCREC is NAAC B+ grade (CGPA 2.83) and has NBA accreditation for CSE, ECE, IT, EE, ME.
+    # 60 [EN      /courses     ] hall=YES ctx=   0
+      Q: Does BCREC offer B.Tech in Cyber Security?
+      A: CSE (Cyber Security) (CY) — 60 seats.
+    # 61 [EN      /courses     ] hall=YES ctx=   0
+      Q: Is there a B.Tech in CS and Design?
+      A: BCREC offers B.Tech in: Computer Science and Engineering (CSE) - 180 seats; Information Technology (IT) - 60 seats; Elec
+    # 62 [EN      /eligibility ] hall=YES ctx=   0
+      Q: What rank is needed for CSE?
+      A: The WBJEE cutoff rank for CSE was 16059 in 2024, 67761 in 2025. The estimated 2026 rank is ~65000. These are approximate
+    # 63 [EN      /eligibility ] hall=YES ctx=   0
+      Q: Can I get CSE with 80,000 rank?
+      A: The WBJEE cutoff rank for CSE was 16059 in 2024, 67761 in 2025. The estimated 2026 rank is ~65000. These are approximate
+    # 64 [EN      /hostel      ] hall=YES ctx=   0
+      Q: What is the hostel capacity?
+      A: Yes, hostel accommodation is available at BCREC. There are 5 hostels — 3 for boys and 2 for girls — with a total capacit
+    # 65 [EN      /hostel      ] hall=YES ctx=   0
+      Q: Are there separate hostels for boys and girls?
+      A: I'm sorry, I'm having trouble connecting. Please call 0343-2501353.
+    # 66 [EN      /online      ] hall=YES ctx=   0
+      Q: Does BCREC have online classes?
+      A: I'm sorry, I'm having trouble connecting. Please call 0343-2501353.
+    # 67 [HI      /departments ] hall=YES ctx=   0
+      Q: बीसीआरईसी में कौन-कौन से विभाग हैं?
+      A: BCREC B.Tech courses: Computer Science and Engineering (CSE) - 180 seats; Information Technology (IT) - 60 seats; Electr
+    # 68 [HI      /fees        ] hall=YES ctx=   0
+      Q: बी.टेक सीएसई की फीस कितनी है?
+      A: BCREC mein B.Tech fees branch ke hisaab se alag hai. CSE, IT, ECE: total छह लाख 17 हज़ार सात सौ रुपये. EE, AIML, DS, CY,
+    # 69 [HI      /fees        ] hall=YES ctx=   0
+      Q: एमबीए की कुल फीस बताएं
+      A: BCREC mein B.Tech fees branch ke hisaab se alag hai. CSE, IT, ECE: total छह लाख 17 हज़ार सात सौ रुपये. EE, AIML, DS, CY,
+    # 70 [HI      /fees        ] hall=YES ctx=   0
+      Q: एडमिशन फीस कितनी है?
+      A: BCREC mein B.Tech fees branch ke hisaab se alag hai. CSE, IT, ECE: total छह लाख 17 हज़ार सात सौ रुपये. EE, AIML, DS, CY,
+    # 71 [HI      /hostel      ] hall=YES ctx=   0
+      Q: हॉस्टल की फीस कितनी है?
+      A: Ji, BCREC mein hostel facility available hai. 5 hostels hain — 3 boys ke liye aur 2 girls ke liye — total 1500 students 
+    # 72 [HI      /hostel      ] hall=YES ctx=   0
+      Q: क्या हॉस्टल अनिवार्य है?
+      A: Ji, BCREC mein hostel facility available hai. 5 hostels hain — 3 boys ke liye aur 2 girls ke liye — total 1500 students 
+    # 73 [HI      /placement   ] hall=YES ctx=   0
+      Q: बीसीआरईसी में प्लेसमेंट कितना है?
+      A: I'm sorry, I'm having trouble connecting. Please call 0343-2501353.
+    # 74 [HI      /admission   ] hall=YES ctx=   0
+      Q: मुझे एडमिशन लेना है। क्या प्रक्रिया है?
+      A: I'm sorry, I'm having trouble connecting. Please call 0343-2501353.
+    # 75 [HI      /admission   ] hall=YES ctx=   0
+      Q: बी.टेक में एडमिशन के लिए क्या योग्यता है?
+      A: <think>
+Okay, the user is asking about the eligibility for B.Tech admission again. Let me check the previous responses. 
+    # 76 [HI      /faculty     ] hall=YES ctx=   0
+      Q: प्रिंसिपल कौन हैं?
+      A: BCREC ke principal Dr. Sanjay S. Pawar hain. Unka phone 0343-2501353 hai.
+    # 77 [HI      /faculty     ] hall=YES ctx=   0
+      Q: उप-प्रिंसिपल कौन हैं?
+      A: BCREC ke principal Dr. Sanjay S. Pawar hain. Unka phone 0343-2501353 hai.
+    # 78 [HI      /faculty     ] hall=YES ctx=   0
+      Q: सीएसई विभाग के एचओडी कौन हैं?
+      A: BCREC B.Tech courses: Computer Science and Engineering (CSE) - 180 seats; Information Technology (IT) - 60 seats; Electr
+    # 79 [HI      /campus      ] hall=YES ctx=   0
+      Q: कैंपस में वाई-फाई उपलब्ध है?
+      A: I'm sorry, I'm having trouble connecting. Please call 0343-2501353.
+    # 80 [HI      /scholarship ] hall=YES ctx=   0
+      Q: क्या छात्रवृत्ति मिलती है?
+      A: I'm sorry, I'm having trouble connecting. Please call 0343-2501353.
+    # 81 [HI      /why_bcrec   ] hall=YES ctx=   0
+      Q: बीसीआरईसी एनबीए मान्यता प्राप्त है?
+      A: I'm sorry, I'm having trouble connecting. Please call 0343-2501353.
+    # 82 [HI      /admission   ] hall=YES ctx=   0
+      Q: क्या लेटरल एंट्री मिलती है?
+      A: I'm sorry, I'm having trouble connecting. Please call 0343-2501353.
+    # 83 [HI      /hostel      ] hall=YES ctx=   0
+      Q: लड़कियों के लिए हॉस्टल है?
+      A: Ji, BCREC mein hostel facility available hai. 5 hostels hain — 3 boys ke liye aur 2 girls ke liye — total 1500 students 
+    # 84 [BN      /departments ] hall=YES ctx=   0
+      Q: বিসিআরইসি-তে কোন কোন ডিপার্টমেন্ট আছে?
+      A: I'm sorry, I'm having trouble connecting. Please call 0343-2501353.
+    # 85 [BN      /departments ] hall=YES ctx=   0
+      Q: বি.টেক এ কী কী শাখা আছে?
+      A: B.Tech e CSE, ECE, IT, EE, ME, CE, CSD, AIML, DS, CY shob branch ache.
+    # 86 [BN      /fees        ] hall=YES ctx=   0
+      Q: বি.টেক সিএসই এর ফি কত?
+      A: BCREC তে B.Tech এর ফি শাখা অনুযায়ী আলাদা। CSE, IT, ECE: মোট ছয় লাখ 17 হাজার সাত শত টাকা. EE, AIML, DS, CY, CSD: মোট পা
+    # 87 [BN      /fees        ] hall=YES ctx=   0
+      Q: এআইএমএল কোর্সের ফি কত?
+      A: BCREC তে B.Tech এর ফি শাখা অনুযায়ী আলাদা। CSE, IT, ECE: মোট ছয় লাখ 17 হাজার সাত শত টাকা. EE, AIML, DS, CY, CSD: মোট পা
+    # 88 [BN      /fees        ] hall=YES ctx=   0
+      Q: এমবিএ এর মোট ফি কত?
+      A: BCREC তে B.Tech এর ফি শাখা অনুযায়ী আলাদা। CSE, IT, ECE: মোট ছয় লাখ 17 হাজার সাত শত টাকা. EE, AIML, DS, CY, CSD: মোট পা
+    # 89 [BN      /hostel      ] hall=YES ctx=   0
+      Q: হোস্টেল ফি কত?
+      A: Yes, hostel accommodation is available at BCREC. There are 5 hostels — 3 for boys and 2 for girls — with a total capacit
+    # 90 [BN      /hostel      ] hall=YES ctx=   0
+      Q: হোস্টেল কি বাধ্যতামূলক?
+      A: জি, BCREC এ হোস্টেল সুবিধা উপলব্ধ। 5টি হোস্টেল — 3টি ছেলেদের এবং 2টি মেয়েদের জন্য — মোট 1500 শিক্ষার্থীর ধারণক্ষমতা।
+    # 91 [BN      /placement   ] hall=YES ctx=   0
+      Q: বিসিআরইসি এর প্লেসমেন্ট রেট কত?
+      A: BCREC er overall placement rate 91% (2025 data), CSE 93.6% ache. Average package 4.25 LPA. BCREC aache, placement bhalo,
+    # 92 [BN      /admission   ] hall=YES ctx=   0
+      Q: ভর্তির প্রক্রিয়া কী?
+      A: I didn't quite catch that. Could you please repeat your question?
+    # 93 [BN      /admission   ] hall=YES ctx=   0
+      Q: ভর্তির জন্য কী কী ডকুমেন্ট লাগে?
+      A: Admission er jonno 10+2 er mark sheet, PCM certificate, Aadhaar/Passport ID proof, JEE ba WBJEE scorecard, migration cer
+    # 94 [BN      /faculty     ] hall=YES ctx=   0
+      Q: প্রিন্সিপাল কে?
+      A: I didn't quite catch that. Could you please repeat your question?
+    # 95 [BN      /faculty     ] hall=YES ctx=   0
+      Q: উপ-প্রিন্সিপাল কে?
+      A: I didn't quite catch that. Could you please repeat your question?
+    # 96 [BN      /faculty     ] hall=YES ctx=   0
+      Q: সিএসই বিভাগের প্রধান কে?
+      A: I didn't quite catch that. Could you please repeat your question?
+    # 97 [BN      /campus      ] hall=YES ctx=   0
+      Q: ক্যাম্পাসে ওয়াই-ফাই আছে?
+      A: Campus-e 24x7 free Wi-Fi ache, library, hostel, academic building, canteen, sports ground, gym, indoor games—all jayga a
+    # 98 [BN      /scholarship ] hall=YES ctx=   0
+      Q: স্কলারশিপ কী কী পাওয়া যায়?
+      A: BCREC-তে TFW, Swami Vivekananda, Kanyashree, OASIS/Aikyashree স্কলারশিপ পাওয়া যায়। আবেদনপ্রক্রিয়া ও যোগ্যতা শর্ত জানত
+    # 99 [BN      /admission   ] hall=YES ctx=   0
+      Q: ল্যাটারাল এন্ট্রি কি পাওয়া যায়?
+      A: হ্যাঁ, ল্যাটারাল এন্ট্রি পাওয়া যায়। ডিপ্লোমা ধারী শিক্ষার্থীরা ২য় বর্ষে যোগদান করতে পারেন, শর্ত হল ১০+২ বা ডিপ্লোমা প
+    #100 [BN      /hostel      ] hall=YES ctx=   0
+      Q: ছেলেদের জন্য আলাদা হোস্টেল আছে?
+      A: জি, BCREC এ হোস্টেল সুবিধা উপলব্ধ। 5টি হোস্টেল — 3টি ছেলেদের এবং 2টি মেয়েদের জন্য — মোট 1500 শিক্ষার্থীর ধারণক্ষমতা।
+    #101 [HINGLISH/departments ] hall=YES ctx=   0
+      Q: BCREC me kaun se departments hain?
+      A: BCREC mein 15 departments hain. Kuch pramukh departments hain: CSE, IT, ECE, EE, ME, CE, AIML, DS, CY, CSD, CSE, IT, ECE
+    #102 [HINGLISH/fees        ] hall=YES ctx=   0
+      Q: CSE ka fee kitna hai?
+      A: Computer Science and Engineering ka total fee छह लाख 17 हज़ार सात सौ रुपये hai. Admission aur semester fee alag se hain.
+    #103 [HINGLISH/fees        ] hall=YES ctx=   0
+      Q: MBA ki total fee kya hai?
+      A: MBA ka total fee चार लाख 19 हज़ार दो सौ रुपये hai. Admission aur semester fee alag se hain.
+    #104 [HINGLISH/fees        ] hall=YES ctx=   0
+      Q: Admission fee kitni hai?
+      A: BCREC B.Tech fees vary by branch. CSE, IT, ECE: six lakh seventeen thousand seven hundred rupees total. EE, AIML, DS, CY
+    #105 [HINGLISH/hostel      ] hall=YES ctx=   0
+      Q: Hostel fee kitni hai bhai?
+      A: Yes, hostel accommodation is available at BCREC. There are 5 hostels — 3 for boys and 2 for girls — with a total capacit
+    #106 [HINGLISH/hostel      ] hall=YES ctx=   0
+      Q: Kya hostel compulsory hai?
+      A: Ji, BCREC mein hostel facility available hai. 5 hostels hain — 3 boys ke liye aur 2 girls ke liye — total 1500 students 
+    #107 [HINGLISH/placement   ] hall=YES ctx=   0
+      Q: Placement kitna percent hai BCREC mein?
+      A: BCREC ka overall placement 91 percent hai, aur CSE branch mein 93.6 percent students ko job mila hai. Top recruiters TCS
+    #108 [HINGLISH/admission   ] hall=YES ctx=   0
+      Q: Admission ke liye kya karna padta hai?
+      A: I'm sorry, I'm having trouble connecting. Please call 0343-2501353.
+    #109 [HINGLISH/admission   ] hall=YES ctx=   0
+      Q: BTech ke liye kya eligibility hai?
+      A: BCREC B.Tech courses: Computer Science and Engineering (CSE) - 180 seats; Information Technology (IT) - 60 seats; Electr
+    #110 [HINGLISH/faculty     ] hall=YES ctx=   0
+      Q: Principal kaun hain?
+      A: The principal of BCREC is Dr. Sanjay S. Pawar. Their phone is 0343-2501353.
+    #111 [HINGLISH/campus      ] hall=YES ctx=   0
+      Q: WiFi available hai campus mein?
+      A: Haan, campus par WiFi facility available hai. Aap apne mobile ya laptop se internet access kar sakte hain aur online cla
+    #112 [HINGLISH/scholarship ] hall=YES ctx=   0
+      Q: Scholarship milti hai kya?
+      A: BCREC mein TFW (Tuition Fee Waiver), Swami Vivekananda Merit-cum-Means Scholarship, Kanyashree K3, OASIS/Aikyashree jais
+    #113 [BANGLISH/departments ] hall=YES ctx=   0
+      Q: BCREC te ki ki department ache?
+      A: BCREC offers B.Tech in: Computer Science and Engineering (CSE) - 180 seats; Information Technology (IT) - 60 seats; Elec
+    #114 [BANGLISH/fees        ] hall=YES ctx=   0
+      Q: CSE er fee koto?
+      A: Computer Science and Engineering এর মোট ফি ছয় লাখ 17 হাজার সাত শত টাকা। ভর্তি এবং সেমিস্টার ফি আলাদা।
+    #115 [BANGLISH/fees        ] hall=YES ctx=   0
+      Q: AIML er total fee koto?
+      A: CSE (Artificial Intelligence and Machine Learning) এর মোট ফি পাঁচ লাখ 67 হাজার এক শত টাকা। ভর্তি এবং সেমিস্টার ফি আলাদা।
+    #116 [BANGLISH/fees        ] hall=YES ctx=   0
+      Q: Admission fee koto?
+      A: BCREC B.Tech fees vary by branch. CSE, IT, ECE: six lakh seventeen thousand seven hundred rupees total. EE, AIML, DS, CY
+    #117 [BANGLISH/hostel      ] hall=YES ctx=   0
+      Q: Hostel er fee koto?
+      A: জি, BCREC এ হোস্টেল সুবিধা উপলব্ধ। 5টি হোস্টেল — 3টি ছেলেদের এবং 2টি মেয়েদের জন্য — মোট 1500 শিক্ষার্থীর ধারণক্ষমতা।
+    #118 [BANGLISH/hostel      ] hall=YES ctx=   0
+      Q: Hostel ki compulsory?
+      A: Yes, hostel accommodation is available at BCREC. There are 5 hostels — 3 for boys and 2 for girls — with a total capacit
+    #119 [BANGLISH/placement   ] hall=YES ctx=   0
+      Q: Placement rate koto BCREC te?
+      A: BCREC te overall placement rate 91 percent, ar CSE department e 93.6 percent placement hoy. Apni kon department e admiss
+    #120 [BANGLISH/admission   ] hall=YES ctx=   0
+      Q: Vorti process ta ki?
+      A: I'm sorry, I'm having trouble connecting. Please call 0343-2501353.
+    #121 [BANGLISH/admission   ] hall=YES ctx=   0
+      Q: Btech e vortir jonno ki ki document lagbe?
+      A: BCREC offers B.Tech in: Computer Science and Engineering (CSE) - 180 seats; Information Technology (IT) - 60 seats; Elec
+    #122 [BANGLISH/faculty     ] hall=YES ctx=   0
+      Q: Principal ke?
+      A: The principal of BCREC is Dr. Sanjay S. Pawar. Their phone is 0343-2501353.
+    #123 [BANGLISH/faculty     ] hall=YES ctx=   0
+      Q: CSE department er HOD ke?
+      A: The HOD of Computer Science and Engineering is Dr. Pabitra Kumar Dey. Email: pabitra.dey@bcrec.ac.in.
+    #124 [BANGLISH/campus      ] hall=YES ctx=   0
+      Q: Campus e WiFi ache?
+      A: Bilkul, campus e high-speed WiFi ache. Pura campus, labs, hostel, canteen sob area e internet facility ache. Apni kon br
+    #125 [EN      /ambiguous   ] hall=YES ctx=   0
+      Q: What is the fee?
+      A: BCREC B.Tech fees vary by branch. CSE, IT, ECE: six lakh seventeen thousand seven hundred rupees total. EE, AIML, DS, CY
+    #126 [EN      /ambiguous   ] hall=YES ctx=   0
+      Q: Who is the HOD?
+      A: Department Heads: CSE: Dr. Pabitra Kumar Dey; IT: Dr. Dinesh Kumar Pradhan; ECE: Dr. Mrinmoy Chakraborty; EE: Dr. Shiben
+    #127 [EN      /followup    ] hall=YES ctx=   0
+      Q: Tell me more about fees
+      A: BCREC B.Tech fees vary by branch. CSE, IT, ECE: six lakh seventeen thousand seven hundred rupees total. EE, AIML, DS, CY
+    #128 [EN      /followup    ] hall=YES ctx=   0
+      Q: What about placements?
+      A: BCREC's 2025 placements saw 91% overall placement, with CSE at 93.6%. Top recruiters like TCS, Infosys, and Amazon offer
+    #129 [EN      /ambiguous   ] hall=YES ctx=   0
+      Q: Is it good?
+      A: I'm sorry, I'm having trouble connecting. Please call 0343-2501353.
+    #130 [HI      /ambiguous   ] hall=YES ctx=   0
+      Q: फीस कितनी है?
+      A: BCREC mein B.Tech fees branch ke hisaab se alag hai. CSE, IT, ECE: total छह लाख 17 हज़ार सात सौ रुपये. EE, AIML, DS, CY,
+    #131 [BN      /ambiguous   ] hall=YES ctx=   0
+      Q: ফি কত?
+      A: BCREC B.Tech fees vary by branch. CSE, IT, ECE: six lakh seventeen thousand seven hundred rupees total. EE, AIML, DS, CY
+    #132 [EN      /ambiguous   ] hall=YES ctx=   0
+      Q: How many departments?
+      A: Dr. B.C. Roy Engineering College mein 15 engineering departments hain, jismein CSE, ECE, IT, EE, ME, CE, AIML, DS, CY, C
+    #133 [EN      /multi_turn  ] hall=YES ctx=   0
+      Q: What is the fee for CSE?
+      A: The total fee for Computer Science and Engineering is six lakh seventeen thousand seven hundred rupees. Admission and se
+    #134 [EN      /multi_turn  ] hall=YES ctx=   0
+      Q: What about AIML?
+      A: <think>
+Okay, the user is asking about AIML again. Let me check the previous interactions. The first time, I mentioned t
+    #135 [EN      /multi_turn  ] hall=YES ctx=   0
+      Q: What documents do I need for admission?
+      A: Required documents for admission include entrance: WBJEE/JEE-Main Rank Card, WBJEE/JEE-Main Admit Card.
+    #136 [EN      /multi_turn  ] hall=YES ctx=   0
+      Q: Where can I track my application?
+      A: Aap BCREC ki official website par login karke application track kar sakte hain. Apne roll number ya application ID se aa
+    #137 [EN      /multi_turn  ] hall=YES ctx=   0
+      Q: Who is the principal?
+      A: The principal of BCREC is Dr. Sanjay S. Pawar. Their phone is 0343-2501353.
+    #138 [EN      /multi_turn  ] hall=YES ctx=   0
+      Q: And the vice principal?
+      A: The principal of BCREC is Dr. Sanjay S. Pawar and the vice principal is Prof. (Dr.) K. M. Hossain.
+    #139 [HI      /multi_turn  ] hall=YES ctx=   0
+      Q: प्रिंसिपल कौन हैं?
+      A: BCREC ke principal Dr. Sanjay S. Pawar hain. Unka phone 0343-2501353 hai.
+    #140 [HI      /multi_turn  ] hall=YES ctx=   0
+      Q: उप-प्रिंसिपल कौन हैं?
+      A: BCREC ke principal Dr. Sanjay S. Pawar hain. Unka phone 0343-2501353 hai.
+    #141 [EN      /policies    ] hall=YES ctx=   0
+      Q: Are there any rules about attendance?
+      A: B CREC mein 75% attendance compulsory hai exams ke liye, lekin specific attendance rules ke baare mein humari data me ko
+    #142 [EN      /why_bcrec   ] hall=YES ctx=   0
+      Q: What accreditation does BCREC have?
+      A: BCREC offers B.Tech in: Computer Science and Engineering (CSE) - 180 seats; Information Technology (IT) - 60 seats; Elec
+================================================================================

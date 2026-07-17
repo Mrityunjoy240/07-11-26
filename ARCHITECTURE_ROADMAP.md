@@ -1604,7 +1604,7 @@ Step 5: Enrollment Confirmation
 | `agents/profile.py` | Continuous profile extraction from conversation. |
 | `agents/escalation.py` | Human handoff detection and summary generation. |
 
-### 6.5 Reasoning Engine
+### 6.7 Reasoning Engine
 
 | Module | Responsibility |
 |--------|---------------|
@@ -1619,7 +1619,7 @@ Step 5: Enrollment Confirmation
 | `reasoning/tools/contacts.py` | Contact info lookup tools. |
 | `reasoning/prompts/manager.py` | Centralized prompt store. Versioned prompts. Template engine. |
 
-### 6.6 Knowledge Layer
+### 6.8 Knowledge Layer
 
 | Module | Responsibility |
 |--------|---------------|
@@ -1631,7 +1631,7 @@ Step 5: Enrollment Confirmation
 | `knowledge/cms/api.py` | CMS REST API. CRUD for all knowledge domains. |
 | `knowledge/cms/audit.py` | Change tracking. Version history. Rollback support. |
 
-### 6.7 Storage Layer
+### 6.9 Storage Layer
 
 | Module | Responsibility |
 |--------|---------------|
@@ -1639,7 +1639,7 @@ Step 5: Enrollment Confirmation
 | `storage/postgres.py` | PostgreSQL client. Conversation history, student profiles. |
 | `storage/minio.py` | S3-compatible storage. Audio files, uploaded documents. |
 
-### 6.8 Observability
+### 6.10 Observability
 
 | Module | Responsibility |
 |--------|---------------|

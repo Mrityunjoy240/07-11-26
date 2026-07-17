@@ -313,7 +313,8 @@ Level 3: Counselor
    • Goal tracking
    • Multi-language
    • Channels: web + voice + WhatsApp
-   ═══ Target by end of Year 1
+    ═══ Maturity Level 3
+
 
 Level 4: Planner
    • Workflow engine operational
@@ -322,7 +323,8 @@ Level 4: Planner
    • Scholarship recommendation
    • Human handoff when confidence drops
    • Channels: all
-   ═══ Target by end of Year 2
+    ═══ Maturity Level 4
+
 
 Level 5: Advisor
    • Proactive outreach (deadline reminders)
@@ -330,7 +332,8 @@ Level 5: Advisor
    • Alumni connection suggestions
    • Cross-channel session continuity
    • Student can start on web → continue on phone → follow up on WhatsApp
-   ═══ Target by end of Year 3
+    ═══ Maturity Level 5
+
 
 Level 6: Autonomous Admission Assistant
    • End-to-end admission processing without human intervention
@@ -340,7 +343,8 @@ Level 6: Autonomous Admission Assistant
    • Follow-up with incomplete applications
    • 95%+ student satisfaction
    • <0.01% error rate
-   ═══ Target by Year 5
+    ═══ Maturity Level 6
+
 ```
 
 **Every architectural decision must not block reaching Level 6.** Even if we are at Level 2 today, the architecture must support Level 6 without redesign.
@@ -372,7 +376,7 @@ Level 6: Autonomous Admission Assistant
 20. [Rollback Strategy](#20-rollback-strategy)
 21. [Versioning Strategy](#21-versioning-strategy)
 22. [Production Readiness Checklist](#22-production-readiness-checklist)
-23. [Estimated Timeline](#23-estimated-timeline)
+23. [Timeline Reference](#23-timeline-reference)
 
 ---
 
@@ -817,49 +821,70 @@ Every decision the system makes must include a **system confidence score** — n
 
 **Confidence is not optional.** Without it, the system cannot know when to escalate. Every human counselor has a sense of "how sure am I about this?" The AI must too.
 
-#### College Brain
+#### College Brain (Executable)
 
-Knowledge is not intelligence. The College Brain is a layer that understands **how this college actually works** — not just what facts are true.
+Knowledge is not intelligence. The College Brain is an **executable layer** that knows how this college actually works — not just what facts are true. It is structured per domain, and each domain contains everything needed to handle that area autonomously.
 
-**What the College Brain knows:**
+**Structure per domain:**
 
 ```
-Domain Knowledge (the "what"):
-  • Fee structures for every branch
-  • Placement data by company and year
-  • HOD names and contact info
-  ← This is the Knowledge Layer
-
-Procedural Knowledge (the "how"):
-  • How WBJEE counseling works
-  • How MAKAUT affiliation affects syllabus
-  • How scholarship applications are processed
-  • How fee refunds work after withdrawal
-  • How hostel allocation works
-  • How branch change works after first year
-  • How backlog exams are scheduled
-  • How document verification works
-  ← This is the College Brain
-
-Tacit Knowledge (the "why"):
-  • Which branches have the best peer culture for research
-  • Which companies recruit which branches most aggressively
-  • What students from specific boards typically struggle with
-  • What scholarship schemes are commonly underutilized
-  • What hidden costs students often miss
-  ← This is also the College Brain (hardest to build)
+College Brain
+├── Admissions
+│   ├── Knowledge: eligibility rules, cutoffs, documents, deadlines
+│   ├── Decision Rules: "if rank < cutoff → eligible", "if board = West Bengal → WBJEE required"
+│   ├── Workflows: application process, document verification, enrollment
+│   ├── Escalations: "if student disputes eligibility → handoff to admissions officer"
+│   ├── Confidence: per-rule confidence scores based on data freshness
+│   ├── Tools: check_eligibility(), get_cutoff(), get_documents()
+│   ├── Policies: executable policy rules (see Policy Engine below)
+│   └── Follow-up Actions: "if eligible → send fee link", "if missing doc → remind in 3 days"
+│
+├── Placement
+│   ├── Knowledge: placement rates, recruiters, packages by branch and year
+│   ├── Decision Rules: "if placement_rate > 90% → highlight", "if avg_package > 5LPA → mark premium"
+│   ├── Workflows: placement process, company visit schedule, interview prep
+│   ├── Escalations: "if student wants specific unreachable company → manage expectations"
+│   ├── Tools: get_placement_stats(), get_recruiters(), get_preparation_tips()
+│   └── Follow-up: "if interested in placement → share training programs"
+│
+├── Fees
+│   ├── Knowledge: fee structures per branch, per semester, per category
+│   ├── Decision Rules: "calculate total = tuition + development + admission", "if scholarship → deduct"
+│   ├── Workflows: fee payment, installment plans, refund process
+│   ├── Tools: calculate_fee(), compare_branches(), payment_options()
+│   └── Follow-up: "after fee quote → check scholarship eligibility"
+│
+├── Scholarship
+│   ├── Knowledge: schemes, eligibility, amounts, application process
+│   ├── Decision Rules: "if category = SC/ST → eligible for Swami Vivekananda"
+│   ├── Workflows: application, document submission, approval tracking
+│   ├── Tools: check_scholarship_eligibility(), apply_for_scholarship()
+│   └── Follow-up: "if eligible → start application workflow"
+│
+├── Hostel
+│   ├── Knowledge: capacity, fees, rules, amenities
+│   ├── Decision Rules: "if distance > 50km → recommend hostel"
+│   ├── Workflows: allocation, check-in, room change
+│   └── Tools: check_availability(), calculate_hostel_fee()
+│
+├── Backlog / Exams
+│   ├── Knowledge: supplementary schedule, fees, rules
+│   ├── Decision Rules: "if failed subjects exist → explain backlog policy first"
+│   └── Workflows: backlog application, exam scheduling
+│
+└── General Rules
+    ├── MAKAUT affiliation policies
+    ├── AICTE regulations
+    ├── Anti-ragging policies
+    └── Safety and conduct rules
 ```
 
-**Implementation:**
-The College Brain is not a single module. It is a collection of:
+**Key property:** The Brain answers "Given this student, what should happen next?" not just "What are the facts?" It is executable — the Conversation Engine can call `brain.admissions.decide(student_profile)` and receive a decision with confidence, not just data.
 
-1. **Procedural rules** (deterministic: "If rank < cutoff, eligible")
-2. **Workflow definitions** (state machines: admission process steps)
-3. **Embedded policy documents** (vector search over official PDFs)
-4. **LLM-accessible tools** (functions the LLM can call for procedural questions)
-5. **Decision heuristics** (scoring rules for recommendations)
-
-The College Brain draws from the Knowledge Layer but is not the same thing. The Knowledge Layer stores data. The College Brain knows what to *do* with it.
+**Implementation approach:**
+- Each domain is a class with known interface: `knowledge()`, `decide(context)`, `tools()`, `workflows()`, `escalation_rules()`
+- Rules are deterministic (not LLM-prompted) where possible — eligibility is a calculation, not a generation
+- The Brain is loaded once at startup and cached. It does not call LLMs itself — it provides structured data and rules for the Reasoning and Decision Engines to use.
 
 ### Ownership Boundaries
 
@@ -924,6 +949,41 @@ Scaling from 1 to 10 colleges:
 
 > If I have to touch more than two modules to accommodate a change in college policy, the architecture is wrong.
 
+### Reasoning vs Planning — The Separation
+
+Most AI systems merge these two. They must be separate.
+
+**Reasoning answers:** *What does the student need?*
+**Planning answers:** *What sequence of actions should I take?*
+
+Example with a real student:
+```
+Student: "I have 48k rank, 76% PCM. Which branch can I get?"
+
+Reasoning                      Planning
+─────────                      ────────
+Student is anxious             │  1. Reassure student
+Eligible for admission         │  2. Ask PCM subject interests
+Missing: specific interest     │  3. Match interests to branches
+Rank is strong for ECE         │  4. Recommend branches with cutoffs
+Average for CSE                │  5. Explain cutoff vs rank
+Likely needs fee info          │  6. Mention fee structure
+No scholarship mentioned       │  7. Ask about scholarship need
+                               │  8. Check hostel requirement
+                               │  9. Offer next steps
+
+Reasoning: who is this student, what is their state, what is true about them?
+Planning: given that reality, what should I do and in what order?
+```
+
+**Why separation matters:**
+- Reasoning is analysis (facts about the student + domain). It should be **deterministic** where possible — eligibility, cutoff comparison, category matching are calculations, not judgements.
+- Planning is strategy (order of actions, which capability to invoke). It should be **stateful** and **adaptive** — the plan changes as the conversation progresses.
+- An LLM is good at reasoning. A state machine is good at planning. Use each for its strength.
+- If reasoning and planning are merged, the LLM must invent a plan on every turn, which is expensive, inconsistent, and unrecoverable when wrong.
+
+**Architecture rule:** The Reasoning Engine produces a `ReasoningResult` (facts about student + query). The Conversation Supervisor passes this to the Planner, which selects the next action. The Reasoning Engine does not decide the order of actions. The Planner does not analyze the student.
+
 ### Future-Growth Patterns
 
 These patterns are not required today but the architecture must not block them.
@@ -932,21 +992,35 @@ These patterns are not required today but the architecture must not block them.
 
 Today the system has a fixed set of skills: admission, fees, placement, hostel, scholarship. As the system grows, capabilities will expand to: loans, complaints, events, attendance, examinations, certificates, research, faculty communication.
 
-Instead of hardcoding `if admission: ... elif hostel: ...`, each capability is a registered module:
+Instead of hardcoding `if admission: ... elif hostel: ...`, each capability is a **self-contained module** that owns everything needed to handle that domain:
 
 ```
-Capability Registry:
-  admission       → handler + tools + prompts + workflows
-  fees            → handler + tools + prompts + workflows
-  placement       → handler + tools + prompts + workflows
-  scholarship     → handler + tools + prompts + workflows
-  hostel          → handler + tools + prompts + workflows
-  loans           → handler + tools + prompts + workflows    (future)
-  examination     → handler + tools + prompts + workflows    (future)
-  certificates    → handler + tools + prompts + workflows    (future)
+Capability:
+  ├── Intent       "What does this domain handle?"
+  │                (intent patterns, keywords, entities)
+  ├── Workflow     "What sequence of actions?"
+  │                (state machine, steps, deadlines)
+  ├── Knowledge    "What facts are relevant?"
+  │                (vector store namespace, graph queries)
+  ├── Decision Rules  "What decisions are made?"
+  │                    (deterministic rules, scoring, eligibility)
+  ├── Memory Needs "What to remember across sessions?"
+  │                (profile slots, conversation history retention)
+  ├── Tools        "What can the LLM invoke?"
+  │                (functions, validators, formatters)
+  ├── Validators   "How to verify the output?"
+  │                (confidence checks, hallucination guards)
+  ├── Escalations  "When to hand off to human?"
+  │                (thresholds, conditions)
+  ├── Follow-up Actions  "What to do after?"
+  │                       (reminders, next-step prompts)
+  └── Policies     "What executable rules apply?"
+                    (see Policy Engine below)
 ```
 
-The Planner queries the registry: "This student needs admission and scholarship help. Which capabilities match?" The registry returns the relevant handlers. New capabilities are added by registering them, not by modifying pipeline code.
+The Planner queries the registry: "This student needs admission and scholarship help. Which capabilities match?" The registry returns the matching capabilities with their full context (workflows, tools, rules). New capabilities are added by registering them in a config file, not by modifying pipeline code or adding new handler classes.
+
+**Critical difference from a handler registry:** A handler says "call this function." A capability says "this entire domain is mine, here's everything needed to handle it." The orchestrator never needs to know the specifics — it just passes the student context and the capability decides how to respond.
 
 #### Memory System Evolution (Future)
 
@@ -1066,56 +1140,74 @@ The event bus (Redis Streams) is already in the architecture. The migration from
               └────────────┬─────────────┘
                            │
               ┌────────────▼─────────────┐
-               │   CONVERSATION ENGINE    │
-               │   (stateless workers)    │
-               │                          │
-               │ ┌──────────────────────┐ │
-               │ │   SUPERVISOR AGENT   │ │
-               │ │  observe → plan →    │ │
-               │ │  act → remember      │ │
-               │ └────────┬──┬──┬───────┘ │
-               │          │  │  │          │
-               │ ┌────────▼──▼──▼───────┐ │
-               │ │  SPECIALIST AGENTS    │ │
-               │ │ Fees · Placement     │ │
-               │ │ Admission · Counselling│ │
-               │ │ College Info · Profile│ │
-               │ └──────────────────────┘ │
-               └────────────┬─────────────┘
-                            │
-               ┌────────────▼─────────────┐
-               │     DECISION ENGINE      │
-               │   What should I do?      │
-               │   Score · Rank · Decide  │
-               │   with Confidence        │
-               └────────────┬─────────────┘
-                            │
-               ┌────────────▼─────────────┐
-               │     REASONING ENGINE     │
-               │                          │
-               │ ┌──────┐ ┌──────┐ ┌────┐ │
-               │ │LLM   │ │ Tool │ │Wkfl│ │
-               │ │Router│ │Exec. │ │Eng.│ │
-               │ └──────┘ └──────┘ └────┘ │
-               └────────────┬─────────────┘
-                            │
-               ┌────────────▼─────────────┐
-               │      COLLEGE BRAIN       │
-               │  How this college works  │
-               │  · Procedural rules      │
-               │  · Workflow definitions  │
-               │  · Policy understanding  │
-               │  · Decision heuristics   │
-               └────────────┬─────────────┘
-                            │
-               ┌────────────▼─────────────┐
-               │      KNOWLEDGE LAYER     │
-               │                          │
-               │  Graph  Vector  Document │
-               │  (Neo4j)(Pinecone) (S3)  │
-               │         │ Cache (Redis)  │
-               │         │ CMS (Staff UI) │
-               └────────────┬─────────────┘
+              │   CONVERSATION ENGINE    │
+              │   (stateless workers)    │
+              │                          │
+              │ ┌──────────────────────┐ │
+              │ │   SUPERVISOR AGENT   │ │
+              │ │  observe → reason →  │ │
+              │ │  plan → act → eval   │ │
+              │ └────────┬──┬──┬───────┘ │
+              │          │  │  │          │
+              │ ┌────────▼──▼──▼───────┐ │
+              │ │  SPECIALIST AGENTS    │ │
+              │ │ Fees · Placement     │ │
+              │ │ Admission · Counselling│ │
+              │ │ College Info · Profile│ │
+              │ └──────────────────────┘ │
+              └────────────┬─────────────┘
+                           │
+              ┌────────────▼─────────────┐
+              │     REASONING ENGINE     │
+              │  What does the student   │
+              │  need?                   │
+              │  · Analyze intent + state│
+              │  · Extract facts/profile │
+              │  · Determine eligibility │
+              │  · Score candidate plans │
+              │                         │
+              │ Output: ReasoningResult  │
+              └────────────┬─────────────┘
+                           │
+              ┌────────────▼─────────────┐
+              │        PLANNER           │
+              │  What should I do next?  │
+              │  · Select next action    │
+              │  · Choose capability     │
+              │  · Sequence steps        │
+              │  · Set follow-ups        │
+              │                         │
+              │ Output: ActionPlan       │
+              └────────────┬─────────────┘
+                           │
+              ┌────────────▼─────────────┐
+              │    CAPABILITY REGISTRY   │
+              │  Which capability owns   │
+              │  this?                  │
+              │  admission · fees        │
+              │  placement · scholarship │
+              │  hostel · exams ...      │
+              └────────────┬─────────────┘
+                           │
+              ┌────────────▼─────────────┐
+              │      COLLEGE BRAIN       │
+              │  What should happen next │
+              │  (per domain)?           │
+              │  · Knowledge             │
+              │  · Decision Rules        │
+              │  · Workflows             │
+              │  · Tools                 │
+              │  · Escalations           │
+              └────────────┬─────────────┘
+                           │
+              ┌────────────▼─────────────┐
+              │      KNOWLEDGE LAYER     │
+              │                          │
+              │  Graph  Vector  Document │
+              │  (Neo4j)(Pinecone) (S3)  │
+              │         │ Cache (Redis)  │
+              │         │ CMS (Staff UI) │
+              └────────────┬─────────────┘
                            │
               ┌────────────▼─────────────┐
               │       STORAGE LAYER      │
@@ -1372,7 +1464,9 @@ class AgentResult:
 - Changes propagate to cache within 60 seconds (cache invalidation event)
 - Preview mode: see how the AI will respond with new data before committing
 
-#### 5.2.6 Reasoning Engine (LLM Router)
+#### 5.2.6 Reasoning Engine
+
+**Purpose:** Analyze the student's state and produce a `ReasoningResult`. The Reasoning Engine answers "What does the student need?" — it does NOT decide what to do next (that's the Planner's job).
 
 **Tiered LLM Architecture:**
 
@@ -1506,7 +1600,117 @@ Step 5: Enrollment Confirmation
   Action: confirm enrollment, share next steps
 ```
 
-#### 5.2.8 Observability Stack
+#### 5.2.8 Planner
+
+**Purpose:** Given a `ReasoningResult` (facts about the student) and `ConversationState`, decide the next action. The Planner answers "What should I do next?" — it does NOT analyze the student (that's the Reasoning Engine's job).
+
+**Planner output:**
+```python
+@dataclass
+class ActionPlan:
+    next_action: str                    # "answer_query" | "ask_clarification" | "reassure" | "recommend" | "handoff"
+    target_capability: str | None       # "admission" | "fees" | "placement" | etc.
+    sequence: list[PlannedStep]         # Ordered steps for multi-turn
+    follow_up: FollowUp | None          # Scheduled follow-up action
+    confidence: float                   # How confident in this plan
+
+@dataclass
+class PlannedStep:
+    action: str
+    params: dict
+    expected_duration: str              # "single_turn" | "multi_turn"
+    depends_on: list[str]              # Prerequisite completions
+
+@dataclass
+class FollowUp:
+    trigger: str                        # "time_elapsed" | "student_returned" | "action_pending"
+    delay: int                          # Minutes to wait
+    message_template: str
+```
+
+**Strategy catalog (initial):**
+
+| Strategy | When | Pattern |
+|----------|------|---------|
+| **Counsel** | Student seeks admission guidance | Reassure → Gather info → Match branches → Compare → Recommend → Next steps |
+| **Inform** | Student asks a specific fact | Answer directly → Check for follow-up → Offer related info |
+| **Guide** | Student starts a workflow (admission, scholarship) | Determine current step → Provide instructions → Set next expected action |
+| **Clarify** | Student is ambiguous | Identify ambiguity → Generate clarifying question → Ask |
+| **Escalate** | Confidence < threshold or student distressed | Acknowledge limit → Summarize context → Handoff to human |
+| **Follow-up** | Student returns after time gap or triggered reminder | Recap previous session → Check progress → Continue from last step |
+
+#### 5.2.9 Policy Engine
+
+**Purpose:** College rules should be executable, not embedded in prompts. The Policy Engine loads, evaluates, and versions all deterministic rules.
+
+**Policy categories:**
+
+| Category | Example | Format |
+|----------|---------|--------|
+| Admission eligibility | "If category=SC and rank<50000 → eligible for CSE" | Table: branch × category × cutoff |
+| Fee computation | "Total = tuition + development + admission fee" | Formula with conditionals |
+| Scholarship | "If family_income<2.5L and pcm>75% → eligible for Merit" | Rule set with AND/OR conditions |
+| MAKAUT rules | "Minimum 75% attendance required for exams" | Binary rule with exception paths |
+| Backlog | "If failed >2 core subjects → can't proceed to next year" | Conditional gate |
+
+**Implementation:** Policies are YAML/JSON files loaded at startup, not code. Changes don't require deployment — just a config reload.
+
+```yaml
+# policies/admission_cutoffs.yaml
+version: "2026-17-17"
+domain: admission
+rules:
+  - branch: CSE
+    category: GENERAL
+    cutoff_rank: 25000
+    eligible: true
+  - branch: CSE
+    category: SC
+    cutoff_rank: 45000
+    eligible: true
+  - branch: ECE
+    category: GENERAL
+    cutoff_rank: 40000
+    eligible: true
+```
+
+**Policy evaluation flow:** PolicyEngine evaluates context → returns decision + matched rule reference + confidence.
+
+#### 5.2.10 Evaluation Engine
+
+**Purpose:** Close the quality feedback loop. Without an Evaluation Engine, every "improvement" is an assumption.
+
+**Evaluation pipeline:**
+```
+Conversation Log
+    ↓
+Expected Behaviour (per query type: fee query → return exact number, counseling → reassure + recommend)
+    ↓
+Actual Behaviour (what the system actually did)
+    ↓
+Scoring: Accuracy · Completeness · Tone · Proactiveness · Safety
+    ↓
+Failure Classification: Hallucination · Omission · Tone Failure · Rule Violation · Incorrect Data
+    ↓
+Confidence Calibration: Did the system's confidence match actual accuracy?
+    ↓
+Regression Check: Is this failure new or known? Track pass rate over time.
+    ↓
+Human Review Queue: Flag low-confidence responses or low-scoring conversations
+    ↓
+Metrics Dashboard: Pass rate, failure distribution, improvement velocity, regression rate
+```
+
+**Key design constraint:** The Evaluation Engine evaluates the *output of every layer*, not just the final response. It should be able to tell you:
+- The Reasoner was wrong (misidentified intent)
+- The Planner was wrong (wrong action sequence)
+- The Brain was wrong (incorrect rule applied)
+- The LLM was wrong (hallucinated a fact)
+- The Confidence system was wrong (overconfident in incorrect response)
+
+This is what enables targeted improvement — you fix the failing layer, not the entire pipeline.
+
+#### 5.2.11 Observability Stack
 
 ```
 ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐
@@ -1589,14 +1793,20 @@ Step 5: Enrollment Confirmation
 | `decision/confidence.py` | Compute system confidence per recommendation. Profile completeness, data freshness, LLM confidence, knowledge coverage, historical accuracy. |
 | `decision/thresholds.py` | Confidence threshold configuration. Autonomous vs qualified vs probe vs handoff. |
 
-### 6.5 College Brain
+### 6.5 College Brain (Executable)
+
+Each domain is a self-contained module with everything needed to handle that area.
 
 | Module | Responsibility |
 |--------|---------------|
-| `brain/procedures.py` | Deterministic procedural rules: eligibility calculation, cutoff comparison, fee computation. |
-| `brain/policies.py` | Policy document ingestion and query. Vector search over official PDFs (MAKAUT rules, AICTE approvals, scholarship schemes). |
-| `brain/heuristics.py` | Decision heuristics for recommendations: branch ranking logic, scholarship matching, hostel allocation rules. |
-| `brain/workflows.py` | Workflow definitions (shared with Workflow Engine). Admission process, scholarship application, hostel booking, backlog process. |
+| `brain/admissions.py` | Admissions domain: eligibility rules, cutoff tables, document checklists, workload definitions, escalation rules, follow-up actions. |
+| `brain/placement.py` | Placement domain: company data, placement rates, package distributions, preparation workflows. |
+| `brain/fees.py` | Fees domain: fee computation rules, installment logic, refund policies, scholarship-aware calculations. |
+| `brain/scholarship.py` | Scholarship domain: scheme definitions, eligibility rules, application workflows, renewal conditions. |
+| `brain/hostel.py` | Hostel domain: capacity rules, allocation logic, fee calculation, amenity queries. |
+| `brain/rules.py` | General rules: MAKAUT policies, AICTE regulations, anti-ragging policies, safety and conduct rules. |
+| `brain/domain_base.py` | Base class for all domains: common interface (`knowledge()`, `decide()`, `tools()`, `workflows()`, `escalations()`). |
+| `brain/registry.py` | Domain registry. Load all domains at startup. Route queries to correct domain. |
 
 ### 6.6 Specialist Agents
 | `agents/counselling.py` | Branch recommendations, career guidance, interest-based advising. |
@@ -1648,6 +1858,70 @@ Step 5: Enrollment Confirmation
 | `observability/logging.py` | Structured JSON logging. Correlation IDs. |
 | `observability/llm.py` | LangFuse integration. Prompt tracking, cost calculation. |
 | `observability/alerts.py` | Alert rules. Error rate, latency, cost thresholds. |
+
+### 6.11 Planner
+
+Reasoning answers "what does the student need?" Planning answers "what should I do next?" These are separate concerns.
+
+| Module | Responsibility |
+|--------|---------------|
+| `planner/engine.py` | Given ReasoningResult + ConversationState, select the next action. Action selection logic. |
+| `planner/sequencer.py` | Sequence multi-step plans. Break goals into ordered actions. Track completion. |
+| `planner/scheduler.py` | Schedule follow-up actions. Reminders, proactive outreach, deadline alerts. |
+| `planner/strategies.py` | Strategy definitions: counseling flow, information gathering, escalation, closing. |
+
+### 6.12 Policy Engine
+
+Scholarship rules, admission rules, MAKAUT rules, branch eligibility rules should not live inside prompts. They should be executable policies.
+
+| Module | Responsibility |
+|--------|---------------|
+| `policies/engine.py` | Policy evaluation engine. Load rules, match context, return decisions. |
+| `policies/admission.py` | Admission eligibility rules: cutoff per branch/category, document requirements. |
+| `policies/scholarship.py` | Scholarship rules: eligibility by category/rank/income, amounts, renewal conditions. |
+| `policies/makaut.py` | MAKAUT affiliation rules: syllabus, exam schedules, credit requirements. |
+| `policies/fees.py` | Fee rules: computation, waivers, refunds, installment eligibility. |
+| `policies/loader.py` | Load policies from config files. Hot-reload on change. Validate policy format. |
+
+**Policy is not prompt.** A policy is:
+- Deterministic ("if category=SC and rank<50000 → eligible for Swami Vivekananda")
+- Versioned (each policy change = new version)
+- Auditable (who changed what, when)
+- Testable (given student profile → expected decision)
+
+### 6.13 Evaluation Engine
+
+The biggest missing subsystem. Everything assumes we'll know whether the AI improved, but how? The Evaluation Engine closes the loop.
+
+| Module | Responsibility |
+|--------|---------------|
+| `evaluation/runner.py` | Run evaluation pipeline against conversation history or test set. |
+| `evaluation/expected.py` | Expected behavior definitions per query type. What should the AI have done? |
+| `evaluation/scorer.py` | Score actual vs expected. Accuracy, completeness, tone, proactiveness, safety. |
+| `evaluation/classifier.py` | Failure classification: hallucination, omission, tone failure, rule violation, incorrect data. |
+| `evaluation/confidence.py` | Confidence calibration. Does system confidence match actual accuracy? |
+| `evaluation/regression.py` | Regression test suite runner. Track pass/fail over time. Alert on regressions. |
+| `evaluation/human_review.py` | Human review queue. Flag low-confidence responses. Collect human corrections. |
+| `evaluation/metrics.py` | Aggregate metrics: pass rate, failure distribution, improvement velocity, regression rate. |
+
+**Evaluation flow:**
+```
+Conversation
+    ↓
+Expected Behaviour (what should have happened)
+    ↓
+Actual Behaviour (what the system did)
+    ↓
+Failure Classification (why they differed)
+    ↓
+Confidence (was the system aware of its failure?)
+    ↓
+Regression (is this a new failure or known?)
+    ↓
+Human Review (when confidence is low)
+    ↓
+Metrics (pass rate, failure distribution, improvement velocity)
+```
 
 ---
 
@@ -1869,101 +2143,123 @@ class ProfileStore(ABC):
 ### 8.1 Simple Query (Fee Lookup via Web Chat)
 
 ```
-Web Browser                    Web Adapter               Event Bus             Conversation Engine           Knowledge Layer
-    │                              │                        │                        │                          │
-    │  POST /api/query             │                        │                        │                          │
-    │  {text: "CSE fee"}           │                        │                        │                          │
-    │─────────────────────────────>│                        │                        │                          │
-    │                              │  MessageEnvelope       │                        │                          │
-    │                              │  → counseling.request  │                        │                          │
-    │                              │───────────────────────>│                        │                          │
-    │                              │                        │  Pick up by worker     │                          │
-    │                              │                        │───────────────────────>│                          │
-    │                              │                        │                        │  OBSERVE                 │
-    │                              │                        │                        │  ── detect language: en  │
-    │                              │                        │                        │  ── route intent: fees  │
-    │                              │                        │                        │  ── no emotion detected │
-    │                              │                        │                        │                          │
-    │                              │                        │                        │  PLAN                    │
-    │                              │                        │                        │  ── action: DELEGATE    │
-    │                              │                        │                        │  ── agent: Fees Agent   │
-    │                              │                        │                        │                          │
-    │                              │                        │  AgentTask             │                          │
-    │                              │                        │  → Fees Agent          │                          │
+Web Browser                    Web Adapter               Event Bus           Conversation Engine         Knowledge Layer
+    │                              │                        │                      │                          │
+    │  POST /api/query             │                        │                      │                          │
+    │  {text: "CSE fee"}           │                        │                      │                          │
+    │─────────────────────────────>│                        │                      │                          │
+    │                              │  MessageEnvelope       │                      │                          │
+    │                              │  → counseling.request  │                      │                          │
+    │                              │───────────────────────>│                      │                          │
+    │                              │                        │  Pick up by worker   │                          │
+    │                              │                        │─────────────────────>│                          │
+    │                              │                        │                      │                          │
+    │                              │                        │                      │  REASON                   │
+    │                              │                        │                      │  ── detect language: en  │
+    │                              │                        │                      │  ── route intent: fees  │
+    │                              │                        │                      │  ── no emotion detected │
+    │                              │                        │                      │  ── output:              │
+    │                              │                        │                      │      ReasoningResult {    │
+    │                              │                        │                      │        intent: "fee_query"│
+    │                              │                        │                      │        domain: "fees"     │
+    │                              │                        │                      │        params: {branch:   │
+    │                              │                        │                      │                  "CSE"}   │
+    │                              │                        │                      │        confidence: 0.95   │
+    │                              │                        │                      │      }                    │
+    │                              │                        │                      │                          │
+    │                              │                        │                      │  PLAN                     │
+    │                              │                        │                      │  ── action: DELEGATE     │
+    │                              │                        │                      │  ── capability: Fees     │
+    │                              │                        │                      │  ── strategy: INFORM     │
+    │                              │                        │                      │                          │
+    │                              │                        │  AgentTask            │                          │
+    │                              │                        │  → Fees Agent        │                          │
     │                              │                        │──────────────────────────────────────────────────>│
-    │                              │                        │                        │                          │
-    │                              │                        │                        │                          │  get_fee("CSE")
-    │                              │                        │                        │                        ──│───────>│
-    │                              │                        │                        │                          │ │       │
-    │                              │                        │                        │                          │ │ CSE:  │
-    │                              │                        │                        │                          │<── ─ ─ │
-    │                              │                        │                        │                          │ 604700 │
-    │                              │                        │  AgentResult           │                          │        │
-    │                              │                        │  ← Fees Agent          │                          │        │
+    │                              │                        │                      │                          │
+    │                              │                        │                      │                          │  get_fee("CSE")
+    │                              │                        │                      │                        ──│───────>│
+    │                              │                        │                      │                          │ │       │
+    │                              │                        │                      │                          │ │ CSE:  │
+    │                              │                        │                      │                          │<── ─ ─ │
+    │                              │                        │                      │                          │ 604700 │
+    │                              │                        │  AgentResult          │                          │        │
+    │                              │                        │  ← Fees Agent        │                          │        │
     │                              │                        │<──────────────────────────────────────────────────│
-    │                              │                        │                        │                          │
-    │                              │                        │                        │  REMEMBER                │
-    │                              │                        │                        │  ── update state        │
-    │                              │                        │                        │  ── update profile (if  │
-    │                              │                        │                        │      any new info)      │
-    │                              │                        │                        │                          │
-    │                              │                        │  ResponseEnvelope      │                          │
-    │                              │                        │  ← counseling.response │                          │
-    │                              │                        │<───────────────────────│                          │
-    │                              │                        │                        │                          │
-    │  200 OK                      │                        │                        │                          │
-    │  {text: "CSE total fee      │                        │                        │                          │
-    │   is 6,04,700..."}          │                        │                        │                          │
-    │<────────────────────────────│                        │                        │                          │
+    │                              │                        │                      │                          │
+    │                              │                        │                      │  REMEMBER                │
+    │                              │                        │                      │  ── update state        │
+    │                              │                        │                      │  ── update profile (if  │
+    │                              │                        │                      │      any new info)      │
+    │                              │                        │                      │                          │
+    │                              │                        │  ResponseEnvelope     │                          │
+    │                              │                        │  ← counseling.response│                          │
+    │                              │                        │<─────────────────────│                          │
+    │                              │                        │                      │                          │
+    │  200 OK                      │                        │                      │                          │
+    │  {text: "CSE total fee      │                        │                      │                          │
+    │   is 6,04,700..."}          │                        │                      │                          │
+    │<────────────────────────────│                        │                      │                          │
 ```
 
 ### 8.2 Counseling Flow (Complex Multi-Turn)
 
 ```
-Student                             Supervisor                    Profile Agent    Counselling Agent   Knowledge
-  │                                      │                            │                  │                │
-  │ "I got 65% PCM"                      │                            │                  │                │
-  │─────────────────────────────────────>│                            │                  │                │
-  │                                      │ OBSERVE                    │                  │                │
-  │                                      │ text: "I got 65%"          │                  │                │
-  │                                      │ implicit: worried about    │                  │                │
-  │                                      │   eligibility              │                  │                │
-  │                                      │ emotion: anxious (0.6)     │                  │                │
-  │                                      │ stage: discovery           │                  │                │
-  │                                      │ profile: missing rank,     │                  │                │
-  │                                      │   board, interest          │                  │                │
-  │                                      │                            │                  │                │
-  │                                      │ PLAN: PROBE + COUNSEL      │                  │                │
-  │                                      │ Need more profile info     │                  │                │
-  │                                      │ before recommending        │                  │                │
-  │                                      │                            │                  │                │
-  │ "65% is a good score. Are you        │                            │                  │                │
-  │  from West Bengal board? Do you      │                            │                  │                │
-  │  have your WBJEE rank?"              │                            │                  │                │
-  │<─────────────────────────────────────│                            │                  │                │
-  │                                      │                            │                  │                │
-  │ "Yes, WB board. My rank is 35000."   │                            │                  │                │
-  │─────────────────────────────────────>│                            │                  │                │
-  │                                      │ OBSERVE                    │                  │                │
-  │                                      │ profile: rank=35000,       │                  │                │
-  │                                      │   board=WBCHSE             │                  │                │
-  │                                      │ emotion: still anxious     │                  │                │
-  │                                      │                            │                  │                │
-│                                      │ PLAN: COUNSEL              │                  │                │
-│                                      │ Eligible for admission     │                  │                │
-│                                      │ Recommend branches         │                  │                │
-│                                      │ based on rank+interest     │                  │                │
-│                                      │                            │                  │                │
-│                                      │───────────────AgentTask──>│                  │                │
-│                                      │                            │                  │                │
-│                                      │<──────────────AgentResult─│                  │                │
-│                                      │   confidence: 0.88         │   recommend      │                │
-│                                      │   breakdown: {...}         │   branches ───>  │                │
-│                                      │                            │                  │                │
-│                                      │ DECIDE                     │                  │                │
-│                                      │ ┌─ Confidence: 88%        │                  │                │
-│                                      │ │  (rank=85%, interest=95%,│                  │                │
-│                                      │ │   career=90%, finance=80%)│                 │                │
+Student                         Supervisor (Reasoner → Planner)          Profile Agent    Counselling Agent   Knowledge
+  │                                      │                                   │                  │                │
+  │ "I got 65% PCM"                      │                                   │                  │                │
+  │─────────────────────────────────────>│                                   │                  │                │
+  │                                      │ REASON                            │                  │                │
+  │                                      │ text: "I got 65%"                 │                  │                │
+  │                                      │ inference: worried about          │                  │                │
+  │                                      │   eligibility                     │                  │                │
+  │                                      │ emotion: anxious (0.6)            │                  │                │
+  │                                      │ stage: discovery                  │                  │                │
+  │                                      │ profile: missing rank,            │                  │                │
+  │                                      │   board, interest                 │                  │                │
+  │                                      │ ReasoningResult:                  │                  │                │
+  │                                      │   intent: eligibility_check       │                  │                │
+  │                                      │   confidence: 0.7                 │                  │                │
+  │                                      │   missing_info: [rank, board,     │                  │                │
+  │                                      │                  interest]        │                  │                │
+  │                                      │                                   │                  │                │
+  │                                      │ PLAN: PROBE + COUNSEL             │                  │                │
+  │                                      │ strategy: GATHER_INFO             │                  │                │
+  │                                      │ Need more profile info            │                  │                │
+  │                                      │ before recommending               │                  │                │
+  │                                      │                                   │                  │                │
+  │ "65% is a good score. Are you        │                                   │                  │                │
+  │  from West Bengal board? Do you      │                                   │                  │                │
+  │  have your WBJEE rank?"              │                                   │                  │                │
+  │<─────────────────────────────────────│                                   │                  │                │
+  │                                      │                                   │                  │                │
+  │ "Yes, WB board. My rank is 35000."   │                                   │                  │                │
+  │─────────────────────────────────────>│                                   │                  │                │
+  │                                      │ REASON                            │                  │                │
+  │                                      │ profile: rank=35000,              │                  │                │
+  │                                      │   board=WBCHSE                    │                  │                │
+  │                                      │ emotion: still anxious            │                  │                │
+  │                                      │ ReasoningResult:                  │                  │                │
+  │                                      │   intent: branch_recommendation   │                  │                │
+  │                                      │   eligible: true                  │                  │                │
+  │                                      │   rank_strength: "good for ECE"   │                  │                │
+  │                                      │   missing_info: [interest]        │                  │                │
+  │                                      │                                   │                  │                │
+  │                                      │ PLAN: COUNSEL                     │                  │                │
+  │                                      │ strategy: RECOMMEND               │                  │                │
+  │                                      │ Eligible for admission            │                  │                │
+  │                                      │ Recommend branches                │                  │                │
+  │                                      │ based on rank+interest            │                  │                │
+  │                                      │                                   │                  │                │
+  │                                      │───────────────AgentTask─────────>│                  │                │
+  │                                      │                                   │                  │                │
+  │                                      │<──────────────AgentResult────────│                  │                │
+  │                                      │   confidence: 0.88                │   recommend      │                │
+  │                                      │   breakdown: {...}                │   branches ───>  │                │
+  │                                      │                                   │                  │                │
+  │                                      │ DECIDE                            │                  │                │
+  │                                      │ ┌─ Confidence: 88%               │                  │                │
+  │                                      │ │  (rank=85%, interest=95%,      │                  │                │
+  │                                      │ │   career=90%, finance=80%)     │                  │                │
 │                                      │ │  Above 70% → proceed    │                  │                │
 │                                      │ │  with qualified rec.    │                  │                │
 │                                      │ └─────────────────────────│                  │                │
@@ -2083,7 +2379,7 @@ Phase 6: REMOVED
 
 ### 9.2 Migration Phases
 
-#### Phase 0: Freeze (Week 0) — DONE
+#### Phase 0: Freeze — DONE
 
 | Action | Status |
 |--------|--------|
@@ -2092,7 +2388,7 @@ Phase 6: REMOVED
 | Create `backup/v1-demo-2026-07-17` branch | ✅ DONE |
 | Document current architecture | ✅ DONE |
 
-#### Phase 1: Infrastructure (Weeks 1-3)
+#### Phase 1: Infrastructure
 
 **Goal:** No behavior changes. Only infrastructure. All existing code continues to work.
 
@@ -2108,7 +2404,7 @@ Phase 6: REMOVED
 
 **Verification:** All existing tests pass. Demo works identically.
 
-#### Phase 2: LLM Provider Abstraction (Weeks 4-5)
+#### Phase 2: LLM Provider Abstraction
 
 **Goal:** Decouple conversation engine from Groq.
 
@@ -2122,7 +2418,7 @@ Phase 6: REMOVED
 
 **Verification:** System still uses Groq for everything. FallbackProvider only activates if Groq is down.
 
-#### Phase 3: Channel Decoupling (Weeks 6-8)
+#### Phase 3: Channel Decoupling
 
 **Goal:** Voice pipeline no longer depends on LiveKit-specific logic.
 
@@ -2136,7 +2432,7 @@ Phase 6: REMOVED
 
 **Verification:** Voice calls work identically. System prompt is identical for voice and text.
 
-#### Phase 4: Supervisor Agent (Weeks 9-12)
+#### Phase 4: Supervisor Agent
 
 **Goal:** Replace flat pipeline with Observe→Plan→Act→Remember loop.
 
@@ -2150,7 +2446,7 @@ Phase 6: REMOVED
 
 **Verification:** Supervisor Agent matches or exceeds GroqService on all regression tests.
 
-#### Phase 5: Knowledge Modernization (Weeks 13-16)
+#### Phase 5: Knowledge Modernization
 
 **Goal:** Replace JSON KB with maintainable knowledge graph + CMS.
 
@@ -2164,7 +2460,7 @@ Phase 6: REMOVED
 
 **Verification:** Staff can update fee structures without developer help. Changes propagate in <60 seconds.
 
-#### Phase 6: Hardening & Scale (Weeks 17-20)
+#### Phase 6: Hardening & Scale
 
 **Goal:** Production-grade reliability, performance, monitoring.
 
@@ -2240,12 +2536,16 @@ bcrec-ai/
 │   │   ├── confidence.py          # System confidence computation
 │   │   └── thresholds.py          # Confidence thresholds config
 │   │
-│   ├── brain/                     # College Brain
+│   ├── brain/                     # College Brain (executable domains)
 │   │   ├── __init__.py
-│   │   ├── procedures.py          # Deterministic procedural rules
-│   │   ├── policies.py            # Policy document ingestion + query
-│   │   ├── heuristics.py          # Decision heuristics for recommendations
-│   │   └── workflows.py           # Workflow definitions
+│   │   ├── domain_base.py          # Base class for all domains
+│   │   ├── registry.py             # Domain registry + routing
+│   │   ├── admissions.py           # Admissions domain
+│   │   ├── placement.py            # Placement domain
+│   │   ├── fees.py                 # Fees domain
+│   │   ├── scholarship.py          # Scholarship domain
+│   │   ├── hostel.py               # Hostel domain
+│   │   └── rules.py                # General college rules
 │   │
 │   ├── reasoning/                 # Reasoning Engine
 │   │   ├── __init__.py
@@ -2273,6 +2573,32 @@ bcrec-ai/
 │   │       │   ├── placement_agent.txt
 │   │       │   └── ...
 │   │       └── templates/         # Reusable prompt fragments
+│   │
+│   ├── planner/                   # Planner
+│   │   ├── __init__.py
+│   │   ├── engine.py              # Action selection logic
+│   │   ├── sequencer.py           # Multi-step plan sequencing
+│   │   ├── scheduler.py           # Follow-up scheduling
+│   │   └── strategies.py          # Counseling strategies
+│   │
+│   ├── policies/                  # Policy Engine
+│   │   ├── __init__.py
+│   │   ├── engine.py              # Policy evaluation engine
+│   │   ├── loader.py              # Policy loading + hot-reload
+│   │   ├── admission.py           # Admission policies
+│   │   ├── scholarship.py         # Scholarship policies
+│   │   ├── makaut.py              # MAKAUT affiliation policies
+│   │   └── fees.py                # Fee computation policies
+│   │
+│   ├── evaluation/                # Evaluation Engine
+│   │   ├── __init__.py
+│   │   ├── runner.py              # Evaluation pipeline runner
+│   │   ├── expected.py            # Expected behaviour definitions
+│   │   ├── scorer.py              # Actual vs expected scoring
+│   │   ├── classifier.py          # Failure classification
+│   │   ├── regression.py          # Regression test runner
+│   │   ├── human_review.py        # Human review queue
+│   │   └── metrics.py             # Aggregate evaluation metrics
 │   │
 │   ├── knowledge/                 # Knowledge Layer
 │   │   ├── __init__.py
@@ -2391,7 +2717,7 @@ bcrec-ai/
 
 ## 11. Development Phases & Milestones
 
-### Phase 1: Infrastructure (Weeks 1-3)
+### Phase 1: Infrastructure
 
 | Week | Milestone | Deliverable | Verification |
 |------|-----------|-------------|--------------|
@@ -2401,55 +2727,55 @@ bcrec-ai/
 
 **Go/No-Go:** Can we restart the server and active sessions survive? Are prompts identical?
 
-### Phase 2: LLM Provider Abstraction (Weeks 4-5)
+### Phase 2: LLM Provider Abstraction
 
-| Week | Milestone | Deliverable | Verification |
+| Step | Milestone | Deliverable | Verification |
 |------|-----------|-------------|--------------|
-| 4 | LLMProvider interface created, Groq wrapped | Old GroqService behind interface | All tests pass |
-| 5 | LLMRouter + FallbackProvider working | System degrades gracefully if Groq is down | Simulate Groq outage, verify fallback |
+| 2.1 | LLMProvider interface created, Groq wrapped | Old GroqService behind interface | All tests pass |
+| 2.2 | LLMRouter + FallbackProvider working | System degrades gracefully if Groq is down | Simulate Groq outage, verify fallback |
 
 **Go/No-Go:** Can we fail Groq and the system still responds?
 
-### Phase 3: Channel Decoupling (Weeks 6-8)
+### Phase 3: Channel Decoupling
 
-| Week | Milestone | Deliverable | Verification |
+| Step | Milestone | Deliverable | Verification |
 |------|-----------|-------------|--------------|
-| 6 | VoiceAdapter interface + LiveKit wrapper | LiveKit behind adapter | Voice calls work identically |
-| 7 | Event bus for voice pipeline | STT→Event→Counseling→Event→TTS | Voice calls work through event bus |
-| 8 | Unified system prompt | Voice and web use same prompt | Behavioral parity verified |
+| 3.1 | VoiceAdapter interface + LiveKit wrapper | LiveKit behind adapter | Voice calls work identically |
+| 3.2 | Event bus for voice pipeline | STT→Event→Counseling→Event→TTS | Voice calls work through event bus |
+| 3.3 | Unified system prompt | Voice and web use same prompt | Behavioral parity verified |
 
 **Go/No-Go:** Do voice and web responses match given the same input?
 
-### Phase 4: Supervisor Agent (Weeks 9-12)
+### Phase 4: Supervisor Agent
 
-| Week | Milestone | Deliverable | Verification |
+| Step | Milestone | Deliverable | Verification |
 |------|-----------|-------------|--------------|
-| 9 | Supervisor Agent prototype | Observe→Plan→Act→Remember loop running | Shadow mode shows comparable quality |
-| 10 | Profile Agent + one specialist agent | Student profile extraction working | Profile data persists across conversations |
-| 11 | All agents migrated, shadow mode running | 95%+ agreement with old system | Regression tests pass |
-| 12 | **Cutover: Supervisor Agent becomes primary** | Old GroqService is fallback only | All demos work with new system |
+| 4.1 | Supervisor Agent prototype | Observe→Plan→Act→Remember loop running | Shadow mode shows comparable quality |
+| 4.2 | Profile Agent + one specialist agent | Student profile extraction working | Profile data persists across conversations |
+| 4.3 | All agents migrated, shadow mode running | 95%+ agreement with old system | Regression tests pass |
+| 4.4 | **Cutover: Supervisor Agent becomes primary** | Old GroqService is fallback only | All demos work with new system |
 
 **Go/No-Go:** Does the Supervisor Agent match or exceed the old system on 100+ regression tests?
 
-### Phase 5: Knowledge Modernization (Weeks 13-16)
+### Phase 5: Knowledge Modernization
 
-| Week | Milestone | Deliverable | Verification |
+| Step | Milestone | Deliverable | Verification |
 |------|-----------|-------------|--------------|
-| 13 | Neo4j schema + data migration | All KB data in graph | Queries return same results as JSON |
-| 14 | CMS API | CRUD endpoints for all domains | Staff can update fee structure via API |
-| 15 | CMS UI | React frontend for knowledge management | Non-developer can update data |
-| 16 | Cache invalidation pipeline | Updates propagate in <60s | Update → invalidate → requery → fresh data |
+| 5.1 | Neo4j schema + data migration | All KB data in graph | Queries return same results as JSON |
+| 5.2 | CMS API | CRUD endpoints for all domains | Staff can update fee structure via API |
+| 5.3 | CMS UI | React frontend for knowledge management | Non-developer can update data |
+| 5.4 | Cache invalidation pipeline | Updates propagate in <60s | Update → invalidate → requery → fresh data |
 
 **Go/No-Go:** Can a non-developer update the fee structure and see it in the AI's response within 60 seconds?
 
-### Phase 6: Hardening (Weeks 17-20)
+### Phase 6: Hardening
 
-| Week | Milestone | Deliverable | Verification |
+| Step | Milestone | Deliverable | Verification |
 |------|-----------|-------------|--------------|
-| 17 | Load test at 50 concurrent users | p95 latency < 3s | k6 report |
-| 18 | Load test at 200 concurrent users | p95 latency < 5s | k6 report, no errors |
-| 19 | All circuit breakers, rate limits, security | Full hardening | Security scan, penetration test |
-| 20 | **Old GroqService deleted** | Codebase cleaned | No references to old monolith |
+| 6.1 | Load test at 50 concurrent users | p95 latency < 3s | k6 report |
+| 6.2 | Load test at 200 concurrent users | p95 latency < 5s | k6 report, no errors |
+| 6.3 | All circuit breakers, rate limits, security | Full hardening | Security scan, penetration test |
+| 6.4 | **Old GroqService deleted** | Codebase cleaned | No references to old monolith |
 
 **Go/No-Go:** Can we delete `groq_service.py`? (The entire file. Every line.)
 
@@ -2979,33 +3305,22 @@ API versioning via URL prefix: `/api/v1/query`, `/api/v2/query`
 
 ---
 
-## 23. Estimated Timeline
+## 23. Timeline Reference
 
-| Phase | Duration | Effort | Personnel | Dependencies |
-|-------|----------|--------|-----------|--------------|
-| 0: Freeze | ✅ 0 days | ✅ DONE | ✅ | None |
-| 1: Infrastructure | 3 weeks | 1 senior backend engineer | Redis experience | Redis + PostgreSQL access |
-| 2: LLM Abstraction | 2 weeks | 1 senior backend engineer | None | Phase 1 |
-| 3: Channel Decoupling | 3 weeks | 1 senior + 1 mid backend | LiveKit + audio experience | Phase 1-2 |
-| 4: Supervisor Agent | 4 weeks | 1 senior + 1 AI engineer | LLM + agent architecture experience | Phase 1-3 |
-| 5: Knowledge Modernization | 4 weeks | 1 full-stack + 1 backend | React + Neo4j experience | Phase 4 |
-| 6: Hardening | 4 weeks | 1 DevOps + 1 backend | K8s + monitoring experience | Phase 1-5 |
+Timeline estimates are maintained outside this document — they change too frequently and become outdated quickly. Reference these external artifacts:
 
-**Total: 20 weeks (~5 months)**
+| Artifact | Location | Owner | Update Cadence |
+|----------|----------|-------|----------------|
+| **Development Roadmap** | `ROADMAP.md` (project root) | Tech Lead | Per sprint |
+| **Sprint Plan** | Project board / Jira | Tech Lead | Per sprint |
+| **Milestone Tracker** | GitHub Milestones | Product Manager | Per phase |
+| **Resource Plan** | HR / budget planning doc | Delivery Manager | Per quarter |
 
-**Critical path:** Phase 4 (Supervisor Agent) is the highest-risk, highest-reward item. It should be prioritized even if other phases are delayed.
-
-### Resource Requirements
-
-| Role | Phase 1-2 | Phase 3-4 | Phase 5-6 |
-|------|-----------|-----------|-----------|
-| Senior Backend Engineer | 1.0 FTE | 1.0 FTE | 0.5 FTE |
-| Mid Backend Engineer | 0 FTE | 1.0 FTE | 1.0 FTE |
-| AI/ML Engineer | 0 FTE | 1.0 FTE | 0 FTE |
-| Full-Stack Engineer (CMS) | 0 FTE | 0 FTE | 1.0 FTE |
-| DevOps Engineer | 0.25 FTE | 0.25 FTE | 0.5 FTE |
-
-**Total effort:** ~7 engineer-months over 5 calendar months.
+**Why timelines are not in this document:**
+- This document describes architecture, which should be relatively stable and timeless.
+- Timeline estimates create false precision — they depend on team size, skill level, simultaneous commitments, and unforeseen complexity.
+- When estimates change (they will), you must update this document, which creates friction and discourages honest re-estimation.
+- Architecture decisions should not be driven by deadlines. "We need this in 3 weeks" is not a valid architectural constraint.
 
 ---
 

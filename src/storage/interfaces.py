@@ -46,13 +46,41 @@ class SessionStore(ABC):
     @abstractmethod
     async def touch(self, session_id: str) -> None: ...
 
+    @abstractmethod
+    async def close(self) -> None: ...
+
+
+class InMemorySessionStore(SessionStore):
+    def __init__(self):
+        self._sessions: dict[str, SessionData] = {}
+
+    async def get(self, session_id: str) -> SessionData | None:
+        return self._sessions.get(session_id)
+
+    async def set(self, session: SessionData, ttl: int | None = None) -> None:
+        self._sessions[session.session_id] = session
+
+    async def delete(self, session_id: str) -> None:
+        self._sessions.pop(session_id, None)
+
+    async def touch(self, session_id: str) -> None:
+        if session_id in self._sessions:
+            self._sessions[session_id].last_active = _utcnow()
+
+    async def close(self) -> None:
+        self._sessions.clear()
+
 
 class ConversationStore(ABC):
     @abstractmethod
-    async def save_message(self, conversation_id: str, message: ConversationMessage) -> None: ...
+    async def save_message(
+        self, conversation_id: str, message: ConversationMessage
+    ) -> None: ...
 
     @abstractmethod
-    async def get_messages(self, conversation_id: str) -> list[ConversationMessage]: ...
+    async def get_messages(
+        self, conversation_id: str
+    ) -> list[ConversationMessage]: ...
 
     @abstractmethod
     async def create_conversation(

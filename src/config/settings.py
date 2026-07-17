@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     app_name: str = "BCREC AI"
     debug: bool = True
 
+    # --- Infrastructure ---
     redis_url: str = "redis://localhost:6379/0"
     redis_session_ttl: int = 1800
 
@@ -16,8 +17,14 @@ class Settings(BaseSettings):
 
     sqlite_path: str = "data/conversations.db"
 
+    # --- Observability ---
     otel_service_name: str = "bcrec-ai"
     otel_endpoint: str | None = None
+
+    # --- Feature Flags (all default OFF) ---
+    use_redis_sessions: bool = False
+    use_postgres_history: bool = False
+    use_otel: bool = False
 
 
 settings = Settings()

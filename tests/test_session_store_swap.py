@@ -8,7 +8,6 @@ import os
 
 import pytest
 
-from src.config.settings import Settings
 from src.storage.factory import create_session_store
 from src.storage.interfaces import (
     ConversationMessage,
@@ -21,7 +20,6 @@ from src.storage.interfaces import (
 @pytest.fixture
 def store() -> SessionStore:
     if os.environ.get("USE_REDIS_SESSIONS", "").lower() in ("true", "1"):
-        s = Settings(use_redis_sessions=True)
         return create_session_store()
     return InMemorySessionStore()
 
@@ -76,8 +74,6 @@ async def test_delete(store: SessionStore, sample_session: SessionData):
 
 @pytest.mark.asyncio
 async def test_touch_updates_last_active(store: SessionStore, sample_session: SessionData):
-    from datetime import UTC, datetime
-
     await store.set(sample_session)
     original = await store.get(sample_session.session_id)
     assert original is not None

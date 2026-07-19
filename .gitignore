@@ -9,7 +9,8 @@ local.env
 
 # Runtime data
 chroma_db/
-data/
+data/*
+!data/benchmark/
 logs/
 uploads/
 temp_audio/

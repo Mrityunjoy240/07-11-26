@@ -1,0 +1,120 @@
+{
+  "id": "MIXED_HINDI_001",
+  "tags": [
+    "admission",
+    "language",
+    "mixed",
+    "natural"
+  ],
+  "difficulty": 4,
+  "ground_truth": {
+    "rank": 55000,
+    "pcm_percentage": 72,
+    "category": "general",
+    "interest": "CSE",
+    "board": "wbjee",
+    "budget": null,
+    "location": ""
+  },
+  "turns": [
+    {
+      "student": "Mera rank 55k hai WBJEE mein. PCM 72. CSE lena hai.",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {
+            "rank": 55000,
+            "pcm_percentage": 72,
+            "interest": "CSE",
+            "exam": "wbjee"
+          },
+          "inference": {},
+          "missing": [
+            "category"
+          ]
+        },
+        "reasoning": {
+          "stage": "evaluation",
+          "profile_completeness": 0.43,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance"
+        },
+        "brain": {
+          "applicable": true,
+          "eligible_branches": [
+            "CE"
+          ],
+          "why": [
+            {
+              "condition": "CSE_cutoff",
+              "met": false,
+              "detail": "Rank 55000 > CSE cutoff 15000"
+            },
+            {
+              "condition": "EE_cutoff",
+              "met": false,
+              "detail": "Rank 55000 > EE cutoff 40000"
+            },
+            {
+              "condition": "ME_cutoff",
+              "met": true,
+              "detail": "Rank 55000 <= ME cutoff 55000"
+            },
+            {
+              "condition": "CE_cutoff",
+              "met": true,
+              "detail": "Rank 55000 <= CE cutoff 70000"
+            }
+          ]
+        },
+        "decision": {
+          "action": "collect_profile",
+          "priority": "normal",
+          "confidence": "high",
+          "why": [
+            "CSE not in range for general",
+            "ME/CE eligible — need category to confirm",
+            "PCM 72 meets minimum"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "rank",
+                "eligible",
+                "ME",
+                "CE"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "category",
+                "general",
+                "OBC",
+                "SC"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Rank=55k beyond CSE cutoff",
+            "Brain=ME/CE eligible",
+            "Decision=collect_profile for category",
+            "Planner=inform eligibility status, ask category"
+          ]
+        }
+      },
+      "must_not": [
+        "switch_to_english_only",
+        "ignore_hindi_words",
+        "say_CSE_possible"
+      ],
+      "ideal_counselor_notes": "Student mixing Hindi and English. Respond in the same mixed register — don't switch to pure English or pure Hindi. Be honest that CSE is not in range for 55k general. Offer ME/CE as realistic options."
+    }
+  ],
+  "expected_end_state": "incomplete",
+  "ideal_counselor_notes": "Code-switching students are common in Bengal. The AI must handle mixed-language input and respond in matching register."
+}

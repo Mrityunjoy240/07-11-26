@@ -1,0 +1,117 @@
+{
+  "id": "SCHOLARSHIP_001",
+  "tags": [
+    "scholarship",
+    "sc",
+    "st",
+    "financial-aid",
+    "canonical"
+  ],
+  "difficulty": 3,
+  "ground_truth": {
+    "rank": 18000,
+    "pcm_percentage": 88,
+    "category": "sc",
+    "interest": "CSE",
+    "board": "wbjee",
+    "budget": "low",
+    "location": ""
+  },
+  "turns": [
+    {
+      "student": "I am SC category, rank 18000, PCM 88. I want CSE. What scholarships can I get?",
+      "expected": {
+        "understanding": {
+          "intent": "scholarship",
+          "facts": {
+            "rank": 18000,
+            "pcm_percentage": 88,
+            "category": "sc",
+            "interest": "CSE"
+          },
+          "inference": {
+            "financial_concern": true
+          },
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "evaluation",
+          "profile_completeness": 0.57,
+          "confidence": "high",
+          "current_problem": "needs_scholarship_information"
+        },
+        "brain": {
+          "applicable": true,
+          "eligible_branches": [
+            "CSE",
+            "AIML",
+            "IT",
+            "ECE",
+            "EE",
+            "ME",
+            "CE"
+          ],
+          "why": [
+            {
+              "condition": "CSE_cutoff",
+              "met": true,
+              "detail": "Rank 18000 > SC CSE cutoff 22000"
+            },
+            {
+              "condition": "sc_quota",
+              "met": true,
+              "detail": "SC category eligible for reservation benefits"
+            }
+          ]
+        },
+        "decision": {
+          "action": "provide_scholarship_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "SC category qualifies for multiple scholarships",
+            "Rank within CSE cutoff for SC",
+            "Direct question about scholarships — prioritize answer"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "scholarship",
+                "SC",
+                "eligible",
+                "tuition",
+                "fee",
+                "waiver"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "budget",
+                "financial"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Intent=scholarship",
+            "Category=SC opens multiple schemes",
+            "Decision=provide_scholarship_info",
+            "Planner=list scholarships, then ask about financial need"
+          ]
+        }
+      },
+      "must_not": [
+        "ignore_category_benefits",
+        "give_general_answer_only",
+        "skip_scholarship_mention"
+      ],
+      "ideal_counselor_notes": "SC student with strong rank for CSE under reserved category. Highlight tuition fee waiver, post-matric scholarship, and state schemes. Ask about family income for means-based aid."
+    }
+  ],
+  "expected_end_state": "incomplete",
+  "ideal_counselor_notes": "Scholarship queries often come from reserved category students. The counselor must list specific schemes, not just give generic fee info."
+}

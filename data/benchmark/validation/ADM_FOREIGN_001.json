@@ -1,0 +1,455 @@
+[
+  {
+    "turn": 0,
+    "student": "I am an NRI living in Dubai. I studied CBSE with 85% PCM. Can I get CSE at your college under NRI quota?",
+    "metrics": [
+      {
+        "stage": "understanding",
+        "metric": "intent.primary",
+        "expected": "nri_admission",
+        "actual": "nri_admission",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "facts.pcm_percentage",
+        "expected": 85,
+        "actual": 85.0,
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "facts.interest",
+        "expected": "CSE",
+        "actual": "CSE",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "facts.board",
+        "expected": "cbse",
+        "actual": "CBSE",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "facts.category",
+        "expected": "nri",
+        "actual": "nri",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "missing",
+        "expected": [
+          "qualification"
+        ],
+        "actual": [
+          "qualification"
+        ],
+        "pass": true,
+        "detail": "overlap=1/1",
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "stage",
+        "expected": "discovery",
+        "actual": "discovery",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "profile_completeness",
+        "expected": 0.6,
+        "actual": 0.5714285714285714,
+        "pass": true,
+        "detail": "tol=0.3, diff=0.03",
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "confidence",
+        "expected": "medium",
+        "actual": "medium",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "current_problem",
+        "expected": "needs_nri_admission_information",
+        "actual": "needs_nri_admission_information",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "brain",
+        "metric": "applicable",
+        "expected": false,
+        "actual": false,
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "brain",
+        "metric": "eligible_branches",
+        "expected": [],
+        "actual": [],
+        "pass": true,
+        "detail": "overlap=0/0",
+        "judge": ""
+      },
+      {
+        "stage": "decision",
+        "metric": "action",
+        "expected": "provide_nri_admission_info",
+        "actual": "provide_nri_admission_info",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0].action",
+        "expected": "inform",
+        "actual": "inform",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'NRI'",
+        "expected": "NRI",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'quota'",
+        "expected": "quota",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'seats'",
+        "expected": "seats",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'fee'",
+        "expected": "fee",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'structure'",
+        "expected": "structure",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1].action",
+        "expected": "ask",
+        "actual": "inform",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1] content contains 'rank'",
+        "expected": "rank",
+        "actual": "Do you have a JEE or board score? What is your percentage?",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1] content contains 'JEE'",
+        "expected": "JEE",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1] content contains 'board'",
+        "expected": "board",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1] content contains 'percentage'",
+        "expected": "percentage",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[2].action",
+        "expected": "ask",
+        "actual": "ask",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[2] content contains 'budget'",
+        "expected": "budget",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[2] content contains 'preference'",
+        "expected": "preference",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[2] content contains 'clarify'",
+        "expected": "clarify",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      }
+    ],
+    "score": "25/28"
+  },
+  {
+    "turn": 1,
+    "student": "I have 92% in CBSE PCM. Budget is not a constraint. I want CSE only.",
+    "metrics": [
+      {
+        "stage": "understanding",
+        "metric": "intent.primary",
+        "expected": "nri_admission",
+        "actual": "admission",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "facts.pcm_percentage",
+        "expected": 92,
+        "actual": 85.0,
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "facts.interest",
+        "expected": "CSE",
+        "actual": "CSE",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "facts.board",
+        "expected": "cbse",
+        "actual": "CBSE",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "facts.category",
+        "expected": "nri",
+        "actual": "nri",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "missing",
+        "expected": [
+          "qualification"
+        ],
+        "actual": [
+          "rank"
+        ],
+        "pass": false,
+        "detail": "overlap=0/1",
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "stage",
+        "expected": "evaluation",
+        "actual": "discovery",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "profile_completeness",
+        "expected": 0.8,
+        "actual": 0.5714285714285714,
+        "pass": true,
+        "detail": "tol=0.3, diff=0.23",
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "confidence",
+        "expected": "high",
+        "actual": "medium",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "current_problem",
+        "expected": "needs_admission_guidance",
+        "actual": "needs_admission_guidance",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "brain",
+        "metric": "applicable",
+        "expected": false,
+        "actual": false,
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "brain",
+        "metric": "eligible_branches",
+        "expected": [],
+        "actual": [],
+        "pass": true,
+        "detail": "overlap=0/0",
+        "judge": ""
+      },
+      {
+        "stage": "decision",
+        "metric": "action",
+        "expected": "guide_nri_application",
+        "actual": "provide_admission_guidance",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0].action",
+        "expected": "inform",
+        "actual": "inform",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'steps'",
+        "expected": "steps",
+        "actual": "The admission process involves WBJEE counseling registration document verification choice filling an",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'apply'",
+        "expected": "apply",
+        "actual": "The admission process involves WBJEE counseling registration document verification choice filling an",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'NRI'",
+        "expected": "NRI",
+        "actual": "The admission process involves WBJEE counseling registration document verification choice filling an",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'application'",
+        "expected": "application",
+        "actual": "The admission process involves WBJEE counseling registration document verification choice filling an",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'deadline'",
+        "expected": "deadline",
+        "actual": "The admission process involves WBJEE counseling registration document verification choice filling an",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1].action",
+        "expected": "inform",
+        "actual": "ask",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1] content contains 'document'",
+        "expected": "document",
+        "actual": "Which step of the process would you like help with?",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1] content contains 'apostille'",
+        "expected": "apostille",
+        "actual": "Which step of the process would you like help with?",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1] content contains 'equivalency'",
+        "expected": "equivalency",
+        "actual": "Which step of the process would you like help with?",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1] content contains 'visa'",
+        "expected": "visa",
+        "actual": "Which step of the process would you like help with?",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[2].action",
+        "expected": "ask",
+        "actual": null,
+        "pass": false,
+        "detail": "Missing turn",
+        "judge": ""
+      }
+    ],
+    "score": "7/25"
+  }
+]

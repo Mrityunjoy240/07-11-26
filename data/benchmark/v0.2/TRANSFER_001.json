@@ -1,0 +1,105 @@
+{
+  "id": "TRANSFER_001",
+  "tags": [
+    "transfer",
+    "migration",
+    "inter-college",
+    "canonical"
+  ],
+  "difficulty": 4,
+  "ground_truth": {
+    "rank": 32000,
+    "pcm_percentage": 78,
+    "category": "general",
+    "interest": "EE",
+    "board": "wbjee",
+    "budget": null,
+    "location": ""
+  },
+  "turns": [
+    {
+      "student": "I am in 1st year EE at a private college in Bengal. I had 32k WBJEE rank. Can I transfer to your college in 2nd year EE?",
+      "expected": {
+        "understanding": {
+          "intent": "transfer",
+          "facts": {
+            "rank": 32000,
+            "pcm_percentage": 78,
+            "interest": "EE",
+            "exam": "wbjee"
+          },
+          "inference": {},
+          "missing": [
+            "current_college",
+            "current_branch",
+            "current_year"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.43,
+          "confidence": "medium",
+          "current_problem": "needs_transfer_information"
+        },
+        "brain": {
+          "applicable": true,
+          "eligible_branches": [],
+          "why": []
+        },
+        "decision": {
+          "action": "provide_transfer_info",
+          "priority": "normal",
+          "confidence": "high",
+          "why": [
+            "Transfer request — need to explain policy",
+            "Rank was sufficient for EE in original counseling",
+            "Inter-college transfer has specific rules"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "transfer",
+                "policy",
+                "vacancy",
+                "seat"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "academic",
+                "credit",
+                "equivalence"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "category",
+                "college",
+                "reason"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Intent=transfer",
+            "Decision=provide_transfer_info",
+            "Planner=explain transfer policy, credit transfer rules, ask for more context"
+          ]
+        }
+      },
+      "must_not": [
+        "assume_transfer_is_easy",
+        "skip_credit_transfer_info",
+        "promise_approval"
+      ],
+      "ideal_counselor_notes": "Transfers are complex. Explain that transfers depend on vacancy, academic performance, and WBJEE board rules. Credit equivalence is decided by an academic committee."
+    }
+  ],
+  "expected_end_state": "incomplete",
+  "ideal_counselor_notes": "Transfer queries require policy expertise. Don't oversimplify or promise anything."
+}

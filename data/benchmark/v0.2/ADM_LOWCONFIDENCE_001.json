@@ -1,0 +1,200 @@
+{
+  "id": "ADM_LOWCONFIDENCE_001",
+  "tags": [
+    "admission",
+    "low-confidence",
+    "anxiety",
+    "encouragement",
+    "canonical"
+  ],
+  "difficulty": 4,
+  "ground_truth": {
+    "rank": 38000,
+    "pcm_percentage": 68,
+    "category": "general",
+    "interest": "CE",
+    "board": "wbjee",
+    "budget": null,
+    "location": ""
+  },
+  "turns": [
+    {
+      "student": "I only got 38k rank and 68 PCM. I don't think I'll get any good college. Should I just give up?",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {
+            "rank": 38000,
+            "pcm_percentage": 68
+          },
+          "inference": {
+            "anxiety": true
+          },
+          "missing": [
+            "interest",
+            "category"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.29,
+          "confidence": "medium",
+          "current_problem": "needs_admission_guidance"
+        },
+        "brain": {
+          "applicable": true,
+          "eligible_branches": [
+            "CE",
+            "ME"
+          ],
+          "why": [
+            {
+              "condition": "EE_cutoff",
+              "met": true,
+              "detail": "38k <= EE cutoff 40k"
+            },
+            {
+              "condition": "ME_cutoff",
+              "met": true,
+              "detail": "38k <= ME cutoff 55k"
+            },
+            {
+              "condition": "CE_cutoff",
+              "met": true,
+              "detail": "38k <= CE cutoff 70k"
+            }
+          ]
+        },
+        "decision": {
+          "action": "encourage_and_collect_profile",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student expressing hopelessness — must encourage first",
+            "Rank 38k is decent — EE/ME/CE open",
+            "Need to collect interest and category to show possibilities"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "encourage",
+              "content_contains": [
+                "38k",
+                "rank",
+                "eligible",
+                "branches"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "interest",
+                "subject"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Anxiety detected",
+            "Hopelessness detected",
+            "Decision=encourage_and_collect_profile",
+            "Planner=encourage with facts, then ask interest to personalize"
+          ]
+        }
+      },
+      "must_not": [
+        "be_cheerleader_without_facts",
+        "dismiss_feelings",
+        "compare_to_others",
+        "promise_unrealistic_options"
+      ],
+      "ideal_counselor_notes": "This student needs encouragement backed by data, not empty platitudes. Show them their rank opens EE/ME/CE. This is real hope, not false hope."
+    },
+    {
+      "student": "I like civil engineering. But is 38k enough for CE?",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {
+            "rank": 38000,
+            "pcm_percentage": 68,
+            "interest": "CE"
+          },
+          "inference": {
+            "anxiety": true
+          },
+          "missing": [
+            "category"
+          ]
+        },
+        "reasoning": {
+          "stage": "evaluation",
+          "profile_completeness": 0.43,
+          "confidence": "high",
+          "current_problem": "needs_branch_guidance"
+        },
+        "brain": {
+          "applicable": true,
+          "eligible_branches": [
+            "CE",
+            "ME"
+          ],
+          "why": [
+            {
+              "condition": "CE_cutoff",
+              "met": true,
+              "detail": "38k well within CE cutoff 70k"
+            }
+          ]
+        },
+        "decision": {
+          "action": "recommend_branches",
+          "priority": "normal",
+          "confidence": "high",
+          "why": [
+            "Interest known — CE is within range",
+            "Reinforce positive message with data",
+            "Ask category to confirm"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "reassure",
+              "content_contains": [
+                "CE",
+                "eligible",
+                "38k",
+                "cutoff",
+                "safe"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "category",
+                "confirm"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Interest=CE",
+            "Brain=CE cutoff 70k > 38k",
+            "Decision=recommend_branches",
+            "Planner=confirm CE eligibility, ask category to finalize"
+          ]
+        }
+      },
+      "must_not": [
+        "sound_dismissive_of_CE",
+        "make_student_feel_silly_for_asking",
+        "skip_reassurance"
+      ],
+      "ideal_counselor_notes": "The student is cautiously hopeful. Reinforce that CE is absolutely achievable. The anxiety should reduce with clear, factual reassurance."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "Low-confidence students need data-backed encouragement. The counselor must be patient, kind, and factual."
+}

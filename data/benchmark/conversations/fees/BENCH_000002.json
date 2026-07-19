@@ -1,0 +1,183 @@
+{
+  "id": "BENCH_000002",
+  "domain": "fees",
+  "difficulty": 3,
+  "primary_language": "hi",
+  "languages": [
+    "hi",
+    "en"
+  ],
+  "speaker_profile": "student",
+  "features": [
+    "noisy_input"
+  ],
+  "ground_truth": {
+    "rank": null,
+    "pcm_percentage": 82,
+    "category": "general",
+    "interest": "CSE",
+    "board": "cbse",
+    "exam": "",
+    "budget": null,
+    "location": "delhi"
+  },
+  "turns": [
+    {
+      "student": "bhaiya mujhe pata karna hai ki cse ka kitna fees hai... mera 82% hai pcm mein",
+      "expected": {
+        "understanding": {
+          "intent": "fee",
+          "facts": {
+            "pcm_percentage": 82,
+            "interest": "CSE"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": [
+            "category",
+            "budget"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.29,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": [
+            "needs_fee_information"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_fee_info",
+          "priority": "high",
+          "confidence": "medium",
+          "why": [
+            "Student explicitly asking about CSE fees",
+            "Have partial profile but fee info is primary ask"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "fees",
+                "CSE",
+                "range"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "category",
+                "rank"
+              ]
+            }
+          ],
+          "confidence": "medium",
+          "dependency_chain": [
+            "Decision=provide_fee_info",
+            "Student_asks_fees"
+          ]
+        }
+      },
+      "must_not": [
+        "recommend_branch",
+        "hallucinate_exact_fees"
+      ],
+      "ideal_counselor_notes": "Student is asking about fees in Hindi. Provide general fee range for CSE, then ask for more details to give specific advice."
+    },
+    {
+      "student": "general category hai. aur kya kya lagta hai admission ke liye... hostel ka alag se lagta hai kya?",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {
+            "category": "general"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": [
+            "rank"
+          ]
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.43,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": [
+            "needs_fee_information",
+            "needs_hostel_info"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "collect_profile",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Continue providing fee information",
+            "Also asking about hostel fees",
+            "Can provide combined fee+hostel info"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "category",
+                "general"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "admission fee",
+                "hostel fee",
+                "total"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "rank",
+                "WBJEE"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_fee_info",
+            "Also_asks_hostel"
+          ]
+        }
+      },
+      "must_not": [
+        "recommend_branch",
+        "ignore_hostel_question"
+      ],
+      "ideal_counselor_notes": "Student switching between fee and hostel. Provide consolidated fee info including hostel. Also need rank for admission guidance."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "Hinglish conversation about fees. Student uses informal Hindi mixed with English terms. Need to respond in a similarly natural, accessible way.",
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T10:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

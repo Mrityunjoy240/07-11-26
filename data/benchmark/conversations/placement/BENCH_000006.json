@@ -1,0 +1,133 @@
+{
+  "id": "BENCH_000006",
+  "domain": "placement",
+  "difficulty": 3,
+  "primary_language": "en",
+  "languages": ["en"],
+  "speaker_profile": "student",
+  "features": ["adversarial"],
+  "ground_truth": {
+    "rank": null,
+    "pcm_percentage": 81,
+    "category": "general",
+    "interest": "CSE",
+    "board": "cbse",
+    "exam": "jee",
+    "budget": null,
+    "location": "bangalore"
+  },
+  "turns": [
+    {
+      "student": "Do colleges guarantee placements? I heard most colleges just show fake numbers.",
+      "expected": {
+        "understanding": {
+          "intent": "placement",
+          "facts": {},
+          "inference": {"skepticism": true},
+          "confidence": "medium",
+          "missing": ["rank", "pcm_percentage", "category", "interest"]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.0,
+          "confidence": "medium",
+          "current_problem": "needs_placement_data",
+          "problems": ["needs_placement_data"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_placement_info",
+          "priority": "high",
+          "confidence": "medium",
+          "why": [
+            "Student is skeptical about placement claims",
+            "Need to build trust with honest information"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": ["concern", "skepticism"]
+            },
+            {
+              "action": "inform",
+              "content_contains": ["placement", "process", "verified"]
+            },
+            {
+              "action": "ask",
+              "content_contains": ["rank", "branch", "interest"]
+            }
+          ],
+          "confidence": "medium",
+          "dependency_chain": ["Decision=provide_placement_info", "Student_skepticism"]
+        }
+      },
+      "must_not": ["guarantee_placements", "dismiss_concern"],
+      "ideal_counselor_notes": "Student is skeptical about placement data. Address the concern honestly, then ask for profile to give specific placement data."
+    },
+    {
+      "student": "I have 81 percent in PCM, CBSE board. JEE rank around 45000. Which branch should I pick for best placements?",
+      "expected": {
+        "understanding": {
+          "intent": "placement",
+          "facts": {"pcm_percentage": 81, "board": "cbse", "exam": "jee", "rank": 45000},
+          "inference": {},
+          "confidence": "high",
+          "missing": ["category", "interest"]
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.43,
+          "confidence": "high",
+          "current_problem": "needs_placement_data",
+          "problems": ["needs_placement_data", "needs_profile_completion"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_placement_info",
+          "priority": "high",
+          "confidence": "medium",
+          "why": [
+            "Have partial profile, can give general placement data",
+            "Need category for specific cutoff-based advice"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": ["placement", "CSE", "average", "package"]
+            },
+            {
+              "action": "ask",
+              "content_contains": ["category", "interest"]
+            }
+          ],
+          "confidence": "medium",
+          "dependency_chain": ["Decision=provide_placement_info", "Partial_profile"]
+        }
+      },
+      "must_not": ["guarantee_salary", "recommend_without_category"],
+      "ideal_counselor_notes": "Provide general placement data for CSE at this rank range, then ask for category and specific interest to narrow down."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "Student is placement-focused and initially skeptical. Need to address trust concern first, then give data-driven guidance. Key challenge: not overpromising on placements while being helpful.",
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

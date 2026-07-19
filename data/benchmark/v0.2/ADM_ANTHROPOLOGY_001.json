@@ -1,0 +1,121 @@
+{
+  "id": "ADM_ANTHROPOLOGY_001",
+  "tags": [
+    "admission",
+    "unusual-interest",
+    "non-engineering",
+    "canonical"
+  ],
+  "difficulty": 5,
+  "ground_truth": {
+    "rank": 50000,
+    "pcm_percentage": 70,
+    "category": "general",
+    "interest": "anthropology",
+    "board": "wbjee",
+    "budget": null,
+    "location": ""
+  },
+  "turns": [
+    {
+      "student": "I have 50k rank, PCM 70. I actually want to study anthropology, not engineering. But my parents want me to take engineering. What should I do?",
+      "expected": {
+        "understanding": {
+          "intent": "career_confusion",
+          "facts": {
+            "rank": 50000,
+            "pcm_percentage": 70,
+            "interest": "anthropology"
+          },
+          "inference": {
+            "confusion": true,
+            "parent_influence": true,
+            "anxiety": true
+          },
+          "missing": [
+            "category"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.43,
+          "confidence": "medium",
+          "current_problem": "needs_branch_guidance"
+        },
+        "brain": {
+          "applicable": true,
+          "eligible_branches": [
+            "CE"
+          ],
+          "why": [
+            {
+              "condition": "CE_cutoff",
+              "met": true,
+              "detail": "50k <= CE cutoff 70k"
+            },
+            {
+              "condition": "ME_cutoff",
+              "met": true,
+              "detail": "50k <= ME cutoff 55k"
+            }
+          ]
+        },
+        "decision": {
+          "action": "provide_career_guidance",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student torn between passion and parental pressure",
+            "Engineering is possible but not desired",
+            "Needs career counseling more than admission help"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "understand",
+                "passion",
+                "anthropology",
+                "parent"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "career",
+                "options",
+                "both",
+                "combination"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "parent",
+                "talk"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Career confusion detected",
+            "Parent pressure detected",
+            "Decision=provide_career_guidance",
+            "Planner=listen empathetically, present all options, suggest parent conversation"
+          ]
+        }
+      },
+      "must_not": [
+        "dismiss_anthropology",
+        "push_only_engineering",
+        "ignore_parental_dynamic",
+        "simplify_complex_decision"
+      ],
+      "ideal_counselor_notes": "This is NOT a simple admission query — it's career confusion with parental pressure. Don't dismiss anthropology or push engineering. Present options: dual degree, minor in anthropology, or dedicated social science path. Respect both the student's passion and the parents' concerns."
+    }
+  ],
+  "expected_end_state": "incomplete",
+  "ideal_counselor_notes": "Some students don't want engineering. The counselor must be honest and supportive, not just a funnel for engineering admissions."
+}

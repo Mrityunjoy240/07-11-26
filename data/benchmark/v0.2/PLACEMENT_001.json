@@ -1,0 +1,87 @@
+{
+  "id": "PLACEMENT_001",
+  "tags": [
+    "placement",
+    "career",
+    "packages",
+    "canonical"
+  ],
+  "difficulty": 2,
+  "ground_truth": {
+    "rank": null,
+    "pcm_percentage": null,
+    "category": null,
+    "interest": "CSE",
+    "board": null,
+    "budget": null,
+    "location": ""
+  },
+  "turns": [
+    {
+      "student": "What is the average and highest placement package for CSE in your college?",
+      "expected": {
+        "understanding": {
+          "intent": "placement",
+          "facts": {
+            "interest": "CSE"
+          },
+          "inference": {},
+          "missing": [
+            "rank",
+            "pcm_percentage",
+            "category"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.14,
+          "confidence": "low",
+          "current_problem": "needs_placement_information"
+        },
+        "brain": {
+          "applicable": false,
+          "eligible_branches": [],
+          "why": []
+        },
+        "decision": {
+          "action": "provide_placement_info",
+          "priority": "normal",
+          "confidence": "high",
+          "why": [
+            "Direct question about placement data",
+            "CSE-specific query — provide branch-wise data"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "average",
+                "highest",
+                "package",
+                "CTC",
+                "CSE",
+                "company"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Intent=placement",
+            "Decision=provide_placement_info",
+            "Planner=share placement stats with company names"
+          ]
+        }
+      },
+      "must_not": [
+        "give_college_wide_avg_only",
+        "hide_branch_specific_data",
+        "exaggerate_numbers"
+      ],
+      "ideal_counselor_notes": "Placement data must be honest and branch-specific. Mention top recruiters, average package, median, and placement percentage."
+    }
+  ],
+  "expected_end_state": "incomplete",
+  "ideal_counselor_notes": "Students often ask placements before admission. Provide real numbers, not vague claims."
+}

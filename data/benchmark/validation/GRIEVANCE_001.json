@@ -1,0 +1,206 @@
+[
+  {
+    "turn": 0,
+    "student": "I gave the mid-semester exam and my marks are much lower than expected. I want to apply for re-evaluation. What is the process?",
+    "metrics": [
+      {
+        "stage": "understanding",
+        "metric": "intent.primary",
+        "expected": "grievance",
+        "actual": "grievance",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "missing",
+        "expected": [
+          "category",
+          "interest",
+          "pcm_percentage",
+          "rank"
+        ],
+        "actual": [
+          "category",
+          "interest",
+          "pcm_percentage",
+          "rank"
+        ],
+        "pass": true,
+        "detail": "overlap=4/4",
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "stage",
+        "expected": "discovery",
+        "actual": "discovery",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "profile_completeness",
+        "expected": 0.1,
+        "actual": 0.0,
+        "pass": true,
+        "detail": "tol=0.3, diff=0.10",
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "confidence",
+        "expected": "low",
+        "actual": "low",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "current_problem",
+        "expected": "needs_grievance_resolution",
+        "actual": "needs_grievance_resolution",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "brain",
+        "metric": "applicable",
+        "expected": false,
+        "actual": false,
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "brain",
+        "metric": "eligible_branches",
+        "expected": [],
+        "actual": [],
+        "pass": true,
+        "detail": "overlap=0/0",
+        "judge": ""
+      },
+      {
+        "stage": "decision",
+        "metric": "action",
+        "expected": "provide_grievance_process",
+        "actual": "provide_grievance_process",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0].action",
+        "expected": "reassure",
+        "actual": "reassure",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'understand'",
+        "expected": "understand",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'frustration'",
+        "expected": "frustration",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'help'",
+        "expected": "help",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'process'",
+        "expected": "process",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1].action",
+        "expected": "inform",
+        "actual": "inform",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1] content contains 're-evaluation'",
+        "expected": "re-evaluation",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1] content contains 'application'",
+        "expected": "application",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1] content contains 'fee'",
+        "expected": "fee",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1] content contains 'deadline'",
+        "expected": "deadline",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[2].action",
+        "expected": "ask",
+        "actual": "ask",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[2] content contains 'department'",
+        "expected": "department",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[2] content contains 'year'",
+        "expected": "year",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[2] content contains 'subject'",
+        "expected": "subject",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      }
+    ],
+    "score": "23/23"
+  }
+]

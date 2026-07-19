@@ -1,0 +1,201 @@
+{
+  "id": "BENCH_000003",
+  "domain": "hostel",
+  "difficulty": 4,
+  "primary_language": "en",
+  "languages": [
+    "en"
+  ],
+  "speaker_profile": "parent",
+  "features": [
+    "parent_mode",
+    "emotion"
+  ],
+  "ground_truth": {
+    "rank": 8000,
+    "pcm_percentage": 91,
+    "category": "general",
+    "interest": "ECE",
+    "board": "cbse",
+    "exam": "jee",
+    "budget": null,
+    "location": "mumbai"
+  },
+  "turns": [
+    {
+      "student": "Hello, I am calling about my daughter's admission. She got 91 percent in PCM and JEE rank 8000. We are from Mumbai.",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {
+            "rank": 8000,
+            "pcm_percentage": 91,
+            "board": "cbse",
+            "exam": "jee",
+            "location": "mumbai"
+          },
+          "inference": {
+            "parent_mode": true
+          },
+          "confidence": "high",
+          "missing": [
+            "category",
+            "interest"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.57,
+          "confidence": "high",
+          "current_problem": "needs_profile_completion",
+          "problems": [
+            "needs_profile_completion"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "collect_profile",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Parent provided good profile info but missing category and interest"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "ask",
+              "content_contains": [
+                "category",
+                "branch",
+                "interest"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=collect_profile",
+            "Missing=category,interest"
+          ]
+        }
+      },
+      "must_not": [
+        "recommend_branch",
+        "address_student_directly"
+      ],
+      "ideal_counselor_notes": "Parent calling about daughter. Good profile info provided. Need to ask about category and branch preference. Address parent respectfully."
+    },
+    {
+      "student": "She is general category. She wants ECE. But I am really worried about the hostel situation. Is the hostel safe for girls? She has never been away from home.",
+      "expected": {
+        "understanding": {
+          "intent": "hostel",
+          "facts": {
+            "category": "general",
+            "interest": "ECE"
+          },
+          "inference": {
+            "parent_mode": true,
+            "anxiety": true
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.71,
+          "confidence": "high",
+          "current_problem": "needs_hostel_info",
+          "problems": [
+            "needs_hostel_info",
+            "expressing_anxiety"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [
+            "CSE",
+            "AIML",
+            "IT",
+            "ECE",
+            "EE",
+            "ME",
+            "CE"
+          ],
+          "applicable": true,
+          "why": [
+            {
+              "condition": "rank_provided",
+              "met": true,
+              "detail": "Rank=8000"
+            },
+            {
+              "condition": "category_known",
+              "met": true,
+              "detail": "General"
+            },
+            {
+              "condition": "rank_within_margin",
+              "met": true,
+              "detail": "8000 < 28000*0.85=23800 for ECE/General"
+            }
+          ]
+        },
+        "decision": {
+          "action": "provide_hostel_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Parent explicitly asking about hostel safety",
+            "Clear anxiety about daughter staying away",
+            "Can address both admission + hostel"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "reassure",
+              "content_contains": [
+                "hostel",
+                "safe",
+                "girls"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "ECE",
+                "eligible",
+                "rank"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_hostel_info",
+            "Anxiety_detected",
+            "Brain=ECE_eligible"
+          ]
+        }
+      },
+      "must_not": [
+        "dismiss_concern",
+        "guarantee_safety"
+      ],
+      "ideal_counselor_notes": "Anxious parent worried about daughter's safety. Need to address hostel safety first (reassure), then provide admission guidance for ECE."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "Parent calling about daughter's admission + hostel. Emotional conversation — parent is anxious about daughter staying away from home. Must address safety concern before providing admission recommendation.",
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T10:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

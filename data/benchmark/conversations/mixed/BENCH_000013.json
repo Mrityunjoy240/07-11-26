@@ -1,0 +1,133 @@
+{
+  "id": "BENCH_000013",
+  "domain": "mixed",
+  "difficulty": 5,
+  "primary_language": "en",
+  "languages": ["en", "hi"],
+  "speaker_profile": "student",
+  "features": ["topic_switch", "parent_mode", "emotion"],
+  "ground_truth": {
+    "rank": 35000,
+    "pcm_percentage": 72,
+    "category": "obc",
+    "interest": "CSE",
+    "board": "wbjee",
+    "exam": "wbjee",
+    "budget": 800000,
+    "location": "kolkata"
+  },
+  "turns": [
+    {
+      "student": "Mujhe CSE chahiye lekin rank 35000 hai. Kya ho jayega? Mere papa keh rahe hain ki kuch nahi hoga.",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {"rank": 35000},
+          "inference": {"parent_pressure": true, "emotion": "anxious"},
+          "confidence": "high",
+          "missing": ["pcm_percentage", "category"]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.14,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance",
+          "problems": ["needs_admission_guidance", "parent_pressure"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "collect_profile",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Rank provided but need category for accurate guidance",
+            "Parent pressure adds urgency"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "reassure",
+              "content_contains": ["options", "35000", "don't worry"]
+            },
+            {
+              "action": "ask",
+              "content_contains": ["category", "PCM percentage"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=collect_profile", "Parent_pressure"]
+        }
+      },
+      "must_not": ["dismiss_parent_concern", "guarantee_admission"],
+      "ideal_counselor_notes": "Anxious student with parent pressure and 35000 rank. Reassure that options exist, ask for category to give specific guidance."
+    },
+    {
+      "student": "OBC category hai, 72 percent PCM. Ab batao kya hoga. Aur hostel ka kya scene hai? Papa pooch rahe hain kitna lagega total.",
+      "expected": {
+        "understanding": {
+          "intent": "hostel",
+          "facts": {"pcm_percentage": 72, "category": "obc"},
+          "inference": {"parent_pressure": true},
+          "confidence": "high",
+          "missing": ["interest"]
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.57,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance",
+          "problems": ["needs_admission_guidance", "needs_fee_information"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_hostel_info",
+          "priority": "high",
+          "confidence": "medium",
+          "why": [
+            "Have enough info for preliminary guidance",
+            "Also asking about fees/hostel — address both"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": ["OBC", "rank 35000", "CSE", "options"]
+            },
+            {
+              "action": "inform",
+              "content_contains": ["hostel", "fees", "total cost"]
+            },
+            {
+              "action": "ask",
+              "content_contains": ["specific branch preference", "location"]
+            }
+          ],
+          "confidence": "medium",
+          "dependency_chain": ["Decision=provide_branch_guidance", "Multiple_topics"]
+        }
+      },
+      "must_not": ["ignore_fee_question", "give_vague_fee_range"],
+      "ideal_counselor_notes": "Student switching between admission chances and fee questions. Address both — give preliminary CSE guidance with OBC category, then provide fee/hostel info."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "Mixed conversation: admission chances + fee/hostel questions + parent pressure. Key challenge: addressing multiple topics without losing track of the admission guidance.",
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

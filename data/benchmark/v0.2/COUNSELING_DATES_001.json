@@ -1,0 +1,115 @@
+{
+  "id": "COUNSELING_DATES_001",
+  "tags": [
+    "admission",
+    "counseling",
+    "schedule",
+    "dates",
+    "canonical"
+  ],
+  "difficulty": 1,
+  "ground_truth": {
+    "rank": 15000,
+    "pcm_percentage": 90,
+    "category": "general",
+    "interest": "CSE",
+    "board": "wbjee",
+    "budget": null,
+    "location": ""
+  },
+  "turns": [
+    {
+      "student": "I got 15k rank, PCM 90. When is the WBJEE counseling? What documents do I need?",
+      "expected": {
+        "understanding": {
+          "intent": "counseling_info",
+          "facts": {
+            "rank": 15000,
+            "pcm_percentage": 90,
+            "interest": "CSE",
+            "exam": "wbjee"
+          },
+          "inference": {},
+          "missing": [
+            "interest",
+            "category"
+          ]
+        },
+        "reasoning": {
+          "stage": "evaluation",
+          "profile_completeness": 0.43,
+          "confidence": "high",
+          "current_problem": "needs_profile_initial"
+        },
+        "brain": {
+          "applicable": true,
+          "eligible_branches": [
+            "AIML",
+            "CE",
+            "ECE",
+            "EE",
+            "IT",
+            "ME"
+          ],
+          "why": []
+        },
+        "decision": {
+          "action": "provide_counseling_schedule",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Rank qualifies for CSE cutoff",
+            "Direct question about counseling schedule and documents",
+            "Give actionable info: dates, process, documents"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "counseling",
+                "round",
+                "date",
+                "venue",
+                "online"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "document",
+                "list",
+                "marksheet",
+                "id",
+                "certificate"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "category",
+                "confirm"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Intent=counseling_info",
+            "Brain=CSE eligible at 15k",
+            "Decision=provide_counseling_schedule",
+            "Planner=give counseling dates, document checklist, confirm category"
+          ]
+        }
+      },
+      "must_not": [
+        "give_outdated_dates",
+        "forget_document_list",
+        "assume_student_knows_process"
+      ],
+      "ideal_counselor_notes": "Counseling info is straightforward but critical. Provide specific dates (tentative), clear document checklist, and step-by-step process. The student has a strong rank — be encouraging."
+    }
+  ],
+  "expected_end_state": "incomplete",
+  "ideal_counselor_notes": "Simple informational queries must be answered precisely. This builds trust for more complex interactions later."
+}

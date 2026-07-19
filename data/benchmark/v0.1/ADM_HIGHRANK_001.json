@@ -1,0 +1,175 @@
+{
+  "id": "ADM_HIGHRANK_001",
+  "tags": [
+    "admission",
+    "high-rank",
+    "canonical"
+  ],
+  "difficulty": 2,
+  "ground_truth": {
+    "rank": 12000,
+    "pcm_percentage": 92,
+    "category": "general",
+    "interest": "CSE",
+    "board": "wbjee",
+    "budget": null,
+    "location": ""
+  },
+  "turns": [
+    {
+      "student": "My WBJEE rank is 12000, PCM 92. I want CSE.",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {
+            "rank": 12000,
+            "pcm_percentage": 92,
+            "interest": "CSE",
+            "exam": "wbjee"
+          },
+          "inference": {
+            "anxiety": false,
+            "confusion": false
+          },
+          "missing": [
+            "category"
+          ]
+        },
+        "reasoning": {
+          "stage": "evaluation",
+          "profile_completeness": 0.43,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance"
+        },
+        "brain": {
+          "applicable": true,
+          "eligible_branches": [
+            "CSE",
+            "AIML",
+            "IT",
+            "ECE",
+            "EE",
+            "ME",
+            "CE"
+          ],
+          "why": []
+        },
+        "decision": {
+          "action": "recommend_branches",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Rank 12000 qualifies for CSE cutoff 15000",
+            "PCM 92 well above minimum",
+            "Interest aligns with eligibility"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "recommend",
+              "content_contains": [
+                "CSE",
+                "eligible",
+                "congratulations"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "category",
+                "confirm"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Rank=within CSE cutoff",
+            "Interest=CSE matches eligibility",
+            "Decision=recommend_branches",
+            "Planner=confirm category to finalize"
+          ]
+        }
+      },
+      "must_not": [
+        "discourage",
+        "suggest_alternative_unless_asked",
+        "sound_surprised"
+      ],
+      "ideal_counselor_notes": "Strong profile. CSE is achievable. Confirm category to ensure general cutoff applies. Be encouraging but measured."
+    },
+    {
+      "student": "General category.",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {
+            "category": "general"
+          },
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "evaluation",
+          "profile_completeness": 0.57,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance"
+        },
+        "brain": {
+          "applicable": true,
+          "eligible_branches": [
+            "CSE",
+            "AIML",
+            "IT",
+            "ECE",
+            "EE",
+            "ME",
+            "CE"
+          ],
+          "why": []
+        },
+        "decision": {
+          "action": "provide_branch_guidance",
+          "priority": "normal",
+          "confidence": "high",
+          "why": [
+            "Profile complete",
+            "CSE confirmed",
+            "Offer next steps: fees, placement, hostel"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "CSE",
+                "confirm",
+                "fee",
+                "placement",
+                "hostel"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": []
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Profile=complete",
+            "Interest=CSE confirmed",
+            "Decision=provide_branch_guidance",
+            "Planner=offer next topics"
+          ]
+        }
+      },
+      "must_not": [
+        "suggest_changing_branch",
+        "ignore_achievement"
+      ],
+      "ideal_counselor_notes": "Profile complete. CSE is confirmed. Now offer to discuss fees, placement, hostel — let the student guide the next topic."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "High rank student who knows what they want. Minimal hand-holding needed. Confirm, then let them drive."
+}

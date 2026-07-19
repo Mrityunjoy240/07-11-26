@@ -1,0 +1,350 @@
+{
+  "id": "BENCH_000001",
+  "domain": "admission",
+  "difficulty": 4,
+  "primary_language": "en",
+  "languages": [
+    "en"
+  ],
+  "speaker_profile": "student",
+  "features": [
+    "missing_info",
+    "topic_switch"
+  ],
+  "ground_truth": {
+    "rank": 25000,
+    "pcm_percentage": 78,
+    "category": "obc",
+    "interest": "CSE",
+    "board": "wbjee",
+    "exam": "wbjee",
+    "budget": null,
+    "location": "kolkata"
+  },
+  "turns": [
+    {
+      "student": "Hello, I need help choosing a college for engineering.",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {},
+          "inference": {},
+          "confidence": "medium",
+          "missing": [
+            "rank",
+            "pcm_percentage",
+            "category",
+            "interest",
+            "board"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.0,
+          "confidence": "high",
+          "current_problem": "needs_profile_completion",
+          "problems": [
+            "needs_profile_completion"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "collect_profile",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "No profile information available",
+            "Need rank, PCM, category to proceed"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "ask",
+              "content_contains": [
+                "rank",
+                "PCM",
+                "category"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=collect_profile",
+            "Missing=all_profile_fields"
+          ]
+        }
+      },
+      "must_not": [
+        "recommend_branch",
+        "hallucinate_cutoff"
+      ],
+      "ideal_counselor_notes": "Student has no profile info yet. Ask for rank, PCM, category, and interest."
+    },
+    {
+      "student": "I gave WBJEE this year. My rank is 25000. I scored 78 percent in PCM from WB board.",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {
+            "rank": 25000,
+            "pcm_percentage": 78,
+            "board": "wbjee",
+            "exam": "wbjee"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": [
+            "category",
+            "interest"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.43,
+          "confidence": "high",
+          "current_problem": "needs_profile_completion",
+          "problems": [
+            "needs_profile_completion"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "collect_profile",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Have rank and PCM but missing category and interest"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "rank",
+                "PCM"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "category",
+                "branch",
+                "interest"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=collect_profile",
+            "Missing=category,interest"
+          ]
+        }
+      },
+      "must_not": [
+        "recommend_branch"
+      ],
+      "ideal_counselor_notes": "Good progress. Need category for cutoff lookup and interest for branch recommendation."
+    },
+    {
+      "student": "I am from OBC category. Actually I am more interested in IT than CSE, but which one can I get?",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {
+            "category": "obc",
+            "interest": "IT"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.71,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance",
+          "problems": [
+            "needs_admission_guidance"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [
+            "CSE",
+            "AIML",
+            "IT",
+            "ECE",
+            "EE",
+            "ME",
+            "CE"
+          ],
+          "applicable": true,
+          "why": [
+            {
+              "condition": "rank_provided",
+              "met": true,
+              "detail": "Rank=25000"
+            },
+            {
+              "condition": "category_known",
+              "met": true,
+              "detail": "OBC cutoffs apply"
+            },
+            {
+              "condition": "rank_within_margin",
+              "met": true,
+              "detail": "25000 < 32000*0.85=27200 for IT/OBC"
+            }
+          ]
+        },
+        "decision": {
+          "action": "recommend_branches",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "All required profile info available",
+            "Brain evaluation complete",
+            "Rank 25000 is competitive for IT under OBC"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "recommend",
+              "content_contains": [
+                "IT",
+                "eligible",
+                "OBC"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "location",
+                "preference"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=recommend_branches",
+            "Brain=IT_eligible",
+            "Missing=location"
+          ]
+        }
+      },
+      "must_not": [
+        "discourage",
+        "suggest_alternative_unless_asked"
+      ],
+      "ideal_counselor_notes": "Rank 25000 with OBC category is competitive for IT. Should recommend IT and ask about other preferences."
+    },
+    {
+      "student": "What about CSE though? My parents want me to take CSE.",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "inference": {
+            "parent_mode": true
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.71,
+          "confidence": "high",
+          "current_problem": "comparing_options",
+          "problems": [
+            "comparing_options"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [
+            "CSE",
+            "AIML",
+            "IT",
+            "ECE",
+            "EE",
+            "ME",
+            "CE"
+          ],
+          "applicable": true,
+          "why": [
+            {
+              "condition": "rank_provided",
+              "met": true,
+              "detail": "Rank=25000"
+            },
+            {
+              "condition": "cse_cutoff_obc",
+              "met": false,
+              "detail": "25000 > 22000*0.85=18700 for CSE/OBC — borderline"
+            }
+          ]
+        },
+        "decision": {
+          "action": "recommend_branches",
+          "priority": "normal",
+          "confidence": "medium",
+          "why": [
+            "CSE is borderline for OBC at rank 25000",
+            "Need to explain realistic chances",
+            "Parent pressure involved"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "CSE",
+                "borderline",
+                "OBC",
+                "cutoff"
+              ]
+            },
+            {
+              "action": "recommend",
+              "content_contains": [
+                "IT",
+                "AIML",
+                "safer"
+              ]
+            }
+          ],
+          "confidence": "medium",
+          "dependency_chain": [
+            "Decision=provide_branch_guidance",
+            "Brain=CSE_borderline",
+            "Parent_pressure"
+          ]
+        }
+      },
+      "must_not": [
+        "guarantee_admission",
+        "dismiss_parent_concern"
+      ],
+      "ideal_counselor_notes": "CSE is borderline for OBC at rank 25000. Should be honest about chances while suggesting safer alternatives like IT or AIML."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "Standard multi-turn admission conversation. Profile builds across 3 turns, then shifts to branch comparison. Key challenge: accurately communicating CSE borderline status without discouraging the student.",
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T10:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

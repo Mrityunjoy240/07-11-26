@@ -1,0 +1,191 @@
+{
+  "id": "ADM_LEGACY_001",
+  "tags": [
+    "admission",
+    "legacy",
+    "alumni",
+    "family",
+    "canonical"
+  ],
+  "difficulty": 2,
+  "ground_truth": {
+    "rank": 25000,
+    "pcm_percentage": 80,
+    "category": "general",
+    "interest": "ECE",
+    "board": "wbjee",
+    "budget": null,
+    "location": ""
+  },
+  "turns": [
+    {
+      "student": "My brother studied EE from this college and is now in TCS. I got 25k rank, PCM 80. Can I get ECE?",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {
+            "rank": 25000,
+            "pcm_percentage": 80,
+            "interest": "ECE"
+          },
+          "inference": {},
+          "missing": [
+            "category"
+          ]
+        },
+        "reasoning": {
+          "stage": "evaluation",
+          "profile_completeness": 0.43,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance"
+        },
+        "brain": {
+          "applicable": true,
+          "eligible_branches": [
+            "CE",
+            "EE",
+            "ME"
+          ],
+          "why": [
+            {
+              "condition": "ECE_cutoff",
+              "met": true,
+              "detail": "Rank 25000 <= ECE cutoff 28000"
+            }
+          ]
+        },
+        "decision": {
+          "action": "recommend_branches",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Rank qualifies for ECE",
+            "Strong academic profile",
+            "Family connection to college is positive",
+            "Brother's success story can be motivational"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "brother",
+                "alumni",
+                "TCS",
+                "proud"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "ECE",
+                "eligible",
+                "cutoff",
+                "curriculum"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "category",
+                "confirm"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Intent=admission",
+            "Legacy connection detected",
+            "Decision=recommend_branches",
+            "Planner=acknowledge family connection, confirm ECE eligibility, ask category"
+          ]
+        }
+      },
+      "must_not": [
+        "ignore_legacy_connection",
+        "treat_as_anonymous_query",
+        "give_robotic_response"
+      ],
+      "ideal_counselor_notes": "Legacy students bring emotional connection. Acknowledge the family tie — it builds rapport. ECE is achievable at 25k. Confirm category to finalize."
+    },
+    {
+      "student": "General category. Can I also sit for TCS placements like my brother?",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {
+            "rank": 25000,
+            "pcm_percentage": 80,
+            "interest": "ECE",
+            "category": "general"
+          },
+          "inference": {},
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "evaluation",
+          "profile_completeness": 0.57,
+          "confidence": "high",
+          "current_problem": "needs_placement_information"
+        },
+        "brain": {
+          "applicable": true,
+          "eligible_branches": [
+            "CE",
+            "EE",
+            "ME"
+          ],
+          "why": []
+        },
+        "decision": {
+          "action": "provide_branch_guidance",
+          "priority": "normal",
+          "confidence": "high",
+          "why": [
+            "Profile complete",
+            "ECE eligibility confirmed",
+            "Address placement question directly — yes TCS recruits from all branches"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "reassure",
+              "content_contains": [
+                "TCS",
+                "placement",
+                "all",
+                "branches",
+                "eligible"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "interest",
+                "ECE",
+                "confirm"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Profile=complete",
+            "Placement question answered positively",
+            "Decision=provide_branch_guidance",
+            "Planner=confirm TCS placement access, ask ECE confirmation"
+          ]
+        }
+      },
+      "must_not": [
+        "ignore_placement_question",
+        "give_noncommittal_answer",
+        "suggest_alternative_branch_unnecessarily"
+      ],
+      "ideal_counselor_notes": "Answer the placement question directly: yes, TCS comes to campus and all branches are eligible. The brother's success should reinforce the student's confidence."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "Legacy students often compare themselves to siblings. Use the comparison positively — set realistic expectations if cutoffs have changed."
+}

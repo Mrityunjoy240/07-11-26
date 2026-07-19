@@ -1,0 +1,185 @@
+[
+  {
+    "turn": 0,
+    "student": "I am a parent. My son got 22k rank, PCM 85. What is the total fee for IT?",
+    "metrics": [
+      {
+        "stage": "understanding",
+        "metric": "intent.primary",
+        "expected": "fee",
+        "actual": "fee",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "facts.rank",
+        "expected": 22000,
+        "actual": null,
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "facts.pcm_percentage",
+        "expected": 85,
+        "actual": 85.0,
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "facts.interest",
+        "expected": "IT",
+        "actual": "IT",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "missing",
+        "expected": [
+          "budget",
+          "category",
+          "rank"
+        ],
+        "actual": [
+          "category",
+          "rank"
+        ],
+        "pass": true,
+        "detail": "overlap=2/3",
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "stage",
+        "expected": "evaluation",
+        "actual": "discovery",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "profile_completeness",
+        "expected": 0.6,
+        "actual": 0.2857142857142857,
+        "pass": false,
+        "detail": "tol=0.3, diff=0.31",
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "confidence",
+        "expected": "high",
+        "actual": "medium",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "current_problem",
+        "expected": "needs_fee_information",
+        "actual": "needs_fee_information",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "brain",
+        "metric": "applicable",
+        "expected": true,
+        "actual": false,
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "brain",
+        "metric": "eligible_branches",
+        "expected": [
+          "CE",
+          "ECE",
+          "EE",
+          "IT",
+          "ME"
+        ],
+        "actual": [],
+        "pass": false,
+        "detail": "overlap=0/5",
+        "judge": ""
+      },
+      {
+        "stage": "decision",
+        "metric": "action",
+        "expected": "provide_fee_info",
+        "actual": "provide_fee_info",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0].action",
+        "expected": "inform",
+        "actual": "inform",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'fee'",
+        "expected": "fee",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'tuition'",
+        "expected": "tuition",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'IT'",
+        "expected": "IT",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'year'",
+        "expected": "year",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1].action",
+        "expected": "ask",
+        "actual": "ask",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1] content contains 'category'",
+        "expected": "category",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1] content contains 'confirm'",
+        "expected": "confirm",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      }
+    ],
+    "score": "14/20"
+  }
+]

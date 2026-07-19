@@ -1,0 +1,191 @@
+{
+  "id": "ADM_FOREIGN_001",
+  "tags": [
+    "admission",
+    "foreign",
+    "nri",
+    "international",
+    "canonical"
+  ],
+  "difficulty": 5,
+  "ground_truth": {
+    "rank": null,
+    "pcm_percentage": 85,
+    "category": "nri",
+    "interest": "CSE",
+    "board": "cbse",
+    "budget": "high",
+    "location": "dubai"
+  },
+  "turns": [
+    {
+      "student": "I am an NRI living in Dubai. I studied CBSE with 85% PCM. Can I get CSE at your college under NRI quota?",
+      "expected": {
+        "understanding": {
+          "intent": "nri_admission",
+          "facts": {
+            "pcm_percentage": 85,
+            "interest": "CSE",
+            "board": "cbse",
+            "category": "nri"
+          },
+          "inference": {},
+          "missing": [
+            "qualification"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.57,
+          "confidence": "medium",
+          "current_problem": "needs_nri_admission_information"
+        },
+        "brain": {
+          "applicable": false,
+          "eligible_branches": [],
+          "why": []
+        },
+        "decision": {
+          "action": "provide_nri_admission_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "NRI quota query — different process from WBJEE",
+            "CBSE PCM 85 is strong",
+            "Need to explain NRI policy, fees, and seat availability"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "NRI",
+                "quota",
+                "seats",
+                "fee",
+                "structure"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "rank",
+                "JEE",
+                "board",
+                "percentage"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "budget",
+                "preference",
+                "clarify"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Intent=nri_admission",
+            "Decision=provide_nri_admission_info",
+            "Planner=explain NRI quota policy, ask for standardized test scores, clarify preferences"
+          ]
+        }
+      },
+      "must_not": [
+        "treat_as_regular_admission",
+        "forget_nri_fee_structure",
+        "assume_wbjee_applies",
+        "ignore_conversion_equivalency"
+      ],
+      "ideal_counselor_notes": "NRI admissions follow a separate process. Explain the fee structure in USD/INR, document requirements (apostille, equivalency), and that CSE seats under NRI quota are limited but 85% PCM is competitive."
+    },
+    {
+      "student": "I have 92% in CBSE PCM. Budget is not a constraint. I want CSE only.",
+      "expected": {
+        "understanding": {
+          "intent": "nri_admission",
+          "facts": {
+            "pcm_percentage": 92,
+            "interest": "CSE",
+            "board": "cbse",
+            "category": "nri"
+          },
+          "inference": {
+            "financial_concern": false
+          },
+          "missing": [
+            "qualification"
+          ]
+        },
+        "reasoning": {
+          "stage": "evaluation",
+          "profile_completeness": 0.57,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance"
+        },
+        "brain": {
+          "applicable": false,
+          "eligible_branches": [],
+          "why": []
+        },
+        "decision": {
+          "action": "guide_nri_application",
+          "priority": "normal",
+          "confidence": "high",
+          "why": [
+            "Strong CBSE score — competitive for NRI quota CSE",
+            "Budget not a concern — focus on admission process",
+            "Guide through NRI application step by step"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "steps",
+                "apply",
+                "NRI",
+                "application",
+                "deadline"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "document",
+                "apostille",
+                "equivalency",
+                "visa"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "questions",
+                "concerns",
+                "clarify"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "CBSE 92% very strong for NRI CSE",
+            "Decision=guide_nri_application",
+            "Planner=walk through application steps, document requirements, address concerns"
+          ]
+        }
+      },
+      "must_not": [
+        "ask_for_wbjee_rank_again",
+        "ignore_nri_documentation_complexity",
+        "give_standard_admission_info"
+      ],
+      "ideal_counselor_notes": "Strong candidate. Walk through the full NRI application process: JEE/other score requirement (if any), document apostille, fee payment in foreign currency, and visa documentation."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "NRI admissions are a niche but important pathway. The counselor must know the separate process thoroughly."
+}

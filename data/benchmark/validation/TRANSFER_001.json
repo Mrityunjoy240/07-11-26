@@ -1,0 +1,226 @@
+[
+  {
+    "turn": 0,
+    "student": "I am in 1st year EE at a private college in Bengal. I had 32k WBJEE rank. Can I transfer to your college in 2nd year EE?",
+    "metrics": [
+      {
+        "stage": "understanding",
+        "metric": "intent.primary",
+        "expected": "transfer",
+        "actual": "transfer",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "facts.rank",
+        "expected": 32000,
+        "actual": null,
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "facts.pcm_percentage",
+        "expected": 78,
+        "actual": null,
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "facts.interest",
+        "expected": "EE",
+        "actual": "EE",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "facts.exam",
+        "expected": "wbjee",
+        "actual": "wbjee",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "missing",
+        "expected": [
+          "current_branch",
+          "current_college",
+          "current_year"
+        ],
+        "actual": [
+          "current_branch"
+        ],
+        "pass": false,
+        "detail": "overlap=1/3",
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "stage",
+        "expected": "discovery",
+        "actual": "discovery",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "profile_completeness",
+        "expected": 0.5,
+        "actual": 0.2857142857142857,
+        "pass": true,
+        "detail": "tol=0.3, diff=0.21",
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "confidence",
+        "expected": "medium",
+        "actual": "medium",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "current_problem",
+        "expected": "needs_transfer_information",
+        "actual": "needs_transfer_information",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "brain",
+        "metric": "applicable",
+        "expected": false,
+        "actual": false,
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "brain",
+        "metric": "eligible_branches",
+        "expected": [],
+        "actual": [],
+        "pass": true,
+        "detail": "overlap=0/0",
+        "judge": ""
+      },
+      {
+        "stage": "decision",
+        "metric": "action",
+        "expected": "provide_transfer_info",
+        "actual": "provide_transfer_info",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0].action",
+        "expected": "inform",
+        "actual": "inform",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'transfer'",
+        "expected": "transfer",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'policy'",
+        "expected": "policy",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'vacancy'",
+        "expected": "vacancy",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'seat'",
+        "expected": "seat",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1].action",
+        "expected": "inform",
+        "actual": "inform",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1] content contains 'academic'",
+        "expected": "academic",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1] content contains 'credit'",
+        "expected": "credit",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1] content contains 'equivalence'",
+        "expected": "equivalence",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[2].action",
+        "expected": "ask",
+        "actual": "ask",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[2] content contains 'category'",
+        "expected": "category",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[2] content contains 'college'",
+        "expected": "college",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[2] content contains 'reason'",
+        "expected": "reason",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      }
+    ],
+    "score": "23/26"
+  }
+]

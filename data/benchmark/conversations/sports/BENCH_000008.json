@@ -1,0 +1,133 @@
+{
+  "id": "BENCH_000008",
+  "domain": "sports",
+  "difficulty": 3,
+  "primary_language": "en",
+  "languages": ["en"],
+  "speaker_profile": "student",
+  "features": ["emotion", "correction"],
+  "ground_truth": {
+    "rank": null,
+    "pcm_percentage": 70,
+    "category": "general",
+    "interest": "CSE",
+    "board": "cbse",
+    "exam": "",
+    "budget": null,
+    "location": "delhi"
+  },
+  "turns": [
+    {
+      "student": "I am a state-level cricket player. Can I get admission through sports quota? I am really worried about my future.",
+      "expected": {
+        "understanding": {
+          "intent": "sports_quota",
+          "facts": {"interest": "CSE"},
+          "inference": {"emotion": "anxious"},
+          "confidence": "high",
+          "missing": ["rank", "pcm_percentage", "category"]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.14,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance",
+          "problems": ["needs_admission_guidance"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_sports_quota_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student is anxious and asking about sports quota",
+            "State-level achievement is relevant"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "reassure",
+              "content_contains": ["sports", "state level", "good"]
+            },
+            {
+              "action": "inform",
+              "content_contains": ["sports quota", "process", "certificates"]
+            },
+            {
+              "action": "ask",
+              "content_contains": ["sport", "achievement level", "category"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_sports_info", "Student_anxious"]
+        }
+      },
+      "must_not": ["guarantee_admission", "dismiss_anxiety"],
+      "ideal_counselor_notes": "Anxious student with state-level cricket achievement. Reassure first, then explain sports quota process and ask for more details."
+    },
+    {
+      "student": "Cricket is my sport. I have state-level certificates. My PCM is 70 percent, general category. Which colleges accept sports quota?",
+      "expected": {
+        "understanding": {
+          "intent": "sports_quota",
+          "facts": {"pcm_percentage": 70, "category": "general", "interest": "cricket"},
+          "inference": {},
+          "confidence": "high",
+          "missing": ["rank"]
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.43,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance",
+          "problems": ["needs_admission_guidance"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_sports_quota_info",
+          "priority": "high",
+          "confidence": "medium",
+          "why": [
+            "Have enough profile info to suggest colleges with sports quota",
+            "State-level cricket is strong for sports admission"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": ["sports quota", "colleges", "cricket"]
+            },
+            {
+              "action": "ask",
+              "content_contains": ["location preference", "branch"]
+            }
+          ],
+          "confidence": "medium",
+          "dependency_chain": ["Decision=provide_sports_info", "Profile_partial"]
+        }
+      },
+      "must_not": ["guarantee_seat", "ignore_academic Requirements"],
+      "ideal_counselor_notes": "Student has good sports credentials. List colleges with strong cricket programs and sports quota. Note that academics still matter."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "State-level cricket player seeking sports quota admission. Need to balance encouragement with realistic expectations about sports vs academic requirements.",
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

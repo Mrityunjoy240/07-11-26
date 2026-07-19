@@ -1,0 +1,133 @@
+{
+  "id": "BENCH_000010",
+  "domain": "lateral",
+  "difficulty": 4,
+  "primary_language": "en",
+  "languages": ["en"],
+  "speaker_profile": "student",
+  "features": ["correction"],
+  "ground_truth": {
+    "rank": null,
+    "pcm_percentage": 78,
+    "category": "obc",
+    "interest": "CSE",
+    "board": "state",
+    "exam": "",
+    "budget": null,
+    "location": "hyderabad"
+  },
+  "turns": [
+    {
+      "student": "I have a diploma in mechanical engineering. Can I get direct admission to second year of B.Tech?",
+      "expected": {
+        "understanding": {
+          "intent": "lateral_entry",
+          "facts": {"interest": "mechanical"},
+          "inference": {},
+          "confidence": "high",
+          "missing": ["rank", "pcm_percentage", "category"]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.14,
+          "confidence": "high",
+          "current_problem": "has_transfer_query",
+          "problems": ["has_transfer_query"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_lateral_entry_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student has diploma, asking about lateral entry",
+            "Lateral entry has specific requirements and process"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": ["lateral entry", "diploma", "second year"]
+            },
+            {
+              "action": "ask",
+              "content_contains": ["diploma percentage", "category", "state"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_lateral_info", "Diploma_holder"]
+        }
+      },
+      "must_not": ["guarantee_admission", "assume_eligibility"],
+      "ideal_counselor_notes": "Diploma holder asking about lateral entry. Explain the process, eligibility, and ask for more academic details."
+    },
+    {
+      "student": "Actually I want to switch to CSE, not continue in mechanical. I scored 78 percent in diploma, OBC category. Is that possible?",
+      "expected": {
+        "understanding": {
+          "intent": "lateral_entry",
+          "facts": {"pcm_percentage": 78, "category": "obc", "interest": "CSE"},
+          "inference": {"branch_switch": true},
+          "confidence": "high",
+          "missing": ["rank"]
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.57,
+          "confidence": "high",
+          "current_problem": "has_transfer_query",
+          "problems": ["has_transfer_query"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_lateral_entry_info",
+          "priority": "high",
+          "confidence": "medium",
+          "why": [
+            "Student wants to switch branch during lateral entry",
+            "Branch switch is possible but limited in some colleges"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": ["switch", "branch"]
+            },
+            {
+              "action": "inform",
+              "content_contains": ["branch switch", "lateral entry", "CSE"]
+            },
+            {
+              "action": "ask",
+              "content_contains": ["college preference", "location"]
+            }
+          ],
+          "confidence": "medium",
+          "dependency_chain": ["Decision=provide_lateral_info", "Branch_switch"]
+        }
+      },
+      "must_not": ["guarantee_branch_switch", "discourage_without_reason"],
+      "ideal_counselor_notes": "Student corrected their interest from mechanical to CSE. Explain that branch switch during lateral entry is possible but competitive in some colleges."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "Diploma holder wanting to switch to CSE via lateral entry. Key challenge: explaining that branch switches are possible but limited, and not discouraging the student.",
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

@@ -1,0 +1,632 @@
+[
+  {
+    "turn": 0,
+    "student": "I got 48k rank in WBJEE.",
+    "metrics": [
+      {
+        "stage": "understanding",
+        "metric": "intent.primary",
+        "expected": "admission",
+        "actual": "admission",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "facts.rank",
+        "expected": 48000,
+        "actual": 48000,
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "facts.exam",
+        "expected": "wbjee",
+        "actual": "wbjee",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "missing",
+        "expected": [
+          "category",
+          "interest",
+          "pcm_percentage"
+        ],
+        "actual": [
+          "category",
+          "interest",
+          "pcm_percentage"
+        ],
+        "pass": true,
+        "detail": "overlap=3/3",
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "stage",
+        "expected": "discovery",
+        "actual": "discovery",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "profile_completeness",
+        "expected": 0.2,
+        "actual": 0.14285714285714285,
+        "pass": true,
+        "detail": "tol=0.3, diff=0.06",
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "confidence",
+        "expected": "medium",
+        "actual": "medium",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "current_problem",
+        "expected": "needs_admission_guidance",
+        "actual": "needs_admission_guidance",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "brain",
+        "metric": "applicable",
+        "expected": false,
+        "actual": true,
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "brain",
+        "metric": "eligible_branches",
+        "expected": [],
+        "actual": [
+          "CE"
+        ],
+        "pass": false,
+        "detail": "overlap=0/0",
+        "judge": ""
+      },
+      {
+        "stage": "decision",
+        "metric": "action",
+        "expected": "collect_profile",
+        "actual": "collect_profile",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0].action",
+        "expected": "ask",
+        "actual": "inform",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'PCM'",
+        "expected": "PCM",
+        "actual": "Based on your rank you are eligible for ME and CE branches at this college.",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'percentage'",
+        "expected": "percentage",
+        "actual": "Based on your rank you are eligible for ME and CE branches at this college.",
+        "pass": false,
+        "judge": ""
+      }
+    ],
+    "score": "9/14"
+  },
+  {
+    "turn": 1,
+    "student": "PCM 82.",
+    "metrics": [
+      {
+        "stage": "understanding",
+        "metric": "intent.primary",
+        "expected": "admission",
+        "actual": "admission",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "facts.pcm_percentage",
+        "expected": 82,
+        "actual": 82.0,
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "missing",
+        "expected": [
+          "category",
+          "interest"
+        ],
+        "actual": [
+          "category",
+          "interest"
+        ],
+        "pass": true,
+        "detail": "overlap=2/2",
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "stage",
+        "expected": "discovery",
+        "actual": "discovery",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "profile_completeness",
+        "expected": 0.4,
+        "actual": 0.2857142857142857,
+        "pass": true,
+        "detail": "tol=0.3, diff=0.11",
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "confidence",
+        "expected": "medium",
+        "actual": "medium",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "current_problem",
+        "expected": "needs_admission_guidance",
+        "actual": "needs_admission_guidance",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "brain",
+        "metric": "applicable",
+        "expected": true,
+        "actual": true,
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "brain",
+        "metric": "eligible_branches",
+        "expected": [
+          "CE",
+          "EE",
+          "ME"
+        ],
+        "actual": [
+          "CE"
+        ],
+        "pass": false,
+        "detail": "overlap=1/3",
+        "judge": ""
+      },
+      {
+        "stage": "decision",
+        "metric": "action",
+        "expected": "collect_profile",
+        "actual": "collect_profile",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0].action",
+        "expected": "ask",
+        "actual": "inform",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'interest'",
+        "expected": "interest",
+        "actual": "Based on your rank you are eligible for ME and CE branches at this college.",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'field'",
+        "expected": "field",
+        "actual": "Based on your rank you are eligible for ME and CE branches at this college.",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'branch'",
+        "expected": "branch",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'like'",
+        "expected": "like",
+        "actual": "Based on your rank you are eligible for ME and CE branches at this college.",
+        "pass": false,
+        "judge": ""
+      }
+    ],
+    "score": "10/15"
+  },
+  {
+    "turn": 2,
+    "student": "I am interested in AI and ML.",
+    "metrics": [
+      {
+        "stage": "understanding",
+        "metric": "intent.primary",
+        "expected": "admission",
+        "actual": "admission",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "facts.interest",
+        "expected": "AI",
+        "actual": "AI",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "missing",
+        "expected": [
+          "category"
+        ],
+        "actual": [
+          "category"
+        ],
+        "pass": true,
+        "detail": "overlap=1/1",
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "stage",
+        "expected": "evaluation",
+        "actual": "evaluation",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "profile_completeness",
+        "expected": 0.7,
+        "actual": 0.42857142857142855,
+        "pass": true,
+        "detail": "tol=0.3, diff=0.27",
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "confidence",
+        "expected": "high",
+        "actual": "medium",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "current_problem",
+        "expected": "needs_admission_guidance",
+        "actual": "needs_admission_guidance",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "brain",
+        "metric": "applicable",
+        "expected": true,
+        "actual": true,
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "brain",
+        "metric": "eligible_branches",
+        "expected": [
+          "CE",
+          "EE",
+          "ME"
+        ],
+        "actual": [
+          "CE"
+        ],
+        "pass": false,
+        "detail": "overlap=1/3",
+        "judge": ""
+      },
+      {
+        "stage": "decision",
+        "metric": "action",
+        "expected": "recommend_branches",
+        "actual": "recommend_branches",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0].action",
+        "expected": "recommend",
+        "actual": "recommend",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'EE'",
+        "expected": "EE",
+        "actual": "Based on your profile, you are eligible for CE.",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'ME'",
+        "expected": "ME",
+        "actual": "Based on your profile, you are eligible for CE.",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'CE'",
+        "expected": "CE",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'eligible'",
+        "expected": "eligible",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1].action",
+        "expected": "ask",
+        "actual": "ask",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1] content contains 'category'",
+        "expected": "category",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1] content contains 'general'",
+        "expected": "general",
+        "actual": "Could you confirm your category?",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1] content contains 'OBC'",
+        "expected": "OBC",
+        "actual": "Could you confirm your category?",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1] content contains 'SC'",
+        "expected": "SC",
+        "actual": "Could you confirm your category?",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1] content contains 'ST'",
+        "expected": "ST",
+        "actual": "Could you confirm your category?",
+        "pass": false,
+        "judge": ""
+      }
+    ],
+    "score": "13/21"
+  },
+  {
+    "turn": 3,
+    "student": "General category.",
+    "metrics": [
+      {
+        "stage": "understanding",
+        "metric": "intent.primary",
+        "expected": "admission",
+        "actual": "admission",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "facts.category",
+        "expected": "general",
+        "actual": "general",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "missing",
+        "expected": [],
+        "actual": [],
+        "pass": false,
+        "detail": "overlap=0/0",
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "stage",
+        "expected": "evaluation",
+        "actual": "evaluation",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "profile_completeness",
+        "expected": 1.0,
+        "actual": 0.5714285714285714,
+        "pass": false,
+        "detail": "tol=0.3, diff=0.43",
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "confidence",
+        "expected": "high",
+        "actual": "high",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "current_problem",
+        "expected": "needs_admission_guidance",
+        "actual": "needs_admission_guidance",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "brain",
+        "metric": "applicable",
+        "expected": true,
+        "actual": true,
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "brain",
+        "metric": "eligible_branches",
+        "expected": [
+          "CE",
+          "EE",
+          "ME"
+        ],
+        "actual": [
+          "CE"
+        ],
+        "pass": false,
+        "detail": "overlap=1/3",
+        "judge": ""
+      },
+      {
+        "stage": "decision",
+        "metric": "action",
+        "expected": "provide_branch_guidance",
+        "actual": "recommend_branches",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0].action",
+        "expected": "inform",
+        "actual": "recommend",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'EE'",
+        "expected": "EE",
+        "actual": "Based on your profile, you are eligible for CE.",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'electrical'",
+        "expected": "electrical",
+        "actual": "Based on your profile, you are eligible for CE.",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'AI'",
+        "expected": "AI",
+        "actual": "Based on your profile, you are eligible for CE.",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'specialization'",
+        "expected": "specialization",
+        "actual": "Based on your profile, you are eligible for CE.",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1].action",
+        "expected": "ask",
+        "actual": "ask",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1] content contains 'preference'",
+        "expected": "preference",
+        "actual": "Could you confirm your category?",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1] content contains 'branch'",
+        "expected": "branch",
+        "actual": "Could you confirm your category?",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1] content contains 'think'",
+        "expected": "think",
+        "actual": "Could you confirm your category?",
+        "pass": false,
+        "judge": ""
+      }
+    ],
+    "score": "7/19"
+  }
+]

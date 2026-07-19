@@ -1,0 +1,103 @@
+{
+  "id": "FEES_PARENT_001",
+  "tags": [
+    "fees",
+    "parent",
+    "loan",
+    "canonical"
+  ],
+  "difficulty": 3,
+  "ground_truth": {
+    "rank": 22000,
+    "pcm_percentage": 85,
+    "category": "general",
+    "interest": "IT",
+    "board": "wbjee",
+    "budget": null,
+    "location": ""
+  },
+  "turns": [
+    {
+      "student": "I am a parent. My son got 22k rank, PCM 85. What is the total fee for IT?",
+      "expected": {
+        "understanding": {
+          "intent": "fee",
+          "facts": {
+            "rank": 22000,
+            "pcm_percentage": 85,
+            "interest": "IT"
+          },
+          "inference": {
+            "parent_influence": true
+          },
+          "missing": [
+            "rank",
+            "category",
+            "budget"
+          ]
+        },
+        "reasoning": {
+          "stage": "evaluation",
+          "profile_completeness": 0.43,
+          "confidence": "high",
+          "current_problem": "needs_fee_information"
+        },
+        "brain": {
+          "applicable": true,
+          "eligible_branches": [
+            "CE",
+            "ECE",
+            "EE",
+            "ME"
+          ],
+          "why": []
+        },
+        "decision": {
+          "action": "provide_fee_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Fee question from parent",
+            "IT is within rank range",
+            "Provide structured fee breakdown"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "fee",
+                "tuition",
+                "IT",
+                "year"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "category",
+                "confirm"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Intent=fee",
+            "Parent mode detected",
+            "Decision=provide_fee_info",
+            "Planner=give fee info, then confirm category"
+          ]
+        }
+      },
+      "must_not": [
+        "recommend_branch",
+        "ignore_rank_eligibility",
+        "give_vague_fee"
+      ],
+      "ideal_counselor_notes": "Parent asking about fees is common. Give specific numbers: tuition, hostel, one-time fees. Mention that fees are per year. Then confirm category as it affects fee structure."
+    }
+  ],
+  "expected_end_state": "incomplete",
+  "ideal_counselor_notes": "Parent asked about fees but didn't specify category. Fee answer depends on category. Give general estimate, ask for category to be precise."
+}

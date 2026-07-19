@@ -1,0 +1,133 @@
+{
+  "id": "BENCH_000009",
+  "domain": "nri",
+  "difficulty": 4,
+  "primary_language": "en",
+  "languages": ["en"],
+  "speaker_profile": "parent",
+  "features": ["parent_mode", "missing_info"],
+  "ground_truth": {
+    "rank": null,
+    "pcm_percentage": 85,
+    "category": "nri",
+    "interest": "ECE",
+    "board": "cbse",
+    "exam": "",
+    "budget": 2000000,
+    "location": "mumbai"
+  },
+  "turns": [
+    {
+      "student": "My daughter is in Dubai. She wants to study engineering in India. How does NRI quota work?",
+      "expected": {
+        "understanding": {
+          "intent": "nri_admission",
+          "facts": {},
+          "inference": {"parent_mode": true, "daughter_abroad": true},
+          "confidence": "high",
+          "missing": ["rank", "pcm_percentage", "category", "interest"]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.0,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance",
+          "problems": ["needs_admission_guidance"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_nri_admission_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Parent asking about NRI quota for daughter in Dubai",
+            "NRI quota has specific requirements and fees"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": ["daughter", "Dubai"]
+            },
+            {
+              "action": "inform",
+              "content_contains": ["NRI quota", "process", "documents", "fees"]
+            },
+            {
+              "action": "ask",
+              "content_contains": ["board", "percentage", "interest"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_nri_info", "Parent_mode"]
+        }
+      },
+      "must_not": ["guarantee_admission", "assume_nri_status"],
+      "ideal_counselor_notes": "Parent seeking NRI quota info for daughter in Dubai. Explain the NRI quota process, fees, and required documents. Ask for academic details."
+    },
+    {
+      "student": "She is in CBSE board, scored 85 percent in PCM. She wants ECE. We are based in Mumbai but she is in Dubai. What documents do we need?",
+      "expected": {
+        "understanding": {
+          "intent": "nri_admission",
+          "facts": {"pcm_percentage": 85, "board": "cbse", "interest": "ECE", "location": "mumbai"},
+          "inference": {"parent_mode": true},
+          "confidence": "high",
+          "missing": ["category", "budget"]
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.57,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance",
+          "problems": ["needs_admission_guidance"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_nri_admission_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Good profile info available for NRI guidance",
+            "Need to explain document requirements specifically"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": ["documents", "passport", "NRI certificate", "sponsorship"]
+            },
+            {
+              "action": "recommend",
+              "content_contains": ["colleges", "ECE", "NRI quota"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_nri_info", "Profile_partial"]
+        }
+      },
+      "must_not": ["guarantee_seat", "ignore_document_requirements"],
+      "ideal_counselor_notes": "Parent has provided good academic details. Explain the specific documents needed for NRI quota admission and list colleges with ECE for NRI students."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "NRI admission scenario with daughter in Dubai. Key challenge: explaining the complex NRI quota process including document requirements and fee structure.",
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

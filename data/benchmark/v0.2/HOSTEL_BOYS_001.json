@@ -1,0 +1,93 @@
+{
+  "id": "HOSTEL_BOYS_001",
+  "tags": [
+    "hostel",
+    "boys-hostel",
+    "facilities",
+    "canonical"
+  ],
+  "difficulty": 2,
+  "ground_truth": {
+    "rank": 30000,
+    "pcm_percentage": null,
+    "category": "general",
+    "interest": null,
+    "board": "wbjee",
+    "budget": null,
+    "location": ""
+  },
+  "turns": [
+    {
+      "student": "What are the hostel fees and facilities for boys?",
+      "expected": {
+        "understanding": {
+          "intent": "hostel",
+          "facts": {},
+          "inference": {},
+          "missing": [
+            "rank",
+            "pcm_percentage",
+            "category",
+            "interest"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.0,
+          "confidence": "low",
+          "current_problem": "needs_hostel_information"
+        },
+        "brain": {
+          "applicable": false,
+          "eligible_branches": [],
+          "why": []
+        },
+        "decision": {
+          "action": "provide_hostel_info",
+          "priority": "normal",
+          "confidence": "high",
+          "why": [
+            "Direct question about hostel fees and facilities",
+            "No admission info needed yet"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "boys",
+                "hostel",
+                "fee",
+                "room",
+                "mess"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "admission",
+                "rank",
+                "branch"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Intent=hostel",
+            "Decision=provide_hostel_info",
+            "Planner=give hostel details first, then collect admission context"
+          ]
+        }
+      },
+      "must_not": [
+        "give_only_fee_without_facilities",
+        "assume_admission_intent",
+        "sound_dismissive"
+      ],
+      "ideal_counselor_notes": "Student asking about hostel before admission. Give comprehensive info: single/double sharing, mess, wifi, common room, gym. Then gently ask about their admission status."
+    }
+  ],
+  "expected_end_state": "incomplete",
+  "ideal_counselor_notes": "Hostel-first queries are common. Provide complete facilities overview, not just fees."
+}

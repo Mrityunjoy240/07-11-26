@@ -1,0 +1,207 @@
+{
+  "id": "BENCH_000004",
+  "domain": "scholarship",
+  "difficulty": 5,
+  "primary_language": "en",
+  "languages": [
+    "en"
+  ],
+  "speaker_profile": "student",
+  "features": [
+    "correction",
+    "emotion"
+  ],
+  "ground_truth": {
+    "rank": 35000,
+    "pcm_percentage": 72,
+    "category": "sc",
+    "interest": "ME",
+    "board": "wbjee",
+    "exam": "wbjee",
+    "budget": "low",
+    "location": "siliguri"
+  },
+  "turns": [
+    {
+      "student": "I need scholarship information. My family income is around 3 lakh per year. I have WBJEE rank 35000 and 72 percent in PCM.",
+      "expected": {
+        "understanding": {
+          "intent": "scholarship",
+          "facts": {
+            "rank": 35000,
+            "pcm_percentage": 72,
+            "board": "wbjee",
+            "exam": "wbjee",
+            "budget": "low"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": [
+            "category",
+            "interest"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.57,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": [
+            "needs_fee_information"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_scholarship_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student explicitly asking about scholarship",
+            "Low family income suggests strong eligibility"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "scholarship",
+                "income",
+                "eligibility"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "category",
+                "branch"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_scholarship_info",
+            "Student_asks_scholarship"
+          ]
+        }
+      },
+      "must_not": [
+        "hallucinate_scholarship_amount",
+        "recommend_branch"
+      ],
+      "ideal_counselor_notes": "Student from low-income family asking about scholarships. Need to provide scholarship info and also gather category for specific schemes."
+    },
+    {
+      "student": "I am SC category. I want mechanical engineering. But wait, actually I made a mistake earlier — my rank is 35000 but my PCM is 72 percent. Oh wait no, I got confused. My rank is actually 45000, not 35000. I'm sorry for the confusion.",
+      "expected": {
+        "understanding": {
+          "intent": "scholarship",
+          "facts": {
+            "rank": 45000,
+            "pcm_percentage": 72,
+            "category": "sc",
+            "interest": "ME"
+          },
+          "inference": {
+            "confusion": true
+          },
+          "confidence": "medium",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "medium",
+          "current_problem": "needs_fee_information",
+          "problems": [
+            "needs_fee_information",
+            "expressing_anxiety"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [
+            "CSE",
+            "AIML",
+            "IT",
+            "ECE",
+            "EE",
+            "ME",
+            "CE"
+          ],
+          "applicable": true,
+          "why": [
+            {
+              "condition": "rank_provided",
+              "met": true,
+              "detail": "Rank=45000 (corrected)"
+            },
+            {
+              "condition": "category_known",
+              "met": true,
+              "detail": "SC"
+            },
+            {
+              "condition": "rank_within_margin",
+              "met": true,
+              "detail": "45000 < 110000*0.85=93500 for ME/SC"
+            }
+          ]
+        },
+        "decision": {
+          "action": "provide_scholarship_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student corrected rank from 35000 to 45000",
+            "SC category with low income qualifies for multiple scholarships",
+            "Primary ask is still scholarship"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "reassure",
+              "content_contains": [
+                "no problem",
+                "corrected"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "SC scholarship",
+                "post-matric",
+                "income"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_scholarship_info",
+            "Rank_corrected",
+            "SC_eligible"
+          ]
+        }
+      },
+      "must_not": [
+        "blame_student_for_mistake",
+        "ignore_correction"
+      ],
+      "ideal_counselor_notes": "Student corrected rank (35000→45000). Must acknowledge correction gracefully, then provide scholarship information. SC + low income = strong scholarship eligibility."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "Scholarship inquiry from SC student with low family income. Key challenge: student corrects rank mid-conversation. Pipeline must update state correctly and not penalize the student for the correction.",
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T10:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

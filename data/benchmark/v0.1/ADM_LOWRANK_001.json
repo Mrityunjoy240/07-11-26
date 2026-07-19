@@ -1,0 +1,345 @@
+{
+  "id": "ADM_LOWRANK_001",
+  "tags": [
+    "admission",
+    "low-rank",
+    "anxiety",
+    "canonical"
+  ],
+  "difficulty": 3,
+  "ground_truth": {
+    "rank": 48000,
+    "pcm_percentage": null,
+    "category": "general",
+    "interest": "AI",
+    "board": "wbjee",
+    "budget": null,
+    "location": ""
+  },
+  "turns": [
+    {
+      "student": "I got 48k rank in WBJEE.",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {
+            "rank": 48000,
+            "exam": "wbjee"
+          },
+          "inference": {
+            "anxiety": false,
+            "confusion": false
+          },
+          "missing": [
+            "pcm_percentage",
+            "interest",
+            "category"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.14,
+          "confidence": "medium",
+          "current_problem": "needs_admission_guidance"
+        },
+        "brain": {
+          "applicable": true,
+          "eligible_branches": []
+        },
+        "decision": {
+          "action": "collect_profile",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "No PCM percentage",
+            "No interest",
+            "No category"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "ask",
+              "content_contains": [
+                "PCM",
+                "percentage"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Understanding=rank extracted",
+            "Reasoning=profile incomplete",
+            "Decision=collect_profile",
+            "Missing=PCM is most critical",
+            "Planner=ask PCM first"
+          ]
+        }
+      },
+      "must_not": [
+        "recommend_branch",
+        "hallucinate_cutoff",
+        "ask_interest_before_pcm"
+      ],
+      "ideal_counselor_notes": "48k is a moderate rank in WBJEE. Don't discourage. First collect PCM since eligibility depends on it."
+    },
+    {
+      "student": "PCM 82.",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {
+            "pcm_percentage": 82
+          },
+          "inference": {},
+          "missing": [
+            "interest",
+            "category"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.29,
+          "confidence": "medium",
+          "current_problem": "needs_admission_guidance"
+        },
+        "brain": {
+          "applicable": true,
+          "eligible_branches": [
+            "CE"
+          ],
+          "why": [
+            {
+              "condition": "rank_provided",
+              "met": true,
+              "detail": "Rank 48000 for general category"
+            },
+            {
+              "condition": "CSE_cutoff",
+              "met": false,
+              "detail": "Rank 48000 > CSE cutoff 15000"
+            },
+            {
+              "condition": "AIML_cutoff",
+              "met": false,
+              "detail": "Rank 48000 > AIML cutoff 18000"
+            },
+            {
+              "condition": "IT_cutoff",
+              "met": false,
+              "detail": "Rank 48000 > IT cutoff 22000"
+            },
+            {
+              "condition": "ECE_cutoff",
+              "met": false,
+              "detail": "Rank 48000 > ECE cutoff 28000"
+            },
+            {
+              "condition": "EE_cutoff",
+              "met": true,
+              "detail": "Rank 48000 <= EE cutoff 40000"
+            },
+            {
+              "condition": "ME_cutoff",
+              "met": true,
+              "detail": "Rank 48000 <= ME cutoff 55000"
+            },
+            {
+              "condition": "CE_cutoff",
+              "met": true,
+              "detail": "Rank 48000 <= CE cutoff 70000"
+            },
+            {
+              "condition": "pcm_minimum_met",
+              "met": true,
+              "detail": "PCM 82% >= 45% minimum"
+            }
+          ]
+        },
+        "decision": {
+          "action": "collect_profile",
+          "priority": "normal",
+          "confidence": "high",
+          "why": [
+            "PCM meets minimum",
+            "44k rank allows EE/ME/CE",
+            "Still need interest and category"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "ask",
+              "content_contains": [
+                "interest",
+                "field",
+                "branch"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Brain=EE/ME/CE eligible",
+            "Decision=collect_profile still needed",
+            "Missing=interest",
+            "Planner=ask interest to refine recommendation"
+          ]
+        }
+      },
+      "must_not": [
+        "recommend_without_interest",
+        "give_rank_cutoff_for_wrong_category"
+      ],
+      "ideal_counselor_notes": "Good news — 82 PCM meets the minimum and 48k opens EE/ME/CE. Don't list branches yet. Ask interest first to personalize."
+    },
+    {
+      "student": "I am interested in AI and ML.",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {
+            "interest": "AI"
+          },
+          "inference": {},
+          "missing": [
+            "category"
+          ]
+        },
+        "reasoning": {
+          "stage": "evaluation",
+          "profile_completeness": 0.43,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance"
+        },
+        "brain": {
+          "applicable": true,
+          "eligible_branches": [
+            "CE"
+          ],
+          "why": []
+        },
+        "decision": {
+          "action": "recommend_branches",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Rank+PCM+interest collected",
+            "AIML not in eligible range for general",
+            "Recommend EE/ME/CE with guidance",
+            "Could suggest CSE/AIML as aspirational if category benefit"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "recommend",
+              "content_contains": [
+                "EE",
+                "ME",
+                "CE",
+                "eligible"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "category",
+                "general",
+                "OBC",
+                "SC",
+                "ST"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Student=interested in AI/AIML",
+            "Brain=AIML cutoff 18000 > rank 48000 for general",
+            "Decision=recommend_branches with realistic options",
+            "Planner=recommend EE/ME/CE, ask category to check if OBC/SC/ST improves options"
+          ]
+        }
+      },
+      "must_not": [
+        "say_AIML_possible_for_general",
+        "ignore_interest",
+        "only_read_cutoffs"
+      ],
+      "ideal_counselor_notes": "Student wants AI but rank doesn't reach AIML for general. Be honest but hopeful — EE still allows AI specialization later. Ask category because SC/ST opens AIML at 48k."
+    },
+    {
+      "student": "General category.",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {
+            "category": "general"
+          },
+          "inference": {},
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "evaluation",
+          "profile_completeness": 0.57,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance"
+        },
+        "brain": {
+          "applicable": true,
+          "eligible_branches": [
+            "CE"
+          ],
+          "why": []
+        },
+        "decision": {
+          "action": "provide_branch_guidance",
+          "priority": "normal",
+          "confidence": "high",
+          "why": [
+            "Profile complete",
+            "Eligible for EE/ME/CE",
+            "Student expressed AI interest",
+            "Guide towards EE as closest to AI"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "EE",
+                "electrical",
+                "AI",
+                "specialization"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "preference",
+                "branch"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Profile=complete",
+            "Brain=EE/ME/CE for general 48k",
+            "Interest=AI",
+            "Decision=provide_branch_guidance",
+            "Planner=EE is closest to AI, explain why, ask preference"
+          ]
+        }
+      },
+      "must_not": [
+        "recommend_CSE",
+        "recommend_AIML",
+        "ignore_AI_interest",
+        "say_management_quota"
+      ],
+      "ideal_counselor_notes": "Profile is now complete. Student likes AI but can't get AIML. EE is the best realistic option — it has AI/ML elective courses in later years. Explain this positively."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "This is the most common admission scenario: moderate rank, good PCM, clear interest. The counselor must collect all fields, set realistic expectations, and provide a path forward that aligns with the student's interests."
+}

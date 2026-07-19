@@ -1,0 +1,320 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Golden Conversation — v2",
+  "description": "A multi-turn admission counseling conversation for the benchmark dataset. Schema v2 adds metadata, features, annotation provenance, and domain-based organization.",
+  "type": "object",
+  "required": [
+    "id", "schema_version", "domain", "difficulty", "primary_language", "features",
+    "ground_truth", "turns", "expected_end_state"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^BENCH_\\d{6}$",
+      "description": "Globally unique conversation ID. Pattern: BENCH_NNNNNN. Never restarts across batches."
+    },
+    "schema_version": {
+      "type": "string",
+      "const": "v2",
+      "description": "Self-describing schema version. Must match the manifest's schema field."
+    },
+    "domain": {
+      "type": "string",
+      "enum": [
+        "admission", "fees", "hostel", "placement", "scholarship",
+        "management", "sports", "nri", "lateral", "transfer",
+        "distance", "counseling", "grievance", "mixed", "multilingual"
+      ],
+      "description": "Primary domain of the conversation. Determines file subdirectory."
+    },
+    "difficulty": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 7,
+      "description": "1=FAQ, 2=Single-turn admission, 3=Profile building, 4=Multi-turn reasoning, 5=Memory+contradiction, 6=Emotion+recommendation, 7=Everything together. Label is derived (not stored)."
+    },
+    "primary_language": {
+      "type": "string",
+      "enum": ["en", "hi", "bn", "te", "ta", "mr", "gu", "kn", "ml", "pa", "ur", "other"],
+      "description": "Primary language as ISO 639-1 code."
+    },
+    "languages": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["en", "hi", "bn", "te", "ta", "mr", "gu", "kn", "ml", "pa", "ur", "other"]
+      },
+      "minItems": 1,
+      "description": "All languages present in the conversation. Length > 1 implies language mixing."
+    },
+    "speaker_profile": {
+      "type": "string",
+      "enum": ["student", "parent", "mixed"],
+      "description": "Who is the primary speaker. 'mixed' when both student and parent contribute."
+    },
+    "features": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "correction",
+          "topic_switch",
+          "missing_info",
+          "adversarial",
+          "parent_mode",
+          "emotion",
+          "language_switch",
+          "noisy_input"
+        ]
+      },
+      "uniqueItems": true,
+      "description": "Complexity features present in this conversation. Controls the domain x complexity matrix."
+    },
+    "ground_truth": {
+      "type": "object",
+      "description": "Canonical facts for this conversation. Used to verify understanding extraction.",
+      "properties": {
+        "rank": { "type": ["integer", "null"] },
+        "pcm_percentage": { "type": ["number", "null"] },
+        "category": { "type": "string" },
+        "interest": { "type": "string" },
+        "board": { "type": "string" },
+        "exam": { "type": "string" },
+        "budget": { "type": ["number", "string", "null"], "description": "Numeric budget or descriptive string like 'low', 'high'." },
+        "location": { "type": "string" }
+      }
+    },
+    "turns": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/turn" },
+      "minItems": 1
+    },
+    "expected_end_state": {
+      "type": "string",
+      "enum": ["success", "escalate", "incomplete"],
+      "description": "success=all info collected+recommendation. escalate=needs human. incomplete=student left."
+    },
+    "ideal_counselor_notes": {
+      "type": "string",
+      "description": "How a real human counselor would approach this conversation."
+    },
+    "annotation": {
+      "type": "object",
+      "description": "Provenance metadata for maintaining annotations at scale.",
+      "properties": {
+        "author": { "type": "string", "description": "Who wrote the initial draft." },
+        "reviewer": { "type": "string", "description": "Who independently reviewed the annotations." },
+        "created": { "type": "string", "format": "date-time" },
+        "reviewed": { "type": "string", "format": "date-time" },
+        "status": {
+          "type": "string",
+          "enum": ["draft", "reviewed", "frozen"],
+          "description": "draft=authored, reviewed=second reviewer approved, frozen=benchmark version locked."
+        }
+      }
+    }
+  },
+  "$defs": {
+    "turn": {
+      "type": "object",
+      "required": ["student", "expected", "must_not"],
+      "properties": {
+        "student": {
+          "type": "string",
+          "description": "What the student (or parent) says this turn."
+        },
+        "expected": {
+          "type": "object",
+          "description": "Expected pipeline output for this turn.",
+          "properties": {
+            "understanding": { "$ref": "#/$defs/understanding" },
+            "reasoning": { "$ref": "#/$defs/reasoning" },
+            "brain": { "$ref": "#/$defs/brain" },
+            "decision": { "$ref": "#/$defs/decision" },
+            "planner": { "$ref": "#/$defs/planner" }
+          }
+        },
+        "must_not": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Forbidden behaviors this turn. e.g. 'recommend_branch', 'hallucinate_cutoff'."
+        },
+        "ideal_counselor_notes": {
+          "type": "string",
+          "description": "Turn-specific guidance."
+        }
+      }
+    },
+    "understanding": {
+      "type": "object",
+      "properties": {
+        "intent": {
+          "type": "string",
+          "enum": [
+            "admission", "fee", "placement", "hostel", "scholarship",
+            "grievance", "counseling", "counseling_info", "nri_admission", "management_quota",
+            "sports_quota", "lateral_entry", "transfer", "distance_education",
+            "career_confusion", "general", "unknown"
+          ]
+        },
+        "facts": {
+          "type": "object",
+          "description": "Structured facts extracted from student input. Matches ground_truth keys.",
+          "properties": {
+            "rank": { "type": ["integer", "null"] },
+            "pcm_percentage": { "type": ["number", "null"] },
+            "category": { "type": "string" },
+            "interest": { "type": "string" },
+            "board": { "type": "string" },
+            "exam": { "type": "string" },
+            "budget": { "type": ["number", "string", "null"] },
+            "location": { "type": "string" }
+          }
+        },
+        "inference": {
+          "type": "object",
+          "description": "Non-factual observations. Lower confidence than facts.",
+          "properties": {
+            "anxiety": { "type": "boolean" },
+            "confusion": { "type": "boolean" },
+            "urgency": { "type": "boolean" },
+            "parent_mode": { "type": "boolean" },
+            "language_switch": { "type": "boolean" }
+          }
+        },
+        "confidence": {
+          "type": "string",
+          "enum": ["high", "medium", "low"]
+        },
+        "missing": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Fields still needed after this turn."
+        }
+      }
+    },
+    "reasoning": {
+      "type": "object",
+      "properties": {
+        "stage": {
+          "type": "string",
+          "enum": ["discovery", "exploration", "comparison", "decision", "post_admission"]
+        },
+        "profile_completeness": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "filled/7 across: rank, pcm_percentage, board, category, interest, budget, location."
+        },
+        "confidence": {
+          "type": "string",
+          "enum": ["high", "medium", "low"]
+        },
+        "current_problem": {
+          "type": "string",
+          "enum": [
+            "needs_admission_guidance", "needs_profile_completion",
+            "needs_fee_information", "needs_placement_data",
+            "needs_hostel_info", "expressing_anxiety",
+            "comparing_options", "has_management_query",
+            "has_transfer_query", "has_grievance", "general_inquiry"
+          ]
+        },
+        "problems": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "brain": {
+      "type": "object",
+      "properties": {
+        "eligible_branches": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "applicable": { "type": "boolean" },
+        "why": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "condition": { "type": "string" },
+              "met": { "type": "boolean" },
+              "detail": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "decision": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string",
+          "enum": [
+            "collect_profile", "encourage_and_collect_profile",
+            "recommend_branches", "provide_admission_info", "provide_admission_guidance",
+            "provide_fee_info", "provide_placement_info",
+            "provide_hostel_info", "provide_scholarship_info",
+            "provide_career_guidance", "provide_counseling_schedule",
+            "escalate_to_human", "explain_management_quota_policy",
+            "provide_grievance_process", "provide_transfer_info",
+            "provide_nri_admission_info", "provide_branch_guidance",
+            "provide_sports_info", "provide_distance_ed_info",
+            "provide_lateral_entry_info", "provide_sports_quota_info",
+            "provide_guidance", "provide_cutoff_info",
+            "reassure", "clarify"
+          ]
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["high", "normal", "low"]
+        },
+        "confidence": {
+          "type": "string",
+          "enum": ["high", "medium", "low"]
+        },
+        "why": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Reasons this action was chosen."
+        }
+      }
+    },
+    "planner": {
+      "type": "object",
+      "properties": {
+        "turns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "action": {
+                "type": "string",
+                "enum": [
+                  "recommend", "ask", "inform", "reassure", "encourage",
+                  "listen", "clarify", "summarize", "escalate"
+                ]
+              },
+              "content_contains": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "Keywords the response MUST include. Max 5. No filler words."
+              }
+            }
+          }
+        },
+        "confidence": {
+          "type": "string",
+          "enum": ["high", "medium", "low"]
+        },
+        "dependency_chain": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Why these actions were chosen. e.g. 'Decision=collect_profile, Missing=PCM'."
+        }
+      }
+    }
+  }
+}

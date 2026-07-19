@@ -1,0 +1,109 @@
+{
+  "version": "v2.0",
+  "pipeline": "main",
+  "date": "2026-07-19",
+  "pipeline_commit": "47f02cc",
+  "benchmark_checksum": "c2f60f49d944c3eb",
+  "conversation_count": 15,
+  "turn_count": 32,
+  "turn_accuracy": 1.0,
+  "conversation_accuracy": 1.0,
+  "intent_accuracy": 1.0,
+  "action_accuracy": 1.0,
+  "retrieval_accuracy": null,
+  "hallucination_rate": null,
+  "avg_latency_ms": 34.7,
+  "failed_conversations": [],
+  "per_conversation": {
+    "BENCH_000001": {
+      "turns": 4,
+      "intent_correct": 4,
+      "action_correct": 4,
+      "turn_accuracy": 100.0
+    },
+    "BENCH_000002": {
+      "turns": 2,
+      "intent_correct": 2,
+      "action_correct": 2,
+      "turn_accuracy": 100.0
+    },
+    "BENCH_000003": {
+      "turns": 2,
+      "intent_correct": 2,
+      "action_correct": 2,
+      "turn_accuracy": 100.0
+    },
+    "BENCH_000004": {
+      "turns": 2,
+      "intent_correct": 2,
+      "action_correct": 2,
+      "turn_accuracy": 100.0
+    },
+    "BENCH_000005": {
+      "turns": 2,
+      "intent_correct": 2,
+      "action_correct": 2,
+      "turn_accuracy": 100.0
+    },
+    "BENCH_000006": {
+      "turns": 2,
+      "intent_correct": 2,
+      "action_correct": 2,
+      "turn_accuracy": 100.0
+    },
+    "BENCH_000007": {
+      "turns": 2,
+      "intent_correct": 2,
+      "action_correct": 2,
+      "turn_accuracy": 100.0
+    },
+    "BENCH_000008": {
+      "turns": 2,
+      "intent_correct": 2,
+      "action_correct": 2,
+      "turn_accuracy": 100.0
+    },
+    "BENCH_000009": {
+      "turns": 2,
+      "intent_correct": 2,
+      "action_correct": 2,
+      "turn_accuracy": 100.0
+    },
+    "BENCH_000010": {
+      "turns": 2,
+      "intent_correct": 2,
+      "action_correct": 2,
+      "turn_accuracy": 100.0
+    },
+    "BENCH_000011": {
+      "turns": 2,
+      "intent_correct": 2,
+      "action_correct": 2,
+      "turn_accuracy": 100.0
+    },
+    "BENCH_000012": {
+      "turns": 2,
+      "intent_correct": 2,
+      "action_correct": 2,
+      "turn_accuracy": 100.0
+    },
+    "BENCH_000013": {
+      "turns": 2,
+      "intent_correct": 2,
+      "action_correct": 2,
+      "turn_accuracy": 100.0
+    },
+    "BENCH_000014": {
+      "turns": 2,
+      "intent_correct": 2,
+      "action_correct": 2,
+      "turn_accuracy": 100.0
+    },
+    "BENCH_000015": {
+      "turns": 2,
+      "intent_correct": 2,
+      "action_correct": 2,
+      "turn_accuracy": 100.0
+    }
+  }
+}

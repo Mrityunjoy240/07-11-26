@@ -1,0 +1,104 @@
+{
+  "id": "ADM_DISTANCE_001",
+  "tags": [
+    "admission",
+    "distance",
+    "online",
+    "blended",
+    "canonical"
+  ],
+  "difficulty": 3,
+  "ground_truth": {
+    "rank": null,
+    "pcm_percentage": null,
+    "category": null,
+    "interest": null,
+    "board": null,
+    "budget": null,
+    "location": "other-state"
+  },
+  "turns": [
+    {
+      "student": "I live in Bihar. Do you offer distance education or online BTech programs?",
+      "expected": {
+        "understanding": {
+          "intent": "distance_education",
+          "facts": {},
+          "inference": {},
+          "missing": [
+            "rank",
+            "pcm_percentage",
+            "category",
+            "interest"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.0,
+          "confidence": "low",
+          "current_problem": "needs_distance_education_information"
+        },
+        "brain": {
+          "applicable": false,
+          "eligible_branches": [],
+          "why": []
+        },
+        "decision": {
+          "action": "provide_distance_ed_info",
+          "priority": "normal",
+          "confidence": "high",
+          "why": [
+            "Direct question about distance/online programs",
+            "Out-of-state student — explain all available options"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "distance",
+                "online",
+                "BTech",
+                "not",
+                "available"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "regular",
+                "hostel",
+                "campus",
+                "option"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "interest",
+                "branch",
+                "relocate"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Intent=distance_education",
+            "Out-of-state detected",
+            "Decision=provide_distance_ed_info",
+            "Planner=clarify no distance BTech, offer regular with hostel, ask interest"
+          ]
+        }
+      },
+      "must_not": [
+        "pretend_distance_btech_exists",
+        "ignore_out_of_state_status",
+        "sound_unwelcoming"
+      ],
+      "ideal_counselor_notes": "Be honest: BTech is full-time on-campus. No distance or online option exists. Do mention hostel facilities for out-of-state students warmly. Don't discourage them."
+    }
+  ],
+  "expected_end_state": "incomplete",
+  "ideal_counselor_notes": "Honesty builds trust. If the program doesn't exist, say so clearly but offer the best alternative."
+}

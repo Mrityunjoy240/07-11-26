@@ -1,0 +1,183 @@
+{
+  "id": "SPORTS_001",
+  "tags": [
+    "admission",
+    "sports-quota",
+    "athlete",
+    "canonical"
+  ],
+  "difficulty": 4,
+  "ground_truth": {
+    "rank": 45000,
+    "pcm_percentage": 60,
+    "category": "general",
+    "interest": "ECE",
+    "board": "wbjee",
+    "budget": null,
+    "location": ""
+  },
+  "turns": [
+    {
+      "student": "I have 45k rank, PCM 60. I am a state-level cricket player. Can I get ECE under sports quota?",
+      "expected": {
+        "understanding": {
+          "intent": "sports_quota",
+          "facts": {
+            "rank": 45000,
+            "pcm_percentage": 60,
+            "interest": "ECE"
+          },
+          "inference": {},
+          "missing": [
+            "category"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.43,
+          "confidence": "medium",
+          "current_problem": "needs_sports_quota_information"
+        },
+        "brain": {
+          "applicable": true,
+          "eligible_branches": [
+            "CE",
+            "ME"
+          ],
+          "why": [
+            {
+              "condition": "ECE_cutoff",
+              "met": true,
+              "detail": "45k > general cutoff 28k but sports quota has relaxation"
+            },
+            {
+              "condition": "sports_quota_benefit",
+              "met": true,
+              "detail": "State-level cricket qualifies for sports quota"
+            }
+          ]
+        },
+        "decision": {
+          "action": "provide_sports_quota_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "State-level athlete qualifies for sports quota consideration",
+            "ECE is within sports quota range typically",
+            "Must explain sports quota process clearly"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "sports",
+                "quota",
+                "ECE",
+                "eligible",
+                "trial"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "certificate",
+                "category",
+                "level"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Intent=sports_quota",
+            "Brain=ECE potentially eligible under sports quota",
+            "Decision=provide_sports_quota_info",
+            "Planner=explain sports quota, ask for supporting documents"
+          ]
+        }
+      },
+      "must_not": [
+        "ignore_sports_achievement",
+        "treat_as_regular_admission_only",
+        "promise_admission"
+      ],
+      "ideal_counselor_notes": "Sports quota is a valid pathway. Explain the process: verification of certificates, trials, and seat allocation. Don't guarantee admission — it depends on the selection committee."
+    },
+    {
+      "student": "General category. I have state-level cricket certificate and participation proofs.",
+      "expected": {
+        "understanding": {
+          "intent": "sports_quota",
+          "facts": {
+            "rank": 45000,
+            "pcm_percentage": 60,
+            "interest": "ECE",
+            "category": "general"
+          },
+          "inference": {},
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "evaluation",
+          "profile_completeness": 0.57,
+          "confidence": "high",
+          "current_problem": "needs_sports_quota_information"
+        },
+        "brain": {
+          "applicable": true,
+          "eligible_branches": [
+            "CE",
+            "ME"
+          ],
+          "why": []
+        },
+        "decision": {
+          "action": "provide_sports_quota_info",
+          "priority": "normal",
+          "confidence": "high",
+          "why": [
+            "Documents available — can proceed with application guidance",
+            "ECE realistic under sports quota",
+            "Provide next steps timeline"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "document",
+                "verification",
+                "trial",
+                "date",
+                "committee"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "questions",
+                "concerns",
+                "clarify"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Profile=complete for sports quota application",
+            "Decision=guide_sports_quota_application",
+            "Planner=explain verification process, ask for remaining questions"
+          ]
+        }
+      },
+      "must_not": [
+        "dismiss_sports_as_less_important",
+        "focus_only_on_academic_cutoffs"
+      ],
+      "ideal_counselor_notes": "The student has everything ready. Give clear guidance on next steps: document submission, trial dates, and selection timeline."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "Sports quota students need recognition of their athletic achievement alongside academic guidance."
+}

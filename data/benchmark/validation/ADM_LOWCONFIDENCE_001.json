@@ -1,0 +1,398 @@
+[
+  {
+    "turn": 0,
+    "student": "I only got 38k rank and 68 PCM. I don't think I'll get any good college. Should I just give up?",
+    "metrics": [
+      {
+        "stage": "understanding",
+        "metric": "intent.primary",
+        "expected": "admission",
+        "actual": "admission",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "facts.rank",
+        "expected": 38000,
+        "actual": 38000,
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "facts.pcm_percentage",
+        "expected": 68,
+        "actual": 68.0,
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "facts.exam",
+        "expected": "wbjee",
+        "actual": "",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "missing",
+        "expected": [
+          "category",
+          "interest"
+        ],
+        "actual": [
+          "category",
+          "interest"
+        ],
+        "pass": true,
+        "detail": "overlap=2/2",
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "stage",
+        "expected": "discovery",
+        "actual": "discovery",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "profile_completeness",
+        "expected": 0.4,
+        "actual": 0.42857142857142855,
+        "pass": true,
+        "detail": "tol=0.3, diff=0.03",
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "confidence",
+        "expected": "medium",
+        "actual": "high",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "current_problem",
+        "expected": "needs_admission_guidance",
+        "actual": "needs_admission_guidance",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "brain",
+        "metric": "applicable",
+        "expected": true,
+        "actual": true,
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "brain",
+        "metric": "eligible_branches",
+        "expected": [
+          "CE",
+          "EE",
+          "ME"
+        ],
+        "actual": [
+          "CE",
+          "ME"
+        ],
+        "pass": true,
+        "detail": "overlap=2/3",
+        "judge": ""
+      },
+      {
+        "stage": "decision",
+        "metric": "action",
+        "expected": "encourage_and_collect_profile",
+        "actual": "encourage_and_collect_profile",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0].action",
+        "expected": "encourage",
+        "actual": "encourage",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains '38k'",
+        "expected": "38k",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'good'",
+        "expected": "good",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'rank'",
+        "expected": "rank",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'eligible'",
+        "expected": "eligible",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'branches'",
+        "expected": "branches",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1].action",
+        "expected": "ask",
+        "actual": "ask",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1] content contains 'interest'",
+        "expected": "interest",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1] content contains 'subject'",
+        "expected": "subject",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1] content contains 'like'",
+        "expected": "like",
+        "actual": "What subject or field are you interested in?",
+        "pass": false,
+        "judge": ""
+      }
+    ],
+    "score": "19/22"
+  },
+  {
+    "turn": 1,
+    "student": "I like civil engineering. But is 38k enough for CE?",
+    "metrics": [
+      {
+        "stage": "understanding",
+        "metric": "intent.primary",
+        "expected": "admission",
+        "actual": "department",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "facts.rank",
+        "expected": 38000,
+        "actual": 38000,
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "facts.pcm_percentage",
+        "expected": 68,
+        "actual": 68.0,
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "facts.interest",
+        "expected": "CE",
+        "actual": "CE",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "facts.exam",
+        "expected": "wbjee",
+        "actual": "",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "missing",
+        "expected": [
+          "category"
+        ],
+        "actual": [
+          "category"
+        ],
+        "pass": true,
+        "detail": "overlap=1/1",
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "stage",
+        "expected": "evaluation",
+        "actual": "evaluation",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "profile_completeness",
+        "expected": 0.6,
+        "actual": 0.5714285714285714,
+        "pass": true,
+        "detail": "tol=0.3, diff=0.03",
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "confidence",
+        "expected": "high",
+        "actual": "high",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "current_problem",
+        "expected": "needs_branch_guidance",
+        "actual": "needs_branch_guidance",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "brain",
+        "metric": "applicable",
+        "expected": true,
+        "actual": true,
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "brain",
+        "metric": "eligible_branches",
+        "expected": [
+          "CE",
+          "EE",
+          "ME"
+        ],
+        "actual": [
+          "CE",
+          "ME"
+        ],
+        "pass": true,
+        "detail": "overlap=2/3",
+        "judge": ""
+      },
+      {
+        "stage": "decision",
+        "metric": "action",
+        "expected": "recommend_branches",
+        "actual": "recommend_branches",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0].action",
+        "expected": "reassure",
+        "actual": "recommend",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'CE'",
+        "expected": "CE",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'eligible'",
+        "expected": "eligible",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains '38k'",
+        "expected": "38k",
+        "actual": "Based on your profile, you are eligible for ME, CE.",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'cutoff'",
+        "expected": "cutoff",
+        "actual": "Based on your profile, you are eligible for ME, CE.",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'safe'",
+        "expected": "safe",
+        "actual": "Based on your profile, you are eligible for ME, CE.",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1].action",
+        "expected": "ask",
+        "actual": "ask",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1] content contains 'category'",
+        "expected": "category",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1] content contains 'confirm'",
+        "expected": "confirm",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      }
+    ],
+    "score": "16/22"
+  }
+]

@@ -1,0 +1,444 @@
+[
+  {
+    "turn": 0,
+    "student": "I am a parent. My daughter got 35k rank and wants ECE. Is the girls hostel safe?",
+    "metrics": [
+      {
+        "stage": "understanding",
+        "metric": "intent.primary",
+        "expected": "hostel",
+        "actual": "hostel",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "facts.rank",
+        "expected": 35000,
+        "actual": 35000,
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "facts.interest",
+        "expected": "ECE",
+        "actual": "ECE",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "missing",
+        "expected": [
+          "category",
+          "pcm_percentage"
+        ],
+        "actual": [
+          "category",
+          "pcm_percentage"
+        ],
+        "pass": true,
+        "detail": "overlap=2/2",
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "stage",
+        "expected": "discovery",
+        "actual": "discovery",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "profile_completeness",
+        "expected": 0.3,
+        "actual": 0.2857142857142857,
+        "pass": true,
+        "detail": "tol=0.3, diff=0.01",
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "confidence",
+        "expected": "medium",
+        "actual": "high",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "current_problem",
+        "expected": "needs_hostel_information",
+        "actual": "needs_hostel_information",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "brain",
+        "metric": "applicable",
+        "expected": true,
+        "actual": true,
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "brain",
+        "metric": "eligible_branches",
+        "expected": [
+          "CE",
+          "ECE",
+          "EE",
+          "ME"
+        ],
+        "actual": [
+          "CE",
+          "ME"
+        ],
+        "pass": true,
+        "detail": "overlap=2/4",
+        "judge": ""
+      },
+      {
+        "stage": "decision",
+        "metric": "action",
+        "expected": "provide_hostel_info",
+        "actual": "provide_hostel_info",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0].action",
+        "expected": "reassure",
+        "actual": "reassure",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'safe'",
+        "expected": "safe",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'security'",
+        "expected": "security",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'girls'",
+        "expected": "girls",
+        "actual": "Your safety is our priority. The hostel has 24x7 security measures in place.",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'hostel'",
+        "expected": "hostel",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1].action",
+        "expected": "inform",
+        "actual": "inform",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1] content contains 'cctv'",
+        "expected": "cctv",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1] content contains 'warden'",
+        "expected": "warden",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1] content contains '24x7'",
+        "expected": "24x7",
+        "actual": "CCTV surveillance wardens and secure entry systems ensure a safe environment.",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[2].action",
+        "expected": "ask",
+        "actual": "ask",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[2] content contains 'PCM'",
+        "expected": "PCM",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[2] content contains 'category'",
+        "expected": "category",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      }
+    ],
+    "score": "20/23"
+  },
+  {
+    "turn": 1,
+    "student": "Yes, PCM 80, general category. But really \u00e2\u20ac\u201d is the girls hostel safe? I've heard things.",
+    "metrics": [
+      {
+        "stage": "understanding",
+        "metric": "intent.primary",
+        "expected": "hostel",
+        "actual": "hostel",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "facts.pcm_percentage",
+        "expected": 80,
+        "actual": 80.0,
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "facts.category",
+        "expected": "general",
+        "actual": "general",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "understanding",
+        "metric": "missing",
+        "expected": [],
+        "actual": [],
+        "pass": false,
+        "detail": "overlap=0/0",
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "stage",
+        "expected": "evaluation",
+        "actual": "evaluation",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "profile_completeness",
+        "expected": 0.9,
+        "actual": 0.5714285714285714,
+        "pass": false,
+        "detail": "tol=0.3, diff=0.33",
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "confidence",
+        "expected": "high",
+        "actual": "high",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "reasoning",
+        "metric": "current_problem",
+        "expected": "needs_hostel_information",
+        "actual": "needs_hostel_information",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "brain",
+        "metric": "applicable",
+        "expected": true,
+        "actual": true,
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "brain",
+        "metric": "eligible_branches",
+        "expected": [
+          "CE",
+          "ECE",
+          "EE",
+          "ME"
+        ],
+        "actual": [
+          "CE",
+          "ME"
+        ],
+        "pass": true,
+        "detail": "overlap=2/4",
+        "judge": ""
+      },
+      {
+        "stage": "decision",
+        "metric": "action",
+        "expected": "provide_hostel_info",
+        "actual": "provide_hostel_info",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0].action",
+        "expected": "reassure",
+        "actual": "reassure",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'understand'",
+        "expected": "understand",
+        "actual": "Your safety is our priority. The hostel has 24x7 security measures in place.",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'concern'",
+        "expected": "concern",
+        "actual": "Your safety is our priority. The hostel has 24x7 security measures in place.",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'specific'",
+        "expected": "specific",
+        "actual": "Your safety is our priority. The hostel has 24x7 security measures in place.",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'policy'",
+        "expected": "policy",
+        "actual": "Your safety is our priority. The hostel has 24x7 security measures in place.",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'safety'",
+        "expected": "safety",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[0] content contains 'measure'",
+        "expected": "measure",
+        "actual": "(present)",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1].action",
+        "expected": "inform",
+        "actual": "inform",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1] content contains 'parent'",
+        "expected": "parent",
+        "actual": "CCTV surveillance wardens and secure entry systems ensure a safe environment.",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1] content contains 'visit'",
+        "expected": "visit",
+        "actual": "CCTV surveillance wardens and secure entry systems ensure a safe environment.",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1] content contains 'committee'",
+        "expected": "committee",
+        "actual": "CCTV surveillance wardens and secure entry systems ensure a safe environment.",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[1] content contains 'complaint'",
+        "expected": "complaint",
+        "actual": "CCTV surveillance wardens and secure entry systems ensure a safe environment.",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[2].action",
+        "expected": "ask",
+        "actual": "ask",
+        "pass": true,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[2] content contains 'any'",
+        "expected": "any",
+        "actual": "Could you share your PCM percentage and category?",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[2] content contains 'question'",
+        "expected": "question",
+        "actual": "Could you share your PCM percentage and category?",
+        "pass": false,
+        "judge": ""
+      },
+      {
+        "stage": "planner",
+        "metric": "turn[2] content contains 'help'",
+        "expected": "help",
+        "actual": "Could you share your PCM percentage and category?",
+        "pass": false,
+        "judge": ""
+      }
+    ],
+    "score": "14/27"
+  }
+]

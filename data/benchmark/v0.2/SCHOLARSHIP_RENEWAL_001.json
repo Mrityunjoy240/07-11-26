@@ -1,0 +1,107 @@
+{
+  "id": "SCHOLARSHIP_RENEWAL_001",
+  "tags": [
+    "scholarship",
+    "renewal",
+    "existing-student",
+    "canonical"
+  ],
+  "difficulty": 3,
+  "ground_truth": {
+    "rank": null,
+    "pcm_percentage": null,
+    "category": "sc",
+    "interest": null,
+    "board": null,
+    "budget": null,
+    "location": ""
+  },
+  "turns": [
+    {
+      "student": "I am a 2nd year SC student. My post-matric scholarship hasn't been renewed this year. Can you help?",
+      "expected": {
+        "understanding": {
+          "intent": "scholarship",
+          "facts": {
+            "category": "sc"
+          },
+          "inference": {
+            "frustration": true
+          },
+          "missing": [
+            "rank",
+            "pcm_percentage"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.14,
+          "confidence": "medium",
+          "current_problem": "needs_scholarship_information"
+        },
+        "brain": {
+          "applicable": false,
+          "eligible_branches": [],
+          "why": []
+        },
+        "decision": {
+          "action": "provide_scholarship_info",
+          "priority": "high",
+          "confidence": "medium",
+          "why": [
+            "Existing student with scholarship problem",
+            "SC scholarship renewal is a known process",
+            "Need more details to diagnose the issue"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "reassure",
+              "content_contains": [
+                "renewal",
+                "scholarship",
+                "look",
+                "into"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "scholarship",
+                "type",
+                "department",
+                "last",
+                "renewed"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "scholarship",
+                "office",
+                "document",
+                "deadline"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Intent=scholarship_renewal",
+            "Existing student",
+            "Decision=investigate_scholarship_renewal",
+            "Planner=reassure, gather information, suggest next steps"
+          ]
+        }
+      },
+      "must_not": [
+        "assume_automatic_renewal",
+        "ignore_existing_student_status",
+        "redirect_without_helping"
+      ],
+      "ideal_counselor_notes": "This is an existing student, not a prospective one. Treat them with priority — scholarship delays cause real hardship. Help diagnose: is it document issue, academic eligibility, or a system delay?"
+    }
+  ],
+  "expected_end_state": "incomplete",
+  "ideal_counselor_notes": "Existing students with administrative problems need concrete help, not just information."
+}

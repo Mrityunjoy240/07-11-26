@@ -1,0 +1,139 @@
+{
+  "id": "BENCH_000012",
+  "domain": "grievance",
+  "difficulty": 5,
+  "primary_language": "en",
+  "languages": ["en"],
+  "speaker_profile": "student",
+  "features": ["adversarial", "emotion"],
+  "ground_truth": {
+    "rank": 22000,
+    "pcm_percentage": 75,
+    "category": "general",
+    "interest": "CSE",
+    "board": "wbjee",
+    "exam": "wbjee",
+    "budget": null,
+    "location": "kolkata"
+  },
+  "turns": [
+    {
+      "student": "This system is useless! I have been asking the same question for 10 minutes and getting the same stupid answer. Just tell me if I can get CSE with 22k rank!",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {"rank": 22000},
+          "inference": {"emotion": "frustrated"},
+          "confidence": "high",
+          "missing": ["pcm_percentage", "category"]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.14,
+          "confidence": "high",
+          "current_problem": "has_grievance",
+          "problems": ["has_grievance", "expressing_anxiety"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "collect_profile",
+          "priority": "high",
+          "confidence": "medium",
+          "why": [
+            "Student is frustrated and wants direct answer",
+            "Rank provided, can give preliminary guidance",
+            "Need to de-escalate while being helpful"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": ["frustration", "same question"]
+            },
+            {
+              "action": "inform",
+              "content_contains": ["CSE", "rank 22000", "chances"]
+            },
+            {
+              "action": "ask",
+              "content_contains": ["category", "PCM percentage"]
+            }
+          ],
+          "confidence": "medium",
+          "dependency_chain": ["Decision=provide_branch_guidance", "Student_frustrated"]
+        }
+      },
+      "must_not": ["be_defensive", "match_hostility", "guarantee_admission"],
+      "ideal_counselor_notes": "Frustrated student demanding direct answer. Acknowledge the frustration, give preliminary guidance based on rank, then ask for missing info to give precise advice."
+    },
+    {
+      "student": "General category. 75 percent PCM. Now tell me straight — CSE possible or not? No beating around the bush.",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {"pcm_percentage": 75, "category": "general"},
+          "inference": {"emotion": "frustrated", "wants_direct_answer": true},
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.57,
+          "confidence": "high",
+          "current_problem": "has_grievance",
+          "problems": ["has_grievance"]
+        },
+        "brain": {
+          "eligible_branches": ["CSE", "AIML", "IT", "ECE", "EE", "ME", "CE"],
+          "applicable": true,
+          "why": [
+            {"condition": "rank_provided", "met": true, "detail": "Rank=22000"},
+            {"condition": "category_known", "met": true, "detail": "General cutoffs apply"},
+            {"condition": "rank_within_margin", "met": false, "detail": "22000 > 18000*1.15=20700 for CSE/General — outside margin"}
+          ]
+        },
+        "decision": {
+          "action": "recommend_branches",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "All profile info available",
+            "CSE is outside margin for general at 22000",
+            "Student wants direct answer — be honest"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": ["CSE", "difficult", "rank 22000", "general"]
+            },
+            {
+              "action": "recommend",
+              "content_contains": ["IT", "AIML", "ECE", "realistic options"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_branch_guidance", "CSE_unlikely"]
+        }
+      },
+      "must_not": ["give_false_hope", "be_vague", "guarantee_alternatives"],
+      "ideal_counselor_notes": "Student wants a straight answer. CSE is unlikely at 22000 for general category. Be honest about this, then immediately redirect to realistic alternatives."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "Frustrated student demanding direct answer. Key challenge: de-escalating hostility while providing honest, actionable guidance without sugarcoating or being defensive.",
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

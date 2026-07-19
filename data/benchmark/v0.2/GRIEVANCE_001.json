@@ -1,0 +1,106 @@
+{
+  "id": "GRIEVANCE_001",
+  "tags": [
+    "grievance",
+    "complaint",
+    "exam",
+    "result",
+    "canonical"
+  ],
+  "difficulty": 4,
+  "ground_truth": {
+    "rank": null,
+    "pcm_percentage": null,
+    "category": null,
+    "interest": null,
+    "board": null,
+    "budget": null,
+    "location": "kolkata"
+  },
+  "turns": [
+    {
+      "student": "I gave the mid-semester exam and my marks are much lower than expected. I want to apply for re-evaluation. What is the process?",
+      "expected": {
+        "understanding": {
+          "intent": "grievance",
+          "facts": {},
+          "inference": {
+            "frustration": true
+          },
+          "missing": [
+            "rank",
+            "pcm_percentage",
+            "category",
+            "interest"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.0,
+          "confidence": "low",
+          "current_problem": "needs_grievance_resolution"
+        },
+        "brain": {
+          "applicable": false,
+          "eligible_branches": [],
+          "why": []
+        },
+        "decision": {
+          "action": "provide_grievance_process",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student is frustrated — acknowledge first",
+            "Re-evaluation is a standard process",
+            "Need department/year details to give specific info"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "reassure",
+              "content_contains": [
+                "understand",
+                "frustration",
+                "process"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "re-evaluation",
+                "application",
+                "fee",
+                "deadline"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "department",
+                "year",
+                "subject"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Intent=grievance",
+            "Frustration detected",
+            "Decision=provide_grievance_process",
+            "Planner=acknowledge frustration, explain process, ask for details"
+          ]
+        }
+      },
+      "must_not": [
+        "dismiss_complaint",
+        "be_defensive",
+        "skip_empathy",
+        "give_vague_process"
+      ],
+      "ideal_counselor_notes": "Grievance handling requires empathy first. Listen, acknowledge the frustration, then explain the process clearly. Never be defensive or dismissive."
+    }
+  ],
+  "expected_end_state": "incomplete",
+  "ideal_counselor_notes": "Student grievances need careful handling. The counselor must balance empathy with procedural accuracy."
+}

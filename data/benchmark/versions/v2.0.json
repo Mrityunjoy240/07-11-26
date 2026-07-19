@@ -1,0 +1,25 @@
+{
+  "version": "2.0",
+  "status": "frozen",
+  "schema": "v2",
+  "created": "2026-07-19T00:00:00Z",
+  "conversation_count": 15,
+  "checksum": "c2f60f49d944c3eb",
+  "conversations": [
+    "BENCH_000001",
+    "BENCH_000002",
+    "BENCH_000003",
+    "BENCH_000004",
+    "BENCH_000005",
+    "BENCH_000006",
+    "BENCH_000007",
+    "BENCH_000008",
+    "BENCH_000009",
+    "BENCH_000010",
+    "BENCH_000011",
+    "BENCH_000012",
+    "BENCH_000013",
+    "BENCH_000014",
+    "BENCH_000015"
+  ]
+}

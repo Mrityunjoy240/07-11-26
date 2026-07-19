@@ -1,0 +1,135 @@
+{
+  "id": "BENCH_000015",
+  "domain": "transfer",
+  "difficulty": 4,
+  "primary_language": "en",
+  "languages": ["en"],
+  "speaker_profile": "student",
+  "features": ["correction"],
+  "ground_truth": {
+    "rank": 28000,
+    "pcm_percentage": 76,
+    "category": "general",
+    "interest": "IT",
+    "board": "wbjee",
+    "exam": "wbjee",
+    "budget": null,
+    "location": "kolkata"
+  },
+  "turns": [
+    {
+      "student": "I am in a private college in Kolkata doing CSE first year. Can I transfer to a government college?",
+      "expected": {
+        "understanding": {
+          "intent": "transfer",
+          "facts": {"interest": "CSE"},
+          "inference": {},
+          "confidence": "high",
+          "missing": ["rank", "pcm_percentage", "category"]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.14,
+          "confidence": "high",
+          "current_problem": "has_transfer_query",
+          "problems": ["has_transfer_query"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_transfer_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student asking about college transfer",
+            "Transfer has specific rules and limitations"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": ["college transfer", "process", "government colleges"]
+            },
+            {
+              "action": "ask",
+              "content_contains": ["rank", "WBJEE", "current college"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_transfer_info", "Student_asks_transfer"]
+        }
+      },
+      "must_not": ["guarantee_transfer", "assume_eligibility"],
+      "ideal_counselor_notes": "Student in private college wants to transfer to government college. Explain the transfer process, eligibility, and ask for rank details."
+    },
+    {
+      "student": "My WBJEE rank was 28000, general category. I scored 76 percent in PCM. Actually I want IT, not CSE. Is that easier to get?",
+      "expected": {
+        "understanding": {
+          "intent": "transfer",
+          "facts": {"rank": 28000, "pcm_percentage": 76, "category": "general", "interest": "IT"},
+          "inference": {},
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.71,
+          "confidence": "high",
+          "current_problem": "has_transfer_query",
+          "problems": ["has_transfer_query"]
+        },
+        "brain": {
+          "eligible_branches": ["CSE", "AIML", "IT", "ECE", "EE", "ME", "CE"],
+          "applicable": true,
+          "why": [
+            {"condition": "rank_provided", "met": true, "detail": "Rank=28000"},
+            {"condition": "category_known", "met": true, "detail": "General cutoffs apply"},
+            {"condition": "rank_within_margin", "met": true, "detail": "28000 < 32000*1.15=36800 for IT/General"}
+          ]
+        },
+        "decision": {
+          "action": "provide_transfer_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "All profile info available",
+            "IT is within margin for general at 28000",
+            "Student corrected interest from CSE to IT",
+            "Transfer context still active — explain transfer eligibility for IT"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": ["IT", "transfer", "easier", "rank 28000"]
+            },
+            {
+              "action": "recommend",
+              "content_contains": ["IT colleges", "government", "Kolkata"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_transfer_info", "IT_eligible"]
+        }
+      },
+      "must_not": ["guarantee_transfer", "discourage_CSE_without_reason"],
+      "ideal_counselor_notes": "Student corrected interest from CSE to IT. IT is more accessible at rank 28000 for general. Explain transfer eligibility for IT specifically."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "Student wanting to transfer from private to government college and switching from CSE to IT. Key challenge: explaining transfer rules while noting IT is more accessible.",
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

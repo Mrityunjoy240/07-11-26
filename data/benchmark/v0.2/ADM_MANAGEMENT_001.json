@@ -1,0 +1,118 @@
+{
+  "id": "ADM_MANAGEMENT_001",
+  "tags": [
+    "admission",
+    "management-quota",
+    "donation",
+    "canonical"
+  ],
+  "difficulty": 5,
+  "ground_truth": {
+    "rank": 68000,
+    "pcm_percentage": 65,
+    "category": "general",
+    "interest": "CSE",
+    "board": "wbjee",
+    "budget": "high",
+    "location": "kolkata"
+  },
+  "turns": [
+    {
+      "student": "My rank is 68k, PCM 65. I want CSE. Is management quota available? I can pay donation.",
+      "expected": {
+        "understanding": {
+          "intent": "management_quota",
+          "facts": {
+            "rank": 68000,
+            "pcm_percentage": 65,
+            "interest": "CSE"
+          },
+          "inference": {
+            "financial_concern": false
+          },
+          "missing": [
+            "category"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.43,
+          "confidence": "medium",
+          "current_problem": "needs_management_quota_information"
+        },
+        "brain": {
+          "applicable": true,
+          "eligible_branches": [],
+          "why": [
+            {
+              "condition": "CSE_cutoff",
+              "met": false,
+              "detail": "68k > 15k general cutoff"
+            },
+            {
+              "condition": "regular_admission",
+              "met": false,
+              "detail": "No branches open at 68k for general"
+            }
+          ]
+        },
+        "decision": {
+          "action": "explain_management_quota_policy",
+          "priority": "normal",
+          "confidence": "high",
+          "why": [
+            "Student explicitly asking about management quota",
+            "Regular admission not possible at 68k general",
+            "Must explain policy without promoting or discouraging"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "management",
+                "quota",
+                "policy",
+                "seats",
+                "government"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "regular",
+                "eligible",
+                "branch",
+                "alternative"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "category",
+                "option"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Intent=management_quota",
+            "Brain=no regular admission possible",
+            "Decision=explain_management_quota_policy",
+            "Planner=state management quota policy neutrally, present regular alternatives, ask for choice"
+          ]
+        }
+      },
+      "must_not": [
+        "promote_management_quota",
+        "suggest_donation_amount",
+        "discourage_from_regular",
+        "misrepresent_seat_availability"
+      ],
+      "ideal_counselor_notes": "Management quota is a sensitive topic. State the policy factually: government rules, seat availability, and that donation amounts are not set by the counselor. Also present what regular admission options exist at 68k."
+    }
+  ],
+  "expected_end_state": "incomplete",
+  "ideal_counselor_notes": "Management quota conversations require extreme care. Stay factual, transparent, and never suggest or quote donation amounts."
+}

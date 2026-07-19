@@ -1,0 +1,191 @@
+{
+  "id": "HOSTEL_GIRLS_001",
+  "tags": [
+    "hostel",
+    "girls-hostel",
+    "safety",
+    "parent",
+    "canonical"
+  ],
+  "difficulty": 3,
+  "ground_truth": {
+    "rank": 35000,
+    "pcm_percentage": 80,
+    "category": "general",
+    "interest": "ECE",
+    "board": "wbjee",
+    "budget": null,
+    "location": ""
+  },
+  "turns": [
+    {
+      "student": "I am a parent. My daughter got 35k rank and wants ECE. Is the girls hostel safe?",
+      "expected": {
+        "understanding": {
+          "intent": "hostel",
+          "facts": {
+            "rank": 35000,
+            "interest": "ECE"
+          },
+          "inference": {
+            "parent_influence": true,
+            "anxiety": true
+          },
+          "missing": [
+            "pcm_percentage",
+            "category"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.29,
+          "confidence": "medium",
+          "current_problem": "needs_hostel_information"
+        },
+        "brain": {
+          "applicable": true,
+          "eligible_branches": [
+            "CE",
+            "ME"
+          ],
+          "why": []
+        },
+        "decision": {
+          "action": "provide_hostel_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Parent asking about hostel safety",
+            "Anxiety detected — reassure first",
+            "Rank + interest already known"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "reassure",
+              "content_contains": [
+                "safe",
+                "security",
+                "girls",
+                "hostel"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "cctv",
+                "warden",
+                "24x7"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "PCM",
+                "category"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Parent mode detected",
+            "Anxiety detected",
+            "Decision=provide_hostel_info with reassurance",
+            "Planner=reassure first, then give details, then collect remaining profile"
+          ]
+        }
+      },
+      "must_not": [
+        "ignore_safety_concern",
+        "dismiss_as_common",
+        "skip_reassurance",
+        "recommend_branch_before_addressing_safety"
+      ],
+      "ideal_counselor_notes": "A parent calling about their daughter's safety is the most emotionally charged scenario. Safety concern must be addressed FIRST with specific details (CCTV, women wardens, 24x7 security, curfew). Reassure before anything else. Then collect remaining info naturally."
+    },
+    {
+      "student": "Yes, PCM 80, general category. But really — is the girls hostel safe? I've heard things.",
+      "expected": {
+        "understanding": {
+          "intent": "hostel",
+          "facts": {
+            "pcm_percentage": 80,
+            "category": "general"
+          },
+          "inference": {
+            "parent_influence": true,
+            "anxiety": true
+          },
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "evaluation",
+          "profile_completeness": 0.57,
+          "confidence": "high",
+          "current_problem": "needs_hostel_information"
+        },
+        "brain": {
+          "applicable": true,
+          "eligible_branches": [
+            "CE",
+            "ME"
+          ],
+          "why": []
+        },
+        "decision": {
+          "action": "provide_hostel_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Repeated safety concern — needs stronger reassurance",
+            "Profile nearly complete",
+            "Offer specific hostel policies"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "reassure",
+              "content_contains": [
+                "understand",
+                "concern",
+                "specific",
+                "policy",
+                "safety",
+                "measure"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "parent",
+                "visit",
+                "committee",
+                "complaint"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": []
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Repeated anxiety=stronger reassurance needed",
+            "Decision=provide_hostel_info with specific policies",
+            "Planner=acknowledge concern, give concrete details, offer to continue"
+          ]
+        }
+      },
+      "must_not": [
+        "repeat_same_answer",
+        "switch_to_admission_topic",
+        "ignore_repeated_concern"
+      ],
+      "ideal_counselor_notes": "Parent is pushing back — they've 'heard things.' Need specific, concrete safety policies. Mention parent visiting hours, internal complaint committee, women's helpline numbers. Don't dismiss their concern or change the subject."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "Hostel safety for girls is the highest-stakes conversation. The parent needs to trust the institution. Specifics matter more than general reassurance."
+}

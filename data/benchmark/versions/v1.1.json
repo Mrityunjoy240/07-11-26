@@ -1,0 +1,31 @@
+{
+  "version": "1.1",
+  "status": "frozen",
+  "schema": "v1",
+  "created": "2026-07-19T00:00:00Z",
+  "conversation_count": 21,
+  "checksum": "7c05aba68bc49bca",
+  "conversations": [
+    "ADM_HIGHRANK_001",
+    "ADM_LOWRANK_001",
+    "FEES_PARENT_001",
+    "HOSTEL_GIRLS_001",
+    "MIXED_HINDI_001",
+    "ADM_ANTHROPOLOGY_001",
+    "ADM_DISTANCE_001",
+    "ADM_FOREIGN_001",
+    "ADM_LATERAL_001",
+    "ADM_LEGACY_001",
+    "ADM_LOWCONFIDENCE_001",
+    "ADM_MANAGEMENT_001",
+    "COUNSELING_DATES_001",
+    "FEES_INSTALLMENT_001",
+    "GRIEVANCE_001",
+    "HOSTEL_BOYS_001",
+    "PLACEMENT_001",
+    "SCHOLARSHIP_001",
+    "SCHOLARSHIP_RENEWAL_001",
+    "SPORTS_001",
+    "TRANSFER_001"
+  ]
+}

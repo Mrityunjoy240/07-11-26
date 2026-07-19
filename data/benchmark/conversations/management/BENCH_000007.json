@@ -1,0 +1,133 @@
+{
+  "id": "BENCH_000007",
+  "domain": "management",
+  "difficulty": 4,
+  "primary_language": "en",
+  "languages": ["en"],
+  "speaker_profile": "parent",
+  "features": ["parent_mode", "missing_info"],
+  "ground_truth": {
+    "rank": null,
+    "pcm_percentage": 65,
+    "category": "general",
+    "interest": "CSE",
+    "board": "cbse",
+    "exam": "",
+    "budget": 1500000,
+    "location": "pune"
+  },
+  "turns": [
+    {
+      "student": "My son scored only 65 percent in PCM. He wants CSE but his rank is very low. Is management quota available?",
+      "expected": {
+        "understanding": {
+          "intent": "management_quota",
+          "facts": {"pcm_percentage": 65},
+          "inference": {"parent_mode": true},
+          "confidence": "high",
+          "missing": ["rank", "category", "interest"]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.14,
+          "confidence": "high",
+          "current_problem": "has_management_query",
+          "problems": ["has_management_query"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "explain_management_quota_policy",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Parent explicitly asking about management quota",
+            "Low PCM score makes management route relevant"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": ["concern", "son"]
+            },
+            {
+              "action": "inform",
+              "content_contains": ["management quota", "process", "fees"]
+            },
+            {
+              "action": "ask",
+              "content_contains": ["budget", "college preference"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_management_info", "Parent_mode"]
+        }
+      },
+      "must_not": ["guarantee_admission", "recommend_without_budget"],
+      "ideal_counselor_notes": "Parent seeking management quota for son with low score. Explain the process and fees, then ask about budget to narrow down options."
+    },
+    {
+      "student": "We can go up to 15 lakhs total. Which colleges have management quota for CSE in Maharashtra?",
+      "expected": {
+        "understanding": {
+          "intent": "management_quota",
+          "facts": {"budget": 1500000, "location": "pune"},
+          "inference": {"parent_mode": true},
+          "confidence": "high",
+          "missing": ["rank", "category"]
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.29,
+          "confidence": "high",
+          "current_problem": "has_management_query",
+          "problems": ["has_management_query"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "explain_management_quota_policy",
+          "priority": "high",
+          "confidence": "medium",
+          "why": [
+            "Have budget and location, can give specific college options",
+            "Management quota varies by college, need to list options"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": ["management quota", "colleges", "Maharashtra", "CSE"]
+            },
+            {
+              "action": "ask",
+              "content_contains": ["specific city", "other preferences"]
+            }
+          ],
+          "confidence": "medium",
+          "dependency_chain": ["Decision=provide_management_info", "Budget_known"]
+        }
+      },
+      "must_not": ["quote_exact_fees", "guarantee_seat"],
+      "ideal_counselor_notes": "Parent provided budget. List Maharashtra colleges with management quota for CSE within 15L budget. Be honest about fee ranges."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "Parent navigating management quota with budget constraints. Key challenge: providing realistic options within budget without overpromising.",
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

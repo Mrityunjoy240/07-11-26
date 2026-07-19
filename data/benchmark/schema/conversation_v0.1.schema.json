@@ -1,0 +1,210 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Golden Conversation — v0.1",
+  "description": "A single multi-turn admission counseling conversation for the benchmark dataset. Every field is mandatory unless marked optional.",
+  "type": "object",
+  "required": [
+    "id", "tags", "difficulty", "ground_truth", "turns", "expected_end_state"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Z]+_[A-Z]+_\\d{3}$",
+      "description": "Unique ID. Pattern: {TOPIC}_{VARIANT}_{NNN}. e.g. ADM_LOWRANK_001"
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "admission, fee, hostel, placement, scholarship, parent, anxiety, memory, language, contradiction, knowledge, reasoning, emotion, failure"
+    },
+    "difficulty": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 7,
+      "description": "1=FAQ, 2=Single-turn admission, 3=Profile building, 4=Multi-turn reasoning, 5=Memory+contradiction, 6=Emotion+recommendation, 7=Everything together"
+    },
+    "ground_truth": {
+      "type": "object",
+      "description": "Canonical facts for this conversation. Used to verify understanding extraction.",
+      "properties": {
+                    "rank": { "type": ["integer", "null"] },
+                          "pcm_percentage": { "type": ["number", "null"] },
+                          "category": { "type": "string" },
+                          "interest": { "type": "string" },
+                          "board": { "type": "string" },
+                          "exam": { "type": "string" },
+                          "budget": { "type": ["number", "null"] },
+                          "location": { "type": "string" }
+      }
+    },
+    "turns": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/turn" },
+      "minItems": 1
+    },
+    "expected_end_state": {
+      "type": "string",
+      "enum": ["success", "escalate", "incomplete"],
+      "description": "How the conversation should end. success=all info collected+recommendation given. escalate=needs human counselor. incomplete=student left."
+    },
+    "ideal_counselor_notes": {
+      "type": "string",
+      "description": "How a real human counselor would approach this conversation. Used for evaluating prompts and planner quality."
+    }
+  },
+  "$defs": {
+    "turn": {
+      "type": "object",
+      "required": ["student", "expected", "must_not"],
+      "properties": {
+        "student": {
+          "type": "string",
+          "description": "What the student says this turn."
+        },
+        "expected": {
+          "type": "object",
+          "description": "Expected pipeline output for this turn.",
+          "properties": {
+            "understanding": {
+              "type": "object",
+              "properties": {
+                "intent": { "type": "string" },
+                "facts": {
+                      "type": "object",
+                      "description": "Structured facts extracted from student input. Matches ground_truth keys.",
+                      "properties": {
+        "rank": { "type": ["integer", "null"] },
+        "pcm_percentage": { "type": ["number", "null"] },
+        "category": { "type": "string" },
+        "interest": { "type": "string" },
+        "board": { "type": "string" },
+        "exam": { "type": "string" },
+        "budget": { "type": ["number", "null"] },
+        "location": { "type": "string" }
+                      }
+                    },
+                    "inference": {
+                      "type": "object",
+                      "description": "Non-factual observations. Lower confidence than facts.",
+                      "properties": {
+                        "anxiety": { "type": "boolean" },
+                        "confusion": { "type": "boolean" },
+                        "urgency": { "type": "boolean" },
+                        "parent_mode": { "type": "boolean" },
+                        "language_switch": { "type": "boolean" }
+                      }
+                    },
+                    "confidence": {
+                      "type": "string",
+                      "enum": ["high", "medium", "low"]
+                    },
+                    "missing": {
+                      "type": "array",
+                      "items": { "type": "string" },
+                      "description": "Fields still needed after this turn."
+                    }
+                  }
+                },
+            "reasoning": {
+              "type": "object",
+              "properties": {
+                "stage": { "type": "string" },
+                "profile_completeness": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "confidence": {
+                  "type": "string",
+                  "enum": ["high", "medium", "low"]
+                },
+                "current_problem": { "type": "string" },
+                "problems": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              }
+            },
+            "brain": {
+              "type": "object",
+              "properties": {
+                "eligible_branches": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                },
+                "applicable": { "type": "boolean" },
+                "why": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "condition": { "type": "string" },
+                      "met": { "type": "boolean" },
+                      "detail": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            },
+            "decision": {
+              "type": "object",
+              "properties": {
+                "action": { "type": "string" },
+                "priority": {
+                  "type": "string",
+                  "enum": ["high", "normal", "low"]
+                },
+                "confidence": {
+                  "type": "string",
+                  "enum": ["high", "medium", "low"]
+                },
+                "why": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "Reasons this action was chosen."
+                }
+              }
+            },
+            "planner": {
+              "type": "object",
+              "properties": {
+                "turns": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "action": { "type": "string" },
+                      "content_contains": {
+                        "type": "array",
+                        "items": { "type": "string" },
+                        "description": "Keywords that must appear in the assistant response."
+                      }
+                    }
+                  }
+                },
+                "confidence": {
+                  "type": "string",
+                  "enum": ["high", "medium", "low"]
+                },
+                "dependency_chain": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "Why the planner chose these actions. e.g. ['Decision=collect_profile', 'Missing=PCM', 'Planner=ask_PCM']"
+                }
+              }
+            }
+          }
+        },
+        "must_not": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Things that MUST NOT happen this turn. e.g. 'recommend_branch', 'hallucinate_cutoff', 'switch_language'."
+        },
+        "ideal_counselor_notes": {
+          "type": "string",
+          "description": "Turn-specific guidance for this exchange."
+        }
+      }
+    }
+  }
+}

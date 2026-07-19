@@ -1,0 +1,222 @@
+{
+  "id": "BENCH_000005",
+  "domain": "multilingual",
+  "difficulty": 4,
+  "primary_language": "bn",
+  "languages": [
+    "bn",
+    "en"
+  ],
+  "speaker_profile": "student",
+  "features": [
+    "language_switch",
+    "noisy_input"
+  ],
+  "ground_truth": {
+    "rank": 12000,
+    "pcm_percentage": 85,
+    "category": "general",
+    "interest": "CSE",
+    "board": "wbjee",
+    "exam": "wbjee",
+    "budget": null,
+    "location": "kolkata"
+  },
+  "turns": [
+    {
+      "student": "amar rank 12000 WBJEE te. CSE kinte parbo ki? pcm 85%",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {
+            "rank": 12000,
+            "pcm_percentage": 85,
+            "board": "wbjee",
+            "exam": "wbjee",
+            "interest": "CSE"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": [
+            "category"
+          ]
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.71,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance",
+          "problems": [
+            "needs_admission_guidance"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [
+            "CSE",
+            "AIML",
+            "IT",
+            "ECE",
+            "EE",
+            "ME",
+            "CE"
+          ],
+          "applicable": true,
+          "why": [
+            {
+              "condition": "rank_provided",
+              "met": true,
+              "detail": "Rank=12000"
+            },
+            {
+              "condition": "cse_cutoff_general",
+              "met": true,
+              "detail": "12000 < 15000*0.85=12750 for CSE/General"
+            }
+          ]
+        },
+        "decision": {
+          "action": "recommend_branches",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Rank 12000 is competitive for CSE under General",
+            "All critical info available except category"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "recommend",
+              "content_contains": [
+                "CSE",
+                "eligible",
+                "rank"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "category"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=recommend_branches",
+            "Brain=CSE_eligible"
+          ]
+        }
+      },
+      "must_not": [
+        "respond_in_bengali_only",
+        "ask_for_info_already_provided"
+      ],
+      "ideal_counselor_notes": "Student asks in Bengali about CSE eligibility with rank 12000. Should respond acknowledging the language but providing clear info. CSE is competitive at this rank."
+    },
+    {
+      "student": "ami general category. but ami jante chai ki placement kemon? CSE te package koto?",
+      "expected": {
+        "understanding": {
+          "intent": "placement",
+          "facts": {
+            "category": "general"
+          },
+          "inference": {
+            "language_switch": true
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "comparison",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "needs_placement_data",
+          "problems": [
+            "needs_placement_data"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [
+            "CSE",
+            "AIML",
+            "IT",
+            "ECE",
+            "EE",
+            "ME",
+            "CE"
+          ],
+          "applicable": true,
+          "why": [
+            {
+              "condition": "rank_provided",
+              "met": true,
+              "detail": "Rank=12000"
+            },
+            {
+              "condition": "category_known",
+              "met": true,
+              "detail": "General"
+            },
+            {
+              "condition": "cse_eligible",
+              "met": true,
+              "detail": "12000 < 12750"
+            }
+          ]
+        },
+        "decision": {
+          "action": "provide_placement_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student asking about CSE placement data",
+            "Rank confirms CSE eligibility",
+            "Can provide placement info alongside recommendation"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "placement",
+                "package",
+                "companies"
+              ]
+            },
+            {
+              "action": "recommend",
+              "content_contains": [
+                "CSE",
+                "strong",
+                "eligible"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_placement_info",
+            "CSE_eligible",
+            "Student_asks_placement"
+          ]
+        }
+      },
+      "must_not": [
+        "hallucinate_exact_packages",
+        "ignore_language_mix"
+      ],
+      "ideal_counselor_notes": "Student switches between Bengali and English. Asks about CSE placement after confirming category. Should provide placement data and reinforce CSE recommendation."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "Bengali-English bilingual student. Natural code-switching between languages. Pipeline must handle Bengali text extraction and maintain conversation flow across language switches.",
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T10:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

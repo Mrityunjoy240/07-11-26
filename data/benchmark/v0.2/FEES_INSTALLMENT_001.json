@@ -1,0 +1,124 @@
+{
+  "id": "FEES_INSTALLMENT_001",
+  "tags": [
+    "fees",
+    "installment",
+    "loan",
+    "financial",
+    "canonical"
+  ],
+  "difficulty": 3,
+  "ground_truth": {
+    "rank": 42000,
+    "pcm_percentage": 75,
+    "category": "obc",
+    "interest": "ME",
+    "board": "wbjee",
+    "budget": "low",
+    "location": ""
+  },
+  "turns": [
+    {
+      "student": "I am OBC, rank 42k, PCM 75. I want ME but budget is tight. Can fees be paid in installments? Is there an education loan tie-up?",
+      "expected": {
+        "understanding": {
+          "intent": "fee",
+          "facts": {
+            "rank": 42000,
+            "pcm_percentage": 75,
+            "category": "obc",
+            "interest": "ME"
+          },
+          "inference": {
+            "financial_concern": true,
+            "anxiety": true
+          },
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "evaluation",
+          "profile_completeness": 0.57,
+          "confidence": "high",
+          "current_problem": "needs_fee_information"
+        },
+        "brain": {
+          "applicable": true,
+          "eligible_branches": [
+            "CE",
+            "EE",
+            "ME"
+          ],
+          "why": [
+            {
+              "condition": "ME_cutoff",
+              "met": true,
+              "detail": "Rank 42000 <= ME cutoff 55000"
+            },
+            {
+              "condition": "obc_relaxation",
+              "met": true,
+              "detail": "OBC category may have fee relaxation"
+            }
+          ]
+        },
+        "decision": {
+          "action": "provide_fee_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Budget concern explicitly stated",
+            "OBC category may have fee waiver options",
+            "ME is in range for 42k OBC",
+            "Installment + loan info requested"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "installment",
+                "fee",
+                "structure",
+                "semester"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "loan",
+                "bank",
+                "tie-up",
+                "SBI",
+                "interest"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "scholarship",
+                "apply",
+                "document"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Budget concern detected",
+            "OBC=fee relaxation possible",
+            "Decision=provide_fee_installment_info",
+            "Planner=first explain installment plan, then loan options, then ask if they want scholarship info"
+          ]
+        }
+      },
+      "must_not": [
+        "ignore_budget_concern",
+        "give_fee_only_without_solutions",
+        "recommend_branch_change_for_fees"
+      ],
+      "ideal_counselor_notes": "This student needs both financial solutions AND admission guidance. Address the money concern seriously — installment plans, education loans, OBC fee waiver, and scholarships should all be covered."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "Financial concerns are the second biggest barrier after rank. The counselor must provide concrete solutions, not just sympathy."
+}

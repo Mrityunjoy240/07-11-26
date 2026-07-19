@@ -1,0 +1,167 @@
+{
+  "id": "ADM_LATERAL_001",
+  "tags": [
+    "admission",
+    "lateral-entry",
+    "diploma",
+    "canonical"
+  ],
+  "difficulty": 4,
+  "ground_truth": {
+    "rank": null,
+    "pcm_percentage": null,
+    "category": "general",
+    "interest": "EE",
+    "board": "jexpo",
+    "budget": null,
+    "location": ""
+  },
+  "turns": [
+    {
+      "student": "I have a diploma in electrical engineering. Can I get lateral entry to BTech at your college?",
+      "expected": {
+        "understanding": {
+          "intent": "lateral_entry",
+          "facts": {
+            "interest": "EE"
+          },
+          "inference": {},
+          "missing": [
+            "diploma_percentage",
+            "exam"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.14,
+          "confidence": "medium",
+          "current_problem": "needs_branch_guidance"
+        },
+        "brain": {
+          "applicable": false,
+          "eligible_branches": [],
+          "why": []
+        },
+        "decision": {
+          "action": "provide_transfer_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Direct question about lateral entry",
+            "Diploma holder needs specific policy details",
+            "Collect remaining info for eligibility check"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "lateral",
+                "diploma",
+                "JEXPO",
+                "seats",
+                "eligible"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "diploma",
+                "percentage",
+                "category"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Intent=lateral_entry",
+            "Missing=diploma_percentage, category",
+            "Decision=provide_lateral_info",
+            "Planner=explain lateral policy, ask for diploma details"
+          ]
+        }
+      },
+      "must_not": [
+        "confuse_with_regular_admission",
+        "ignore_diploma_holder_status",
+        "ask_for_wbjee_rank"
+      ],
+      "ideal_counselor_notes": "Lateral entry follows JEXPO not WBJEE. Explain that diploma holders enter 2nd year directly. Seats are limited. Ask for diploma branch and percentage to assess eligibility."
+    },
+    {
+      "student": "Diploma in EE with 78%. General category.",
+      "expected": {
+        "understanding": {
+          "intent": "lateral_entry",
+          "facts": {
+            "interest": "EE",
+            "category": "general"
+          },
+          "inference": {},
+          "missing": [
+            "diploma_percentage"
+          ]
+        },
+        "reasoning": {
+          "stage": "evaluation",
+          "profile_completeness": 0.29,
+          "confidence": "high",
+          "current_problem": "needs_branch_guidance"
+        },
+        "brain": {
+          "applicable": false,
+          "eligible_branches": [],
+          "why": []
+        },
+        "decision": {
+          "action": "clarify",
+          "priority": "normal",
+          "confidence": "high",
+          "why": [
+            "Diploma branch matches desired BTech branch",
+            "Percentage meets minimum 60% criteria",
+            "Category known — can proceed with next steps"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "eligible",
+                "apply",
+                "counseling",
+                "seat",
+                "allotment"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "interested",
+                "preference",
+                "clarify"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Diploma EE matches BTech EE",
+            "Percentage=78% above minimum",
+            "Decision=confirm_lateral_eligibility",
+            "Planner=explain application process, ask for preferences"
+          ]
+        }
+      },
+      "must_not": [
+        "recommend_first_year_cycle",
+        "skip_jexpo_mention",
+        "promise_seat"
+      ],
+      "ideal_counselor_notes": "Profile is strong enough for lateral EE. Explain that JEXPO counseling is separate. Provide realistic timeline. Don't promise a seat — seats depend on availability."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "Lateral entry students are often overlooked by generic admission systems. The counselor must recognize the alternative pathway and provide accurate policy-specific information."
+}

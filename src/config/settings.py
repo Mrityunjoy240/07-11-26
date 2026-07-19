@@ -2,7 +2,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+    model_config = SettingsConfigDict(
+        env_file=".env", env_file_encoding="utf-8", extra="ignore"
+    )
 
     app_name: str = "BCREC AI"
     debug: bool = True
@@ -20,6 +22,13 @@ class Settings(BaseSettings):
     # --- Observability ---
     otel_service_name: str = "bcrec-ai"
     otel_endpoint: str | None = None
+
+    # --- Pipeline ---
+    pipeline_mode: str = "legacy"  # "legacy" | "shadow" | "new"
+    pipeline_version: str = "1.0.0"
+
+    # --- LLM ---
+    groq_api_key: str = ""
 
     # --- Feature Flags (all default OFF) ---
     use_redis_sessions: bool = False

@@ -8,7 +8,9 @@ from src.engines.interfaces import UnderstandingInput
 from src.understanding.interpreter import DomainInterpreter
 from src.understanding.models import (
     ConversationSignals,
+    IntentDiagnostics,
     MissingInformation,
+    StageDetail,
     UnderstandingIntent,
     UnderstandingResult,
 )
@@ -21,6 +23,19 @@ from src.understanding.profile import (
 from src.understanding.vocabulary import INTENT_CONCEPTS, match_concept
 
 logger = logging.getLogger(__name__)
+
+
+def _detect_conflicts(pre: dict[str, float], post: dict[str, float]) -> list[str]:
+    """Compare pre/post conflict scores to describe what conflicts fired."""
+    conflicts: list[str] = []
+    for intent in set(list(pre.keys()) + list(post.keys())):
+        pre_val = pre.get(intent, 0)
+        post_val = post.get(intent, 0)
+        if post_val < pre_val:
+            conflicts.append(f"'{intent}' reduced by {pre_val - post_val:.3f}")
+        elif post_val > pre_val:
+            conflicts.append(f"'{intent}' boosted by {post_val - pre_val:.3f}")
+    return conflicts
 
 
 RE_RANK = re.compile(
@@ -64,9 +79,12 @@ RE_NAME = re.compile(
 
 _INTENT_PATTERNS: list[tuple[str, str, float]] = [
     ("fee", (
-        r"(?:fee|fees|tuition|शुल्क|फीस|কোর্স ফি|course fee|কত টাকা|"
-        r"kitna fee|fee kitna|how much|koto taka|koto fee|多少钱|"
-        r"fee structure|fee details|installment|payment)"
+        r"(?:\bfee\b|\bfees\b|\btuition\b|शुल्क|फीस|ফীस|কোর্স ফি|\bcourse\s+fee\b|কত টাকা|"
+        r"kitna\s+fee\b|fee\s+kitna|how\s+much|koto\s+taka|koto\s+fee|多少钱|"
+        r"fee\s+structure|fee\s+details|installment|payment|"
+        r"fee\s+waiver|concession|discount|"
+        r"ফি(?:স)?(?:\s+কি(?:তনি|তা))?|"
+        r"फीस(?:\s+कितन)?)"
     ), 0.8),
     ("admission", (
         r"(?:admission|apply.*college|form.*fill|admit|प्रवेश|ভর্তি|"
@@ -85,16 +103,22 @@ _INTENT_PATTERNS: list[tuple[str, str, float]] = [
         r"mess|boarding|hostel fee|hostel facility|আবাসন)"
     ), 0.8),
     ("scholarship", (
-        r"(?:scholarship|financial\s*aid|concession|stipend|"
+        r"(?:scholarship|financial\s*aid|stipend|"
         r"छात्रवृत्ति|স্কলারশিপ|free\s*ship|ছাত্রবৃত্তি|"
-        r"fee waiver|post.matric|merit|based scholarship)"
+        r"post.matric|merit|based scholarship)"
     ), 0.8),
     ("department", (
-        r"(?:department\s+info|branch\s+info|stream\s+info|"
-        r"which\s+department|which\s+branch|कौन\s+स[ेा]\s+विभाग|"
-        r"विभाग\s+है|বিভাগ\s+আছে|branch(es)?\s+do\s+you|"
+        r"(?:"
+        r"(?:department|branch|stream|course).*?(?:offer|avail|provid|have|there|kya|hai|क्या|কি|কৌন|kon|kaun)|"
+        r"(?:which|what|kaun|kon|কোন)\s+(?:department|branch|stream|course)|"
+        r"department\s+info|branch\s+info|stream\s+info|"
+        r"which\s+department|which\s+branch|"
+        r"कौन\s+स[ेा]\s+विभाग|"
+        r"विभाग\s+है|বিভাগ\s+আছে|"
+        r"branch(es)?\s+do\s+you|"
         r"departments?\s+are|branch\s+available|"
-        r"kaun.*branch|kon.*branch|কন.*branch)"
+        r"kaun.*branch|kon.*branch|কন.*branch"
+        r")"
     ), 0.7),
     ("contact", (
         r"(?:contact|phone|email|address|reach|संपर्क|"
@@ -144,12 +168,26 @@ _INTENT_PATTERNS: list[tuple[str, str, float]] = [
         r"allotment|choice.*filling|mock.*round|"
         r"counseling.*document|document.*counseling)"
     ), 0.7),
+    ("document", (
+        r"(?:document|marksheet|certificate|10th.*mark|12th.*mark|"
+        r"provisional|transfer.*certificate|migration.*certificate|"
+        r"document.*need|need.*document|what.*document|"
+        r"ডকুমেন্ট|प्रमाणपत्र|দস্তাবেজ)"
+    ), 0.7),
     ("career_confusion", (
-        r"(?:confused.*(?:about|which|what|career)|not\s+sure.*(?:about|which|what)|"
-        r"what\s+should\s+i\s+(?:do|study|choose|pick)|"
-        r"dilemma|career.*option|what\s+to\s+(?:do|choose|take)|"
-        r"parent.*want.*engineering|don.*t\s+know\s+what)"
-    ), 0.6),
+        r"(?:confus(?:ed|ion|ing|e).*?(?:about|which|what|career|hai|mein)|"
+        r"not\s+sure.*?(?:about|which|what|hai)|"
+        r"what\s+should\s+(?:i|she|he)\s+(?:do|study|choose|pick)|"
+        r"dilemma|career.*?option|what\s+to\s+(?:do|choose|take)|"
+        r"parent.*?want.*?engineering|don.*?t\s+know\s+what|"
+        r"decide\s+(?:nahi|nhi|ni)\s+(?:kar|pa|sak)|"
+        r"kaun\s+sa\s+(?:branch|stream|subject|career)|"
+        r"kya\s+(?:kare|choose\s+kare|lena\s+chahiye)|"
+        r"confusion\s+(?:hai|mein|ho|raha)|"
+        r"pareshan.*?(?:hai|mein|choice|career|branch)|"
+        r"samajh\s+(?:nahi|nhi|ni)\s+(?:aa|raha)|"
+        r"কনফিউশন|দ্বিধা|কী\s+করব)"
+    ), 0.7),
     ("lateral_entry", (
         r"(?:lateral|direct.*second.*year|diploma.*btech|polytechnic.*admission|"
         r"diploma.*(admission|engineering|btech|second)|jexpo|"
@@ -162,6 +200,17 @@ _INTENT_PATTERNS: list[tuple[str, str, float]] = [
     ("nri_admission", (
         r"(?:nri|foreign|international.*student|"
         r"abroad|nri\s*quota|nri\s*seat|outside.*india)"
+    ), 0.7),
+    ("loan", (
+        r"(?:education\s*loan|student\s*loan|loan|शिक्षा\s*ऋण|"
+        r"bank.*loan|loan.*amount|loan.*interest|loan.*apply|"
+        r"কতটাকা\s*ঋণ|how\s*much\s*loan|loan\s*available)"
+    ), 0.8),
+    ("institution", (
+        r"(?:affiliat|accredit|naac|college.*affil|"
+        r"college.*name|institution.*name|"
+        r"principal|hod|head\s+of\s+department|director|dean|"
+        r"কলেজের\s+নাম)"
     ), 0.7),
 ]
 
@@ -199,6 +248,7 @@ _SIGNAL_PATTERNS: dict[str, list[tuple[str, float]]] = {
         (r'\bfreaking\s+out\b', 0.5),
         (r'\bfeeling\s+nervous\b', 0.4),
         (r"\bi'?m\s+worried\b", 0.45),
+        (r"\bi\s+am\s+very\s+worried\b", 0.45),
         (r"\bi\s+am\s+scared\b", 0.45),
         (r'\bchinta\b', 0.35),
         (r'\bडर\b', 0.4),
@@ -407,10 +457,17 @@ class UnderstandingEngine:
         self._prev_signals: ConversationSignals | None = None
 
     def process(self, input: UnderstandingInput) -> UnderstandingResult:
-        return self.understand(input.text, input.state)
+        result = self.understand(input.text, input.state, debug=input.debug)
+        if input.debug:
+            diag: IntentDiagnostics | None = result.metadata.get("_diag_raw")
+            if diag:
+                result.metadata["intent_diagnostics"] = diag
+                result.metadata["intent_diagnostics_str"] = self._format_diagnostics(diag)
+        return result
 
     def understand(
-        self, text: str, state: ConversationState | None = None
+        self, text: str, state: ConversationState | None = None,
+        debug: bool = False,
     ) -> UnderstandingResult:
         # Stage 1: Language
         language = self._detect_language(text)
@@ -429,7 +486,7 @@ class UnderstandingEngine:
             profile.student_type = domain.student_type
 
         # Stage 4: Evidence-based intent classification (uses profile + domain + state)
-        intent = self._classify_intent(text, profile, domain, state)
+        intent, diagnostics = self._classify_intent(text, profile, domain, state, debug=debug)
 
         # Override intent with domain-aware intent if still unknown
         if intent.primary == "unknown" and domain.primary_intent != "unknown":
@@ -447,7 +504,7 @@ class UnderstandingEngine:
         references = self._detect_references(text)
         confidence = self._score_confidence(text, profile, intent)
 
-        return UnderstandingResult(
+        result = UnderstandingResult(
             text=text,
             language=language,
             intent=intent,
@@ -458,6 +515,9 @@ class UnderstandingEngine:
             confidence=confidence,
             domain=domain,
         )
+        if debug and diagnostics:
+            result.metadata["_diag_raw"] = diagnostics
+        return result
 
     def _detect_language(self, text: str) -> str:
         if any("\u0980" <= c <= "\u09ff" for c in text):
@@ -482,8 +542,10 @@ class UnderstandingEngine:
         profile: StudentProfile | None = None,
         domain: DomainInterpretation | None = None,
         state: ConversationState | None = None,
-    ) -> UnderstandingIntent:
+        debug: bool = False,
+    ) -> tuple[UnderstandingIntent, IntentDiagnostics | None]:
         tl = text.lower().strip()
+        diagnostics = IntentDiagnostics(input=text) if debug else None
 
         # Stage 1: Keyword evidence (existing _INTENT_PATTERNS)
         keyword_scores: dict[str, float] = {}
@@ -498,7 +560,7 @@ class UnderstandingEngine:
         domain_scores = self._domain_intent_evidence(domain)
 
         # Stage 4: Conversation context evidence
-        context_scores = self._context_intent_evidence(state, profile)
+        context_scores = self._context_intent_evidence(state, profile, tl)
 
         # Stage 5: Additional wording pattern evidence
         wording_scores = self._wording_intent_evidence(tl)
@@ -517,6 +579,23 @@ class UnderstandingEngine:
             "keyword": 0.35, "entity": 0.25, "domain": 0.15,
             "context": 0.15, "wording": 0.05, "completeness": 0.05,
         }
+
+        stage_raw = {
+            "keyword": keyword_scores,
+            "entity": entity_scores,
+            "domain": domain_scores,
+            "context": context_scores,
+            "wording": wording_scores,
+            "completeness": completeness_scores,
+        }
+
+        per_intent_breakdown: dict[str, dict[str, float]] = {}
+        for intent in all_intents:
+            breakdown: dict[str, float] = {}
+            for stage, raw in stage_raw.items():
+                breakdown[stage] = round(raw.get(intent, 0.0) * weights[stage], 3)
+            per_intent_breakdown[intent] = breakdown
+
         for intent in all_intents:
             score = (
                 keyword_scores.get(intent, 0.0) * weights["keyword"]
@@ -527,6 +606,8 @@ class UnderstandingEngine:
                 + completeness_scores.get(intent, 0.0) * weights["completeness"]
             )
             all_scores[intent] = round(score, 3)
+
+        pre_conflict = dict(all_scores)
 
         # Apply conflict resolution
         all_scores = self._resolve_intent_conflicts(all_scores, tl, profile, domain)
@@ -543,7 +624,172 @@ class UnderstandingEngine:
             best = "unknown"
             best_score = 0.0
 
-        return UnderstandingIntent(primary=best, confidence=best_score, all_scores=all_scores)
+        intent = UnderstandingIntent(primary=best, confidence=best_score, all_scores=all_scores)
+
+        if debug:
+            _d = diagnostics
+            _d.stage_weights = weights
+            _d.stage_details = {
+                name: StageDetail(
+                    scores=scores,
+                    evidence=self._collect_stage_evidence(name, tl, profile, state, domain),
+                )
+                for name, scores in stage_raw.items()
+            }
+            _d.per_intent_breakdown = per_intent_breakdown
+            _d.pre_conflict = pre_conflict
+            _d.post_conflict = all_scores
+            _d.conflicts_applied = _detect_conflicts(pre_conflict, all_scores)
+            _d.winner = best
+            _d.confidence = best_score
+            _d.winner_reason = self._build_winner_reason(
+                best, all_scores, pre_conflict, per_intent_breakdown, _d.conflicts_applied,
+            )
+            # Ranked intents, margin, confidence class
+            sorted_scores = sorted(all_scores.items(), key=lambda x: -x[1])
+            _d.ranked_intents = sorted_scores
+            _d.runner_up_score = sorted_scores[1][1] if len(sorted_scores) > 1 else 0.0
+            _d.margin = round(best_score - _d.runner_up_score, 3)
+            if _d.margin > 0.30:
+                _d.confidence_class = "HIGH"
+            elif _d.margin >= 0.15:
+                _d.confidence_class = "MEDIUM"
+            elif _d.margin >= 0.05:
+                _d.confidence_class = "LOW"
+            else:
+                _d.confidence_class = "AMBIGUOUS"
+
+        return intent, diagnostics
+
+    def _collect_stage_evidence(
+        self, stage: str, tl: str, profile: StudentProfile | None,
+        state: ConversationState | None, domain: DomainInterpretation | None,
+    ) -> list[str]:
+        evidence: list[str] = []
+        if stage == "keyword":
+            for intent_name, pattern, weight in _INTENT_PATTERNS:
+                m = re.search(pattern, tl)
+                if m:
+                    evidence.append(f"{intent_name} +{weight} [{m.group(0)}]")
+        elif stage == "entity" and profile:
+            def _get_val(field: str):
+                mapping = {
+                    "rank": profile.academic.rank,
+                    "pcm_percentage": profile.academic.pcm_percentage,
+                    "exam": profile.academic.exam,
+                    "board": profile.academic.board,
+                    "budget": profile.personal.budget,
+                    "category": profile.personal.category,
+                    "interest": profile.career.interest,
+                    "hostel_required": profile.personal.hostel_required,
+                    "location": profile.personal.location,
+                }
+                return mapping.get(field)
+            seen_intents: set[str] = set()
+            for field, mappings in self._ENTITY_EVIDENCE.items():
+                val = _get_val(field)
+                if val is not None and val != "":
+                    for intent_name, weight in mappings:
+                        if intent_name not in seen_intents:
+                            evidence.append(f"{intent_name} +{weight} ({field}={val})")
+                            seen_intents.add(intent_name)
+        elif stage == "domain" and domain:
+            if domain.primary_intent != "unknown":
+                evidence.append(f"{domain.primary_intent} (domain)")
+            for inferred in domain.all_intents:
+                if inferred != domain.primary_intent:
+                    evidence.append(f"{inferred} (domain inference)")
+        elif stage == "context" and state:
+            prev_intent = (state.goals or {}).get("primary", "")
+            if prev_intent and prev_intent not in ("unknown", "general", "greeting", "repeat"):
+                evidence.append(f"prev_intent={prev_intent}")
+            if state.stage:
+                evidence.append(f"stage={state.stage.value if hasattr(state.stage, 'value') else state.stage}")
+        elif stage == "wording":
+            wording_scores = self._wording_intent_evidence(tl)
+            for intent, sc in wording_scores.items():
+                evidence.append(f"{intent} +{sc} (wording)")
+        return evidence
+
+    def _build_winner_reason(
+        self, winner: str, post: dict[str, float], pre: dict[str, float],
+        breakdown: dict[str, dict[str, float]], conflicts: list[str],
+    ) -> str:
+        if winner == "unknown":
+            return "No intent scored above threshold (0.08)."
+        parts: list[str] = []
+        parts.append(f"'{winner}' won (score={post.get(winner, 0.0):.3f})")
+        wb = breakdown.get(winner, {})
+        contributing = [(s, sc) for s, sc in wb.items() if sc > 0]
+        if contributing:
+            contributing.sort(key=lambda x: -x[1])
+            parts.append("contributing stages: " + ", ".join(f"{s}={sc:.3f}" for s, sc in contributing))
+        loser_parts: list[str] = []
+        for intent, pre_score in sorted(pre.items(), key=lambda x: -x[1]):
+            if intent == winner:
+                continue
+            post_score = post.get(intent, 0.0)
+            if post_score < pre_score:
+                loser_parts.append(f"'{intent}' dropped {pre_score:.3f}->{post_score:.3f}")
+            lb = breakdown.get(intent, {})
+            lc = [(s, sc) for s, sc in lb.items() if sc > 0]
+            if lc:
+                lc_str = ", ".join(f"{s}={sc:.3f}" for s, sc in sorted(lc, key=lambda x: -x[1]))
+                loser_parts.append(f"'{intent}' had {lc_str}")
+        if loser_parts:
+            parts.append("losers: " + "; ".join(loser_parts))
+        if conflicts:
+            parts.append("conflicts: " + ", ".join(conflicts))
+        return ". ".join(parts)
+
+    # ── Diagnostics formatting ────────────────────────────────────────────
+
+    def _format_diagnostics(self, diag: IntentDiagnostics) -> str:
+        lines: list[str] = [
+            "=" * 60,
+            f"Intent Diagnostics: {diag.winner} ({diag.confidence:.3f}) [{diag.confidence_class}]",
+            "=" * 60,
+        ]
+        # Per-stage evidence
+        for stage_name in ["keyword", "entity", "domain", "context", "wording", "completeness"]:
+            sd = diag.stage_details.get(stage_name)
+            if not sd:
+                continue
+            if not sd.scores and not sd.evidence:
+                continue
+            lines.append(f"\n  Stage: {stage_name} (weight={diag.stage_weights.get(stage_name, 0):.2f})")
+            for intent, score in sorted(sd.scores.items(), key=lambda x: -x[1]):
+                lines.append(f"    {intent:<20s} +{score:.2f}")
+            for ev in sd.evidence:
+                lines.append(f"      └ {ev}")
+        # Per-intent breakdown
+        lines.append("\n  Weighted Scores:")
+        for intent, breakdown in sorted(diag.per_intent_breakdown.items(), key=lambda x: -sum(x[1].values())):
+            total = sum(breakdown.values())
+            lines.append(f"\n    {intent}")
+            for stage, sc in sorted(breakdown.items(), key=lambda x: -x[1]):
+                if sc > 0:
+                    lines.append(f"      {stage:<15s} {sc:.3f}")
+            lines.append(f"      {'':15s} -----")
+            lines.append(f"      {'TOTAL':15s} {total:.3f}")
+        # Pre vs post conflict
+        if diag.pre_conflict != diag.post_conflict:
+            lines.append("\n  Conflict Resolution:")
+            for intent in sorted(set(list(diag.pre_conflict.keys()) + list(diag.post_conflict.keys()))):
+                pre = diag.pre_conflict.get(intent, 0)
+                post = diag.post_conflict.get(intent, 0)
+                if pre != post:
+                    lines.append(f"    {intent:<20s} {pre:.3f} → {post:.3f}")
+        # Rankings
+        if diag.ranked_intents:
+            lines.append(f"\n  Rankings (margin={diag.margin:.3f}, class={diag.confidence_class}):")
+            for i, (intent, score) in enumerate(diag.ranked_intents, 1):
+                marker = " ← winner" if i == 1 else ""
+                lines.append(f"    {i}. {intent:<20s} {score:.3f}{marker}")
+        # Winner reason
+        lines.append(f"\n  Winner Reason:\n    {diag.winner_reason}")
+        lines.append("=" * 60)
+        return "\n".join(lines)
 
     # ── Evidence scoring helpers ─────────────────────────────────────────
 
@@ -552,7 +798,7 @@ class UnderstandingEngine:
         "pcm_percentage": [("admission", 0.4)],
         "exam": [("admission", 0.4)],
         "board": [("admission", 0.3)],
-        "budget": [("fee", 0.5), ("scholarship", 0.2)],
+        "budget": [("fee", 0.5), ("scholarship", 0.2), ("loan", 0.3)],
         "category": [("admission", 0.3)],
         "interest": [("admission", 0.4)],
         "hostel_required": [("hostel", 0.7)],
@@ -632,6 +878,7 @@ class UnderstandingEngine:
 
     def _context_intent_evidence(
         self, state: ConversationState | None, profile: StudentProfile | None = None,
+        tl: str = "",
     ) -> dict[str, float]:
         scores: dict[str, float] = {}
         if state is None:
@@ -649,6 +896,26 @@ class UnderstandingEngine:
         prev_intent = (state.goals or {}).get("primary", "")
         if prev_intent and prev_intent not in ("unknown", "general", "greeting", "repeat"):
             scores[prev_intent] = max(scores.get(prev_intent, 0.0), 0.7)
+
+        # Topic continuity: if previous intent was a persistent topic and
+        # current text contains keywords for that topic, boost it strongly
+        _TOPIC_KEYWORDS = {
+            "hostel": r'\b(hostel|room|mess|boarding|dorm|warden|accommodation|security|girl)',
+            "fee": r'\b(fee|fees|cost|pay|budget|lakh|tuition|installment|payment)',
+            "placement": r'\b(placement|job|package|salary|recruit|company|lpa|ctc|career.*after)',
+            "scholarship": r'\b(scholarship|stipend|financial.*aid|merit.*aid)',
+            "safety": r'\b(safe|safety|security|ragging|anti.ragg|girl|women|daughter|warden)',
+            "career_confusion": r'\b(confused|not\s+sure|dilemma|what.*choose|which.*branch|career.*option|decide)',
+            "grievance": r'\b(complaint|grievance|unacceptable|re.?evaluat|issue|problem|mess)',
+            "distance_education": r'\b(distance|online.*course|correspondence|blended)',
+            "sports_quota": r'\b(sports|athlete|player|cricket|football|state.level|national.*level)',
+            "transfer": r'\b(transfer|migration|change.*college|switch.*college|lateral)',
+            "loan": r'\b(loan|education.*loan|bank.*loan)',
+            "counseling_info": r'\b(counsel|counselling|allotment|choice.*fill|mock.*round)',
+        }
+        if prev_intent in _TOPIC_KEYWORDS:
+            if re.search(_TOPIC_KEYWORDS[prev_intent], tl):
+                scores[prev_intent] = max(scores.get(prev_intent, 0.0), 0.85)
 
         stage = getattr(state, "stage", None)
         if stage is None:
@@ -671,9 +938,9 @@ class UnderstandingEngine:
 
         if re.search(r'\b(get|got|have|secured|scored)\s+\d+', tl):
             scores['admission'] = max(scores.get('admission', 0.0), 0.3)
-        if re.search(r'\b(how much|kitna|koto|cost|spend|pay|kitne|多少钱)', tl):
-            scores['fee'] = max(scores.get('fee', 0.0), 0.35)
-        if re.search(r'\b(waiver|concession|stipend|free.?ship|post.?matric)', tl):
+        if re.search(r'\b(how much|kitna|koto|cost|spend|pay|kitne|多少钱|concession|kam\s+fees?)', tl):
+            scores['fee'] = max(scores.get('fee', 0.0), 0.4)
+        if re.search(r'\b(scholarship|stipend|free.?ship|post.?matric|merit.*scholarship)', tl):
             scores['scholarship'] = max(scores.get('scholarship', 0.0), 0.5)
         if re.search(r'\b(room|mess|boarding|dorm|accommodation|abas)', tl):
             scores['hostel'] = max(scores.get('hostel', 0.0), 0.5)
@@ -691,10 +958,20 @@ class UnderstandingEngine:
             scores['distance_education'] = max(scores.get('distance_education', 0.0), 0.6)
         if re.search(r'\b(re.?evaluat|complaint|grievance|marks.*low|lower.*expect)', tl):
             scores['grievance'] = max(scores.get('grievance', 0.0), 0.5)
+        if re.search(r'\b(unacceptable|furious|angry|nobody.*responded|want.*speak.*charge|complete.*mess|terrible)', tl):
+            scores['grievance'] = max(scores.get('grievance', 0.0), 0.6)
         if re.search(r'\b(counseling|counselling|document.*need|when.*counsel)', tl):
             scores['counseling_info'] = max(scores.get('counseling_info', 0.0), 0.5)
-        if re.search(r'\b(confused|not sure|dilemma|what to (choose|do|take)|career)', tl):
-            scores['career_confusion'] = max(scores.get('career_confusion', 0.0), 0.4)
+        if re.search(r'\b(document|marksheet|certificate|10th|12th|provisional|transfer.*certificate|migration.*certificate)', tl):
+            scores['document'] = max(scores.get('document', 0.0), 0.4)
+        if re.search(r'\b(affiliat|accredit|naac|university|principal|hod|director|dean)', tl):
+            scores['institution'] = max(scores.get('institution', 0.0), 0.5)
+        if re.search(r'\b(confused|not\s+sure|dilemma|what\s+to\s+(?:choose|do|take)|career|confusion)', tl):
+            scores['career_confusion'] = max(scores.get('career_confusion', 0.0), 0.45)
+        if re.search(r'(?:decide\s+(?:nahi|nhi|ni)|samajh\s+(?:nahi|nhi|ni)|kaun\s+sa|kya\s+kare|pareshan)', tl):
+            scores['career_confusion'] = max(scores.get('career_confusion', 0.0), 0.5)
+        if re.search(r'\b(loan|education.*loan|bank.*loan|loan.*amount)', tl):
+            scores['loan'] = max(scores.get('loan', 0.0), 0.5)
         if re.search(r'\b(girl|women|girls.*hostel|daughter|beti)', tl):
             scores['safety'] = max(scores.get('safety', 0.0), 0.3)
 
@@ -734,11 +1011,20 @@ class UnderstandingEngine:
         # "admission" keywords + domain-specific intent → domain wins
         domain_specific = {"lateral_entry", "management_quota", "sports_quota",
                            "nri_admission", "transfer", "scholarship",
-                           "distance_education", "counseling_info", "grievance"}
+                           "distance_education", "counseling_info", "grievance",
+                           "career_confusion", "loan", "institution",
+                           "hostel", "fee", "placement", "safety"}
         if result.get("admission", 0) > 0:
             for ds in domain_specific:
-                if ds in result and result[ds] >= result["admission"] * 0.4:
-                    result["admission"] *= 0.5
+                if ds in result and result[ds] >= result["admission"] * 0.3:
+                    result["admission"] *= 0.4
+
+        # Merge lateral_entry into transfer (granularity fix)
+        if "transfer" in result and "lateral_entry" in result:
+            result["transfer"] = max(result["transfer"], result["lateral_entry"])
+            del result["lateral_entry"]
+        elif "lateral_entry" in result and "transfer" not in result:
+            result["transfer"] = result.pop("lateral_entry")
 
         # "hostel" + "fee" → if hostel entity, hostel wins
         if "hostel" in result and "fee" in result:
@@ -749,7 +1035,7 @@ class UnderstandingEngine:
 
         # "scholarship" + "fee" → if scholarship is much stronger, fee suppressed
         if "scholarship" in result and "fee" in result:
-            if result["scholarship"] >= result["fee"] * 1.2:
+            if result["scholarship"] >= result["fee"] * 0.9:
                 result["fee"] *= 0.5
 
         # "greeting" + meaningful content → remove greeting

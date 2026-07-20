@@ -15,6 +15,7 @@ class Engine(Protocol, Generic[InputT, OutputT]):
 class UnderstandingInput:
     text: str
     state: Any = None
+    debug: bool = False
     metadata: dict[str, Any] = field(default_factory=dict)
 
 
@@ -23,6 +24,7 @@ class ReasoningInput:
     understanding: Any
     state: Any = None
     college_brain: Any = None
+    debug: bool = False
     metadata: dict[str, Any] = field(default_factory=dict)
 
 
@@ -31,6 +33,7 @@ class DecisionInput:
     reasoning: Any
     brain_response: Any | None = None
     capabilities: Any | None = None
+    debug: bool = False
     metadata: dict[str, Any] = field(default_factory=dict)
 
 

@@ -46,6 +46,7 @@ class PipelineResult:
     decision: Any = None
     plan: Plan | None = None
     llm_prompt: str = ""
+    llm_diagnostics: Any = None
     confidence: float = 0.0
     errors: list[str] = field(default_factory=list)
     latency_ms: dict[str, int] = field(default_factory=dict)
@@ -88,6 +89,7 @@ class PipelineOrchestrator:
         self,
         text: str,
         state: ConversationState | None = None,
+        debug: bool = False,
     ) -> PipelineResult:
         errors: list[str] = []
         latencies: dict[str, int] = {}
@@ -104,7 +106,7 @@ class PipelineOrchestrator:
 
         try:
             t = time.perf_counter()
-            understanding = self.understanding.process(UnderstandingInput(text=text, state=state))
+            understanding = self.understanding.process(UnderstandingInput(text=text, state=state, debug=debug))
             latencies["understanding"] = _elapsed_ms(t)
         except Exception as e:
             errors.append(f"Understanding failed: {e}")
@@ -113,7 +115,7 @@ class PipelineOrchestrator:
         try:
             t = time.perf_counter()
             reasoning = self.reasoning.process(
-                ReasoningInput(understanding=understanding, state=state, college_brain=self.brain)
+                ReasoningInput(understanding=understanding, state=state, college_brain=self.brain, debug=debug)
             )
             latencies["reasoning"] = _elapsed_ms(t)
         except Exception as e:
@@ -137,6 +139,7 @@ class PipelineOrchestrator:
                     brain_response=brain_response,
                     capabilities=self.registry,
                     metadata={"student_text": text},
+                    debug=debug,
                 )
             )
             latencies["decision"] = _elapsed_ms(t)
@@ -148,24 +151,27 @@ class PipelineOrchestrator:
         if decision:
             try:
                 t = time.perf_counter()
-                plan = self.planner.process(decision, brain_response)
+                plan = self.planner.process(decision, brain_response, debug=debug)
                 latencies["planner"] = _elapsed_ms(t)
             except Exception as e:
                 errors.append(f"Planner failed: {e}")
 
-        llm_prompt = ""
         response = ""
+        llm_diagnostics = None
         if plan:
             try:
                 t = time.perf_counter()
                 history = self._get_history(state)
-                response = self.composer.compose(
+                composer_result = self.composer.compose(
                     plan=plan,
                     decision=decision,
                     brain_response=brain_response,
                     user_text=text,
                     history=history,
+                    debug=debug,
                 )
+                response = composer_result.text
+                llm_diagnostics = composer_result.diagnostics
                 latencies["llm"] = _elapsed_ms(t)
                 llm_prompt = getattr(self.composer._llm, "last_prompt", "")
             except Exception as e:
@@ -198,9 +204,19 @@ class PipelineOrchestrator:
             if response:
                 state.history.append({"role": "user", "content": text})
                 state.history.append({"role": "assistant", "content": response})
-            # Track resolved intent for multi-turn context
+            # Track resolved intent and problem for multi-turn context
             if understanding and hasattr(understanding, 'intent'):
                 state.goals["primary"] = understanding.intent.primary
+            if reasoning and reasoning.current_problem:
+                prev = state.metadata.get("previous_problem", "")
+                current = reasoning.current_problem
+                if current == "needs_admission_guidance" and prev == "needs_admission_guidance":
+                    state.metadata["admission_guidance_turns"] = state.metadata.get("admission_guidance_turns", 1) + 1
+                elif current == "needs_admission_guidance":
+                    state.metadata["admission_guidance_turns"] = 1
+                else:
+                    state.metadata["admission_guidance_turns"] = 0
+                state.metadata["previous_problem"] = current
 
         logger.info(
             "pipeline.run latencies_ms=%s errors=%d version=%s",
@@ -218,6 +234,7 @@ class PipelineOrchestrator:
             decision=decision,
             plan=plan,
             llm_prompt=llm_prompt,
+            llm_diagnostics=llm_diagnostics,
             confidence=getattr(reasoning, "confidence", 0.0),
             errors=errors,
             latency_ms=latencies,

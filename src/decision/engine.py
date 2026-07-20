@@ -1,5 +1,6 @@
 import logging
 
+from src.decision.models import DecisionDiagnostics, DecisionStep
 from src.engines.interfaces import DecisionInput, DecisionOutput
 from src.registry import CapabilityRegistry
 
@@ -32,18 +33,30 @@ _DECISION_RULES: dict[str, tuple[str, str, str]] = {
                             "Student confused — clarify question"),
     "needs_personalized_guidance": ("provide_guidance", "normal",
                                     "General personalized guidance"),
+    "needs_institution_info": ("provide_program_info", "normal",
+                               "Student asking about institution details"),
+    "needs_seat_info": ("provide_program_info", "normal",
+                        "Student asking about seat availability"),
+    "needs_loan_info": ("provide_program_info", "normal",
+                        "Student asking about education loan options"),
+    "needs_document_info": ("provide_program_info", "normal",
+                            "Student asking about required documents"),
+    "needs_safety_info": ("provide_program_info", "normal",
+                          "Student asking about campus safety"),
+    "needs_career_guidance": ("provide_career_guidance", "normal",
+                              "Student confused about career options"),
 }
 
 # knowledge_needed hint → action for when reasoning outputs a generic problem
 # but the pipeline's knowledge-need signal is more specific.
 _KNOWLEDGE_TO_ACTION: dict[str, str] = {
-    "distance_education_information": "provide_distance_ed_info",
-    "nri_admission_information": "provide_nri_admission_info",
+    "distance_education_information": "provide_program_info",
+    "nri_admission_information": "provide_program_info",
     "management_quota_information": "explain_management_quota_policy",
     "grievance_information": "provide_grievance_process",
-    "transfer_information": "provide_transfer_info",
-    "sports_quota_information": "provide_sports_quota_info",
-    "lateral_entry_information": "provide_lateral_entry_info",
+    "transfer_information": "explain_policy",
+    "sports_quota_information": "provide_program_info",
+    "lateral_entry_information": "explain_policy",
     "counseling_information": "provide_counseling_schedule",
     "scholarship_information": "provide_scholarship_info",
 }
@@ -72,6 +85,15 @@ class DecisionEngine:
         completeness = getattr(reasoning, "profile_completeness", 0.0)
         knowledge_needed = getattr(reasoning, "knowledge_needed", None) or []
 
+        steps: list[DecisionStep] | None = [] if input.debug else None
+
+        def _step(name: str, act: str, pri: str, rat: str, conds: list[str] | None = None):
+            if steps is not None:
+                steps.append(DecisionStep(
+                    step=name, action=act, priority=pri, rationale=rat,
+                    conditions=conds or [],
+                ))
+
         # ── Step 1: Resolve from current_problem ────────────────────
         rule = _DECISION_RULES.get(problem)
         if rule:
@@ -80,14 +102,17 @@ class DecisionEngine:
             action = "clarify"
             priority = "normal"
             rationale = f"Unknown problem '{problem}' — request clarification"
+        _step("1 - Problem lookup", action, priority, rationale,
+              [f"problem={problem}"])
 
         # ── Step 2: Refine generic fallbacks via knowledge_needed ───
-        # When reasoning says "collect profile" but actually knows the
-        # student is asking about transfer / distance-ed / NRI / etc.
         if action in _GENERIC_ACTIONS:
             for need in knowledge_needed:
                 mapped = _KNOWLEDGE_TO_ACTION.get(need)
                 if mapped:
+                    _step("2 - Knowledge override", mapped, "normal",
+                          f"Student needs {need.replace('_', ' ')}",
+                          [f"action was {action}", f"knowledge={need}"])
                     action = mapped
                     priority = "normal"
                     rationale = f"Student needs {need.replace('_', ' ')}"
@@ -102,36 +127,48 @@ class DecisionEngine:
             if any(w in _student_text for w in ["not engineering", "anthropology", "economics",
                                                   "psychology", "medicine", "design",
                                                   "actually want"]):
+                _step("2b - Text routing", "provide_career_guidance", "normal",
+                      "Student interested in non-engineering career",
+                      [f"action was {action}"])
                 action = "provide_career_guidance"
                 priority = "normal"
                 rationale = "Student interested in non-engineering career"
             elif any(w in _student_text for w in ["don't think", "not sure", "not confident",
-                                                   "doubt", "hopeless", "not get"]):
+                                                    "doubt", "hopeless", "not get",
+                                                    "chances are gone"]):
+                _step("2b - Text routing", "encourage_and_collect_profile", "high",
+                      "Student showing low confidence — encourage first",
+                      [f"action was {action}"])
                 action = "encourage_and_collect_profile"
                 priority = "high"
                 rationale = "Student showing low confidence — encourage first"
             elif any(w in _student_text for w in ["brother", "sister", "cousin", "relative",
                                                    "alumni", "family member", "family",
                                                    "studied here", "graduated"]):
+                _step("2b - Text routing", "recommend_branches", "high",
+                      "Student has family legacy at this college",
+                      [f"action was {action}"])
                 action = "recommend_branches"
                 priority = "high"
                 rationale = "Student has family legacy at this college"
-            elif any(w in _student_text for w in ["when is", "counseling", "documents do i need"]):
+            elif any(w in _student_text for w in ["when is", "documents do i need"]):
+                _step("2b - Text routing", "provide_counseling_schedule", "normal",
+                      "Student asking about counseling schedule and documents",
+                      [f"action was {action}"])
                 action = "provide_counseling_schedule"
                 priority = "normal"
                 rationale = "Student asking about counseling schedule and documents"
 
         # ── Step 3: Gateway → collect_profile when very incomplete ──
-        # If reasoning chose admission/branch guidance but the profile
-        # is too sparse, collect more info first.
-        if action in ("provide_admission_guidance", "provide_branch_guidance") and completeness < 0.5:
+        if action in ("provide_admission_guidance", "provide_branch_guidance") and completeness < 0.3:
+            _step("3 - Incompleteness guard", "collect_profile", "high",
+                  "Profile too incomplete for guidance",
+                  [f"action was {action}", f"completeness={completeness:.2f}"])
             action = "collect_profile"
             priority = "high"
             rationale = "Profile too incomplete for guidance — collect missing fields first"
 
-        # ── Step 4: Brain override (only for gateway actions) ───────
-        # Skip brain override when student needs empathy, has special context,
-        # or is asking for specific information — recommend can come next turn.
+        # ── Step 4: Brain override ─────────────────────────────────
         has_eligible = (brain and hasattr(brain, "admission") and brain.admission
                         and brain.admission.applicable
                         and brain.admission.data.get("eligible_branches"))
@@ -146,9 +183,10 @@ class DecisionEngine:
             "needs_fee_information", "needs_placement_information",
             "needs_hostel_information", "needs_scholarship_information",
             "needs_cutoff_information",
+            "needs_safety_info", "needs_institution_info",
+            "needs_seat_info", "needs_loan_info", "needs_document_info",
+            "needs_career_guidance", "needs_grievance_resolution",
         )
-        # Skip brain override when student has empathy needs, special context,
-        # or specific info requests — recommend can come next turn.
         _student_text = (input.metadata or {}).get("student_text", "").lower()
         _has_empathy_context = any(w in _student_text for w in [
             "brother", "sister", "cousin", "relative", "alumni", "family", "proud",
@@ -158,10 +196,15 @@ class DecisionEngine:
             "don't think", "not sure", "not confident", "doubt", "hopeless",
             "counseling", "documents", "when is", "paperwork", "registration",
         ])
-        if (has_eligible and action in _GATEWAY_ACTIONS
+        brain_override = (has_eligible and action in _GATEWAY_ACTIONS
                 and not _has_anxiety and not _has_special_context
                 and not _is_info_request and not _has_empathy_context
-                and completeness >= 0.3):
+                and completeness >= 0.5)
+        if brain_override:
+            _step("4 - Brain override", "recommend_branches", "high",
+                  f"Eligible branches available",
+                  [f"action was {action}", "has_eligible=true",
+                   f"completeness={completeness:.2f}"])
             action = "recommend_branches"
             branches_list = brain.admission.data["eligible_branches"][:3]
             rationale = f"Eligible for {', '.join(branches_list)}"
@@ -170,8 +213,7 @@ class DecisionEngine:
         # ── Remaining fields ────────────────────────────────────────
         escalate = _has_anxiety
 
-        # Enrich rationale with risk/context signals so Planner empathy
-        # routing can detect them (e.g., safety, legacy, anxiety keywords).
+        # Enrich rationale with risk/context signals
         if risks:
             risk_tags = " ".join(r.replace("_", " ") for r in risks)
             rationale = f"{rationale} {risk_tags}" if rationale else risk_tags
@@ -195,5 +237,18 @@ class DecisionEngine:
             rationale=rationale,
             required_info=required,
             escalate=escalate,
-            metadata=input.metadata,
+            metadata={
+                **input.metadata,
+                **({"decision_diagnostics": DecisionDiagnostics(
+                    input_problem=problem,
+                    completeness=completeness,
+                    risks=risks,
+                    knowledge_needed=knowledge_needed,
+                    stage=stage,
+                    steps=steps or [],
+                    final_action=action,
+                    final_priority=priority,
+                    final_rationale=rationale,
+                )} if input.debug else {}),
+            },
         )

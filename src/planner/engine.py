@@ -2,23 +2,27 @@ import logging
 import re
 
 from src.engines.interfaces import DecisionOutput
-from src.planner.models import Plan, Turn
+from src.planner.models import Plan, PlannerDiagnostics, Turn
 
 logger = logging.getLogger(__name__)
 
 
 class MinimalPlanner:
     VERSION = "v2"
-    """Converts a DecisionOutput into an ordered conversation Plan using 5 behavioral patterns."""
+    """Converts a DecisionOutput into an ordered conversation Plan using behavioral patterns."""
 
-    def process(self, decision: DecisionOutput, brain_response: object | None = None) -> Plan:
+    def process(
+        self, decision: DecisionOutput, brain_response: object | None = None,
+        debug: bool = False,
+    ) -> Plan:
         action = decision.action
         rationale = (decision.rationale or "").lower()
 
         handler = _resolve_handler(action, rationale, decision, brain_response)
+        handler_name = getattr(handler, "__name__", "unknown")
         turns = handler(decision, brain_response)
 
-        return Plan(
+        plan = Plan(
             turns=turns,
             confidence=decision.confidence,
             escalate=decision.escalate,
@@ -28,6 +32,104 @@ class MinimalPlanner:
                 "required_info": decision.required_info,
             },
         )
+
+        if debug:
+            reason, fallback = self._trace_handler(
+                action, rationale, decision, brain_response, handler_name,
+            )
+            templates_used = []
+            for turn in turns:
+                if turn.content:
+                    # Infer which template by matching content to _CONTENT_MAP
+                    for k, v in _CONTENT_MAP.items():
+                        if v and turn.content.startswith(v[:30]):
+                            templates_used.append(k)
+                            break
+            plan.metadata["planner_diagnostics"] = PlannerDiagnostics(
+                input_action=action,
+                input_rationale=decision.rationale or "",
+                handler_selected=handler_name,
+                handler_reason=reason,
+                templates_used=templates_used or ["_generate_inform"],
+                generated_turns=turns,
+                expected_inputs=",".join(
+                    t.expected_input for t in turns if t.expected_input
+                ),
+                was_fallback=fallback,
+            )
+
+        return plan
+
+    @staticmethod
+    def _trace_handler(
+        action: str, rationale: str, decision: DecisionOutput,
+        brain: object | None, handler_name: str,
+    ) -> tuple[str, bool]:
+        student_text = (decision.metadata or {}).get("student_text", "").lower()
+        fallback = handler_name == "_fallback_handler"
+        reason_parts: list[str] = [f"action={action}"]
+
+        if action == "collect_profile":
+            missing = decision.required_info or []
+            has_brain = brain and hasattr(brain, "admission") and brain.admission
+            has_eligible = any(w in rationale for w in ["eligible", "branch", "cutoff"])
+            if has_brain or has_eligible:
+                reason_parts.append("brain_data_available or eligible info in rationale")
+            else:
+                reason_parts.append("no brain data → single_ask")
+            return "; ".join(reason_parts), fallback
+
+        if action == "recommend_branches":
+            _legacy = ["legacy", "brother", "sister", "alumni", "family", "proud",
+                       "cousin", "relative", "studied here", "graduated"]
+            if any(w in rationale for w in _legacy):
+                reason_parts.append("family_legacy_keywords in rationale → empathy_legacy")
+            elif any(w in rationale for w in ["anxiety", "anxious", "hopeless", "worried", "concern", "distress"]):
+                reason_parts.append("anxiety_keywords in rationale → empathy_reassure")
+            else:
+                reason_parts.append("default → recommend_ask")
+            return "; ".join(reason_parts), fallback
+
+        if action == "provide_hostel_info":
+            _safety = ["safe", "safety", "security", "secure", "girls", "women",
+                       "female", "daughter", "parent", "accommodation"]
+            if any(w in rationale for w in _safety) or any(w in student_text for w in _safety):
+                reason_parts.append("safety_keywords detected → empathy_reassure_inform_ask")
+            else:
+                reason_parts.append("default → inform_ask")
+            return "; ".join(reason_parts), fallback
+
+        if action == "provide_branch_guidance":
+            if any(w in rationale for w in ["legacy", "placement question", "tcs"]):
+                reason_parts.append("empathy keywords → empathy_reassure_ask")
+            else:
+                reason_parts.append("default → inform_ask")
+            return "; ".join(reason_parts), fallback
+
+        if action == "provide_placement_info":
+            _empathy = ["tcs", "sit for", "like my brother"]
+            if any(w in student_text for w in _empathy):
+                reason_parts.append("empathy keywords in text → empathy_reassure_ask")
+            else:
+                reason_parts.append("default → single")
+            return "; ".join(reason_parts), fallback
+
+        if action == "provide_scholarship_info":
+            _empathy = ["renewal", "hasn't been renewed", "delayed", "stopped"]
+            if any(w in student_text for w in _empathy):
+                reason_parts.append("renewal keywords → empathy_triple")
+            else:
+                reason_parts.append("default → inform_ask")
+            return "; ".join(reason_parts), fallback
+
+        entry = _ACTION_BEHAVIOR.get(action)
+        if entry:
+            name = getattr(entry, "__name__", "unknown")
+            reason_parts.append(f"direct lookup in _ACTION_BEHAVIOR → {name}")
+            return "; ".join(reason_parts), fallback
+
+        reason_parts.append(f"no match in _ACTION_BEHAVIOR → _fallback_handler")
+        return "; ".join(reason_parts), True
 
 
 def _resolve_handler(action: str, rationale: str, decision: DecisionOutput, brain: object | None):

@@ -53,6 +53,35 @@ class UnderstandingIntent:
 
 
 @dataclass
+class StageDetail:
+    """Per-intent scores and evidence for a single scoring stage."""
+    scores: dict[str, float] = field(default_factory=dict)
+    evidence: list[str] = field(default_factory=list)
+
+
+@dataclass
+class IntentDiagnostics:
+    """Full per-intent, per-stage scoring trace for debugging."""
+    input: str = ""
+    stage_details: dict[str, StageDetail] = field(default_factory=dict)
+    stage_weights: dict[str, float] = field(default_factory=dict)
+
+    per_intent_breakdown: dict[str, dict[str, float]] = field(default_factory=dict)
+    pre_conflict: dict[str, float] = field(default_factory=dict)
+    post_conflict: dict[str, float] = field(default_factory=dict)
+    conflicts_applied: list[str] = field(default_factory=list)
+    winner: str = ""
+    confidence: float = 0.0
+    winner_reason: str = ""
+
+    ranked_intents: list[tuple[str, float]] = field(default_factory=list)
+    runner_up_score: float = 0.0
+    margin: float = 0.0
+    confidence_class: str = "LOW"
+    validation: Any = None
+
+
+@dataclass
 class UnderstandingResult:
     text: str
     language: str = "en"

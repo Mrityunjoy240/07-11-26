@@ -25,6 +25,7 @@ from app.api import (
     voice,
     ws_voice,
     knowledge_base,
+    voice_sdk,
 )
 
 # Initialize Database
@@ -51,6 +52,52 @@ async def add_session_id_middleware(request: Request, call_next):
     if not hasattr(request.state, "session_id"):
         request.state.session_id = str(uuid4())
     response = await call_next(request)
+    return response
+
+
+# Observability Middleware — request timing + X-Request-ID for every request.
+# Pure observation. No effect on prompts, routing, RAG, memory, telemetry,
+# or shadow routing.
+@app.middleware("http")
+async def observability_middleware(request: Request, call_next):
+    from time import time
+    from uuid import uuid4
+
+    from app.services.request_log import record_request
+
+    request_id = str(uuid4())
+    request.state.request_id = request_id
+    request.state.request_started = time()
+
+    entry = {
+        "event": "http_request",
+        "request_id": request_id,
+        "method": request.method,
+        "path": request.url.path,
+        "client_ip": request.client.host if request.client else None,
+        "x_forwarded_for": request.headers.get("x-forwarded-for"),
+    }
+    request.state.request_entry = entry
+
+    try:
+        response = await call_next(request)
+    except Exception as exc:  # noqa: BLE001 — observe failures, never mask them
+        duration_ms = round((time() - request.state.request_started) * 1000, 2)
+        entry["status"] = 500
+        entry["error"] = str(exc)
+        entry["latency_ms"] = duration_ms
+        record_request(entry)
+        logger.error("REQ %s %s %s FAILED after %sms: %s",
+                     request_id, request.method, request.url.path, duration_ms, exc)
+        raise
+
+    duration_ms = round((time() - request.state.request_started) * 1000, 2)
+    response.headers["X-Request-ID"] = request_id
+    entry["status"] = response.status_code
+    entry["latency_ms"] = duration_ms
+    record_request(entry)
+    logger.info("REQ %s %s %s -> %s (%sms)",
+                request_id, request.method, request.url.path, response.status_code, duration_ms)
     return response
 
 
@@ -97,6 +144,7 @@ app.include_router(auth_routes.router, tags=["auth"])
 app.include_router(admin.router, prefix="/admin", tags=["admin"])
 app.include_router(knowledge_base.router, prefix="/admin", tags=["kb"])
 app.include_router(voice.router, prefix="/voice", tags=["voice"])
+app.include_router(voice_sdk.router, prefix="/sdk", tags=["sarvam-sdk"])
 
 # Serve Frontend Static Files (if they exist)
 # Check multiple possible locations to support both Local and Docker/Railway
@@ -137,3 +185,15 @@ if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
+
+# ---------------------------------------------------------------------------
+# Shutdown hook — always tear down Sarvam SDK bridge sessions cleanly.
+# ---------------------------------------------------------------------------
+@app.on_event("shutdown")
+async def shutdown_sarvam_sdk_bridge():
+    from app.services.sarvam_sdk import get_sarvam_sdk_service
+
+    service = get_sarvam_sdk_service()
+    logger.info("Shutting down Sarvam SDK bridge...")
+    await service.stop_all()

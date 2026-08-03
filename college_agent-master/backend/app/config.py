@@ -34,6 +34,11 @@ class Settings(BaseSettings):
     livekit_api_key: str = ""
     livekit_api_secret: str = ""
 
+    # Sarvam Agents SDK (Samvaad bridge) — org/workspace/app targeting
+    sarvam_org_id: str = ""
+    sarvam_workspace_id: str = ""
+    sarvam_app_id: str = ""
+
     # Twilio Settings
     twilio_account_sid: str = ""
     twilio_auth_token: str = ""

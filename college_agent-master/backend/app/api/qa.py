@@ -48,6 +48,14 @@ async def query_endpoint(request: Request, data: GroqQueryRequest):
     start_time = time.time()
     session_id = data.session_id or "default"
 
+    request_id = getattr(request.state, "request_id", None)
+    entry = getattr(request.state, "request_entry", None)
+    if entry is not None:
+        entry["event"] = "qa_request"
+        entry["message"] = data.message
+        entry["session_id"] = session_id
+        entry["conversation_id"] = data.conversation_id
+
     try:
         service = get_groq_service()
         result = await service.generate_response(data.message, session_id=session_id)
@@ -60,13 +68,7 @@ async def query_endpoint(request: Request, data: GroqQueryRequest):
             result = post_process_response(None, data.message, result, "en")
         # ── End DEMO_SAFEPOINT post-processing ──
 
-        logger.info(
-            f"[PERF {session_id}] API endpoint: {_api_ms}ms  "
-            f"source={result.get('source', '?')}  "
-            f"answer_len={len(result.get('answer', ''))}"
-        )
-
-        return QueryResponse(
+        response = QueryResponse(
             answer=result["answer"],
             voice_text=result.get("voice_text"),
             sources=[],
@@ -80,16 +82,43 @@ async def query_endpoint(request: Request, data: GroqQueryRequest):
                 else "llm_generated",
             ),
         )
+
+        # Response observability — source, confidence, answer length, total latency.
+        if entry is not None:
+            entry["response_source"] = response.source
+            entry["confidence"] = response.confidence
+            entry["answer_len"] = len(response.answer)
+            entry["latency_ms"] = round((time.time() - start_time) * 1000, 2)
+            entry["status"] = 200
+
+        logger.info(
+            f"QA_OK request_id={request_id} session={session_id} "
+            f"source={response.source} confidence={response.confidence} "
+            f"answer_len={len(response.answer)} latency_ms={round((time.time() - start_time) * 1000, 2)} "
+            f"source_engine={result.get('source', '?')}"
+        )
+        return response
     except Exception as e:
-        logger.error(f"Query error: {e}")
+        if entry is not None:
+            entry["error"] = str(e)
+            entry["status"] = 500
+            entry["latency_ms"] = round((time.time() - start_time) * 1000, 2)
+        logger.error(f"QA_ERR request_id={request_id} session={session_id}: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.post("/query-stream")
-async def query_stream_endpoint(data: GroqQueryRequest):
+async def query_stream_endpoint(request: Request, data: GroqQueryRequest):
     """
     STREAMING ENDPOINT with in-memory session memory.
     """
+    entry = getattr(request.state, "request_entry", None)
+    if entry is not None:
+        entry["event"] = "qa_stream_request"
+        entry["message"] = data.message
+        entry["session_id"] = data.session_id or "default"
+        entry["conversation_id"] = data.conversation_id
+
     try:
         session_id = data.session_id or "default"
         service = get_groq_service()
@@ -104,8 +133,20 @@ async def query_stream_endpoint(data: GroqQueryRequest):
 
         return StreamingResponse(stream_generator(), media_type="text/event-stream")
     except Exception as e:
-        logger.error(f"Stream error: {e}")
+        if entry is not None:
+            entry["error"] = str(e)
+            entry["status"] = 500
+        logger.error(f"STREAM_ERR request_id={getattr(request.state, 'request_id', None)}: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@router.get("/debug/last-requests")
+async def debug_last_requests():
+    """Debug endpoint: last 100 request records in chronological order."""
+    from app.services.request_log import get_request_logger
+
+    requests = get_request_logger().snapshot()
+    return {"count": len(requests), "requests": requests}
 
 
 @router.post("/session/clear")

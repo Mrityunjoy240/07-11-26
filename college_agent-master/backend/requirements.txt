@@ -14,6 +14,7 @@ httpx
 websockets
 pydub
 sarvamai
+sarvam-conv-ai-sdk
 aiofiles
 pypdf
 pandas

@@ -24,7 +24,7 @@
         "admission", "fees", "hostel", "placement", "scholarship",
         "management", "sports", "nri", "lateral", "transfer",
         "distance", "counseling", "grievance", "mixed", "multilingual",
-        "career"
+        "career", "institution"
       ],
       "description": "Primary domain of the conversation. Determines file subdirectory."
     },

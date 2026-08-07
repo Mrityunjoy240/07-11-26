@@ -29,7 +29,7 @@ VALID_DOMAINS = {
     "admission", "fees", "hostel", "placement", "scholarship",
     "management", "sports", "nri", "lateral", "transfer",
     "distance", "counseling", "grievance", "mixed", "multilingual",
-    "career",
+    "career", "institution",
 }
 
 VALID_FEATURES = {
@@ -81,7 +81,7 @@ DOMAIN_DIR_MAP = {
     "lateral": "lateral", "transfer": "transfer", "distance": "distance",
     "counseling": "counseling", "grievance": "grievance",
     "mixed": "mixed", "multilingual": "multilingual",
-    "career": "career",
+    "career": "career", "institution": "institution",
 }
 
 FILLER_WORDS = {
@@ -310,7 +310,14 @@ class CoverageValidator:
         return issues
 
     def _scenario_key(self, conv: dict) -> str:
-        """Create a semantic scenario key from domain + features + ground_truth pattern."""
+        """Create a semantic scenario key from domain + features + ground_truth
+        pattern + primary intent + language + turn count.
+
+        Intent, primary language and turn count mirror the v2.1 matrix row
+        attributes (see data/benchmark/coverage/v2.1_matrix.json), so
+        profile-less scenarios (institution facts, greeting, unknown, repeat)
+        are distinguished the same way the coverage matrix distinguishes them.
+        """
         gt = conv.get("ground_truth", {})
         domain = conv.get("domain", "")
         features = sorted(conv.get("features", []))
@@ -318,10 +325,20 @@ class CoverageValidator:
         pcm = gt.get("pcm_percentage")
         cat = gt.get("category", "")
         interest = gt.get("interest", "")
+        turns = conv.get("turns", [])
+        intent = ""
+        for t in turns:
+            und = (t.get("expected") or {}).get("understanding", {})
+            if und.get("intent"):
+                intent = und["intent"]
+                break
         # Quantize rank to nearest 5000, PCM to nearest 10
         rank_bucket = f"rank_{(rank // 5000) * 5000}" if rank else "rank_none"
         pcm_bucket = f"pcm_{(int(pcm) // 10) * 10}" if pcm else "pcm_none"
-        return f"{domain}|{','.join(features)}|{rank_bucket}|{pcm_bucket}|{cat}|{interest}"
+        return (
+            f"{domain}|{','.join(features)}|{rank_bucket}|{pcm_bucket}|"
+            f"{cat}|{interest}|{intent}|{conv.get('primary_language', '')}|{len(turns)}"
+        )
 
     def _check_duplicates(self, convs: list[dict]) -> list[str]:
         issues = []

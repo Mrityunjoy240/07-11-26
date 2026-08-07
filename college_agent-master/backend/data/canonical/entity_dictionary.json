@@ -290,6 +290,7 @@
       "canonical": "Dr. Sanjay S. Pawar",
       "role": "Principal",
       "aliases": [
+        "principal",
         "sanjay pawar",
         "sanjay s pawar",
         "dr sanjay",
@@ -563,6 +564,7 @@
     "BCREC": {
       "canonical": "BCREC",
       "full_form": "Dr. B.C. Roy Engineering College",
+      "tts_spoken": "B C Roy Engineering College",
       "aliases": [
         "b c roy",
         "bcrec",

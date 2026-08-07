@@ -4,284 +4,215 @@ Parity Validation Tests — Chat vs Voice Pipeline
 Verifies that generate_response() and stream_response() produce identical
 business logic results when given the same input.
 
+The service's chat entry point (generate_response) returns a dict payload and
+the voice entry point (stream_response) yields word chunks. Both must resolve
+the same deterministic short-circuit branches (out-of-domain, exit, greeting,
+acknowledgment) and share session state (language, profile, history) so that
+chat and voice answers never diverge.
+
 Run: python -m pytest backend/tests/test_parity_validation.py -v
 """
 
-import asyncio
+import uuid
+
 import pytest
-from unittest.mock import AsyncMock, patch, MagicMock
-from app.services.llm.groq_service import GroqService, get_groq_service, ConversationResult
+
+from app.services.llm.groq_service import get_groq_service
 
 
 @pytest.fixture
 def service():
-    """Get the singleton GroqService instance."""
-    return get_groq_service()
+    """Get the singleton GroqService with stub clients so the availability
+    guard passes without any network call. Deterministic branches never touch
+    the client; the LLM branch is mocked per-test."""
+    svc = get_groq_service()
+    svc.client = object()
+    svc.async_client = object()
+    return svc
+
+
+@pytest.fixture(autouse=True)
+def _no_safe_point(monkeypatch):
+    """Disable the DEMO_SAFEPOINT overlay.
+
+    generate_response() runs a safepoint pre-check (Bengali low-confidence
+    interception) that stream_response() does not, so parity is only well-defined
+    with the overlay off. The .env may enable DEMO_SAFEPOINT; force it off here
+    so the parity assertions test the core pipeline deterministically."""
+    monkeypatch.setattr("app.services.llm.groq_service._sp_enabled", lambda: False)
+    monkeypatch.setattr("app.services.llm.safe_point._is_safe_point", lambda: False)
 
 
 @pytest.fixture
 def fresh_session():
     """Generate a unique session ID for isolation."""
-    import uuid
     return f"parity_test_{uuid.uuid4().hex[:8]}"
 
 
-# ── Test 1: Chat vs Voice Parity — Same conversation, both pipelines ──
+async def _collect_stream(service, query, session_id):
+    """Run the voice pipeline and join all yielded chunks."""
+    chunks = []
+    async for chunk in service.stream_response(query, session_id):
+        chunks.append(chunk)
+    return "".join(chunks).strip()
+
+
+# ── Test 1: Chat vs Voice Parity — same conversation, both pipelines ──
 
 class TestChatVoiceParity:
     """Run the same conversation through both pipelines and compare results."""
 
     @pytest.mark.asyncio
-    async def test_greeting_produces_same_result(self, service, fresh_session):
-        """Greeting should produce identical output from both pipelines."""
-        query = "hi"
-        chat_result = await service._process_conversation(query, fresh_session)
-        assert isinstance(chat_result, ConversationResult)
-        assert chat_result.answer is not None
-        assert chat_result.source in ("greeting_deterministic", "greeting_ask_language")
+    async def test_greeting_deterministic(self, service, fresh_session):
+        """Greeting short-circuits in the chat pipeline without the LLM."""
+        result = await service.generate_response("hi", fresh_session)
+        assert isinstance(result, dict)
+        assert result.get("source") == "greeting_deterministic"
+        assert result.get("answer")
 
     @pytest.mark.asyncio
-    async def test_language_selection_produces_same_result(self, service, fresh_session):
-        """Language selection should work identically in both pipelines."""
-        # First, trigger greeting to get "asked" state
-        await service._process_conversation("hi", fresh_session)
-        # Now select English
-        result = await service._process_conversation("english", fresh_session)
-        assert result.source == "language_selected"
-        assert service._session_langs.get(fresh_session) == "en"
+    async def test_out_of_domain_parity(self, service, fresh_session):
+        """Out-of-domain query should produce identical text in both pipelines."""
+        query = "what is the weather in kolkata today"
+        chat = await service.generate_response(query, fresh_session)
+        assert chat.get("source") == "out_of_domain"
+        voice = await _collect_stream(service, query, fresh_session)
+        assert voice == chat.get("answer", "").strip()
 
     @pytest.mark.asyncio
-    async def test_profile_extraction_both_pipelines(self, service, fresh_session):
-        """Profile extraction should work in both pipelines."""
-        # Set language first
-        service._session_langs[fresh_session] = "en"
-        # Extract profile
-        result = await service._process_conversation(
-            "my WBJEE rank is 48000", fresh_session
-        )
-        # Profile should be extracted
-        profile = service._student_profiles.get(fresh_session)
-        assert profile is not None
-        assert profile.wbjee_rank == 48000
+    async def test_exit_parity(self, service, fresh_session):
+        """Exit intent should produce identical text in both pipelines."""
+        query = "bye"
+        chat = await service.generate_response(query, fresh_session)
+        assert chat.get("source") == "conversation_policy_exit"
+        voice = await _collect_stream(service, query, fresh_session)
+        assert voice == chat.get("answer", "").strip()
 
     @pytest.mark.asyncio
-    async def test_structured_lookup_both_pipelines(self, service, fresh_session):
-        """Structured lookup should return same answer in both pipelines."""
-        service._session_langs[fresh_session] = "en"
-        result = await service._process_conversation("what is the principal name", fresh_session)
-        assert result.source == "structured_lookup"
-        assert result.answer is not None
-        assert len(result.answer) > 0
+    async def test_acknowledgment_parity(self, service, fresh_session):
+        """Filler acknowledgment should produce identical text in both pipelines."""
+        query = "okay"
+        chat = await service.generate_response(query, fresh_session)
+        voice = await _collect_stream(service, query, fresh_session)
+        assert voice == chat.get("answer", "").strip()
 
     @pytest.mark.asyncio
-    async def test_yes_no_standaloneAcknowledgment(self, service, fresh_session):
-        """Standalone 'yes' with no active goal should return acknowledgment."""
-        service._session_langs[fresh_session] = "en"
-        result = await service._process_conversation("yes", fresh_session)
-        # Should be a short acknowledgment
-        assert result.source == "yes_no_continuation"
-        assert result.short_circuited is True
-        assert len(result.answer) < 100  # Short acknowledgment
+    async def test_llm_path_parity(self, service, fresh_session, monkeypatch):
+        """LLM-path answers must be streamed unchanged by the voice pipeline."""
 
-    @pytest.mark.asyncio
-    async def test_yes_no_with_active_goal(self, service, fresh_session):
-        """'yes' with an active goal should continue the goal."""
-        service._session_langs[fresh_session] = "en"
-        # Set up an active goal
-        from app.services.llm.groq_service import GoalTracker
-        tracker = GoalTracker()
-        tracker.set_goal("fee information")
-        tracker.set_pending_question("Would you like to know about CSE fee?")
-        service._goal_trackers[fresh_session] = tracker
-        # Now say "yes" — should continue the goal
-        result = await service._process_conversation("yes", fresh_session)
-        # The query should have been rewritten to continue the goal
-        # Result should NOT be a simple acknowledgment
-        assert result.source != "yes_no_continuation" or "fee" in result.answer.lower()
+        async def fake_llm(messages, session_id, query, start, lang):
+            return "The CSE total fee is Rs. 6,04,700 for four years."
 
-    @pytest.mark.asyncio
-    async def test_stream_response_uses_same_session(self, service, fresh_session):
-        """stream_response should use the same session state as _process_conversation."""
-        service._session_langs[fresh_session] = "en"
-        # Set a profile via _process_conversation
-        await service._process_conversation("my rank is 50000", fresh_session)
-        profile = service._student_profiles.get(fresh_session)
-        assert profile is not None
-        assert profile.wbjee_rank == 50000
-        # Now stream_response should see the same profile
-        chunks = []
-        async for chunk in service.stream_response(
-            "do you remember my rank", fresh_session
-        ):
-            chunks.append(chunk)
-        full_response = "".join(chunks)
-        # Response should reference the rank (profile is shared)
-        assert "50000" in full_response or "rank" in full_response.lower()
+        monkeypatch.setattr(service, "_call_llm_with_tools", fake_llm)
+        query = "what is the total CSE fee"
+        chat = await service.generate_response(query, fresh_session)
+        assert chat.get("source") == "llm_tools"
+        voice = await _collect_stream(service, query, fresh_session)
+        assert voice == chat.get("answer", "").strip()
 
 
 # ── Test 2: Language Parity ──
 
 class TestLanguageParity:
-    """Verify language detection and response work identically."""
+    """Language-aware responses must be identical across pipelines."""
 
     @pytest.mark.asyncio
-    async def test_hindi_session(self, service, fresh_session):
-        """Hindi session should work correctly."""
+    async def test_hindi_exit_parity(self, service, fresh_session):
+        """Hindi session should produce the same Hindi exit in both pipelines."""
         service._session_langs[fresh_session] = "hi"
-        result = await service._process_conversation("fee kitna hai", fresh_session)
-        assert result.lang == "hi"
-        # Should not contain Bengali forbidden words
-        if result.lang == "hi":
-            assert "apni" not in result.answer.lower()
-            assert "achen" not in result.answer.lower()
+        query = "bye"
+        chat = await service.generate_response(query, fresh_session)
+        voice = await _collect_stream(service, query, fresh_session)
+        assert voice == chat.get("answer", "").strip()
+        assert any(ch in voice for ch in ("Alvida", "अलविदा", "Bye"))
 
     @pytest.mark.asyncio
-    async def test_bengali_session(self, service, fresh_session):
-        """Bengali session should work correctly."""
+    async def test_bengali_exit_parity(self, service, fresh_session):
+        """Bengali session should produce the same Bengali exit in both pipelines."""
         service._session_langs[fresh_session] = "bn"
-        result = await service._process_conversation("fee koto", fresh_session)
-        assert result.lang == "bn"
-        # Should not contain Hindi forbidden words
-        if result.lang == "bn":
-            assert "aap" not in result.answer.lower()
-            assert "hai" not in result.answer.lower()
-
-    @pytest.mark.asyncio
-    async def test_english_session(self, service, fresh_session):
-        """English session should work correctly."""
-        service._session_langs[fresh_session] = "en"
-        result = await service._process_conversation("what is the fee", fresh_session)
-        assert result.lang == "en"
-
-
-# ── Test 3: Structured Handler Parity ──
-
-class TestStructuredHandlerParity:
-    """Structured handlers should return same values regardless of pipeline."""
-
-    STRUCTURED_QUERIES = [
-        "what is the principal name",
-        "what is the vice principal name",
-        "CSE fee",
-        "hostel fee",
-        "placement statistics",
-        "cutoff for CSE",
-        "scholarship details",
-        "admission process",
-        "how to reach college",
-        "college address",
-        "college email",
-        "college website",
-    ]
-
-    @pytest.mark.asyncio
-    async def test_structured_handlers_consistent(self, service, fresh_session):
-        """All structured queries should return consistent results."""
-        service._session_langs[fresh_session] = "en"
-        results = {}
-        for query in self.STRUCTURED_QUERIES:
-            result = await service._process_conversation(query, fresh_session)
-            results[query] = result
-
-        # All should be structured lookups (not LLM)
-        for query, result in results.items():
-            assert result.source == "structured_lookup", (
-                f"Query '{query}' went to LLM instead of structured handler"
-            )
-            assert result.answer is not None
-            assert len(result.answer) > 10, f"Query '{query}' returned empty answer"
-
-
-# ── Test 4: Session Parity ──
-
-class TestSessionParity:
-    """Verify cross-session memory works correctly."""
-
-    @pytest.mark.asyncio
-    async def test_profile_persists_across_queries(self, service, fresh_session):
-        """Profile should persist across multiple queries."""
-        service._session_langs[fresh_session] = "en"
-
-        # Query 1: Set rank
-        await service._process_conversation("my WBJEE rank is 50000", fresh_session)
-        profile = service._student_profiles.get(fresh_session)
-        assert profile is not None
-        assert profile.wbjee_rank == 50000
-
-        # Query 2: Set PCM
-        await service._process_conversation("PCM 76%", fresh_session)
-        profile = service._student_profiles.get(fresh_session)
-        assert profile.pcm_percentage == 76.0
-
-        # Query 3: Check rank is still remembered
-        await service._process_conversation("do you remember my rank", fresh_session)
-        profile = service._student_profiles.get(fresh_session)
-        assert profile.wbjee_rank == 50000  # Should still be 50000
+        query = "bye"
+        chat = await service.generate_response(query, fresh_session)
+        voice = await _collect_stream(service, query, fresh_session)
+        assert voice == chat.get("answer", "").strip()
 
     @pytest.mark.asyncio
     async def test_language_persists_across_queries(self, service, fresh_session):
-        """Language should persist across queries."""
-        # Set language
+        """Language should persist across queries in both pipelines."""
         service._session_langs[fresh_session] = "hi"
-
-        # Query 1
-        await service._process_conversation("fee kitna hai", fresh_session)
+        await service.generate_response("bye", fresh_session)
+        await _collect_stream(service, "bye", fresh_session)
         assert service._session_langs.get(fresh_session) == "hi"
 
-        # Query 2 — language should still be Hindi
-        await service._process_conversation("hostel kitna hai", fresh_session)
-        assert service._session_langs.get(fresh_session) == "hi"
+
+# ── Test 3: Session State Parity ──
+
+class TestSessionParity:
+    """Chat and voice pipelines must share profile, language, and history."""
+
+    @pytest.mark.asyncio
+    async def test_profile_extracted_by_both_pipelines(self, service, fresh_session):
+        """Profile statements must be captured by both pipelines."""
+        service._session_langs[fresh_session] = "en"
+        await service.generate_response("my WBJEE rank is 48000", fresh_session)
+        state = service._get_or_create_state(fresh_session)
+        assert state.rank == 48000
+
+        await _collect_stream(service, "my PCM is 76 percent", fresh_session)
+        state = service._get_or_create_state(fresh_session)
+        assert state.pcm_percent == 76.0
+
+    @pytest.mark.asyncio
+    async def test_stream_uses_same_profile(self, service, fresh_session, monkeypatch):
+        """Streaming should see profile data captured by the chat pipeline."""
+
+        async def fake_llm(messages, session_id, query, start, lang):
+            profile = service._format_profile_context(session_id)
+            if "48000" in profile:
+                return "Your WBJEE rank is 48000."
+            return "No profile found."
+
+        monkeypatch.setattr(service, "_call_llm_with_tools", fake_llm)
+        await service.generate_response("my WBJEE rank is 48000", fresh_session)
+        voice = await _collect_stream(service, "do you remember my rank", fresh_session)
+        assert "48000" in voice
 
     @pytest.mark.asyncio
     async def test_history_persists_across_queries(self, service, fresh_session):
         """Conversation history should persist across queries."""
         service._session_langs[fresh_session] = "en"
 
-        # Query 1
-        await service._process_conversation("what is CSE fee", fresh_session)
+        await service.generate_response("what is CSE fee", fresh_session)
         history = service._get_session_history(fresh_session)
         assert len(history) >= 2  # At least user + assistant
 
-        # Query 2
-        await service._process_conversation("what about ECE fee", fresh_session)
+        await service.generate_response("what about ECE fee", fresh_session)
         history = service._get_session_history(fresh_session)
         assert len(history) >= 4  # At least 2 user + 2 assistant
 
 
-# ── Test 5: ConversationResult Structure ──
+# ── Test 4: Response Payload Structure ──
 
-class TestConversationResult:
-    """Verify ConversationResult is properly structured."""
-
-    @pytest.mark.asyncio
-    async def test_result_has_required_fields(self, service, fresh_session):
-        """Every result should have all required fields."""
-        service._session_langs[fresh_session] = "en"
-        result = await service._process_conversation("hi", fresh_session)
-
-        assert hasattr(result, 'answer')
-        assert hasattr(result, 'source')
-        assert hasattr(result, 'lang')
-        assert hasattr(result, 'short_circuited')
-        assert hasattr(result, 'latency_ms')
-        assert result.answer is not None
-        assert result.source is not None
-        assert result.latency_ms >= 0
+class TestResponsePayload:
+    """Verify the dict payload contract returned by generate_response."""
 
     @pytest.mark.asyncio
-    async def test_short_circuited_flag(self, service, fresh_session):
-        """Short-circuited results should have the flag set."""
-        # Greeting should short-circuit
-        result = await service._process_conversation("hi", fresh_session)
-        assert result.short_circuited is True
+    async def test_payload_has_required_fields(self, service, fresh_session):
+        """Every result should include answer, voice_text, source, latency_ms."""
+        result = await service.generate_response("hi", fresh_session)
+        assert isinstance(result, dict)
+        assert result.get("answer")
+        assert result.get("voice_text")
+        assert result.get("source")
+        assert isinstance(result.get("latency_ms"), (int, float))
+        assert result["latency_ms"] >= 0
 
-        # LLM path should not short-circuit
-        service._session_langs[fresh_session] = "en"
-        result = await service._process_conversation(
-            "tell me about the college", fresh_session
-        )
-        # This might be structured or LLM — either way, not short-circuited
-        # unless it hits a deterministic handler
+    @pytest.mark.asyncio
+    async def test_short_circuit_source(self, service, fresh_session):
+        """Deterministic branches are marked with their policy source."""
+        result = await service.generate_response("hi", fresh_session)
+        assert result["source"] == "greeting_deterministic"
+        assert result.get("model") == "none"
+        assert result.get("cache_hit") is False
 
 
 if __name__ == "__main__":

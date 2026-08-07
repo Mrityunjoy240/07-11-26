@@ -6482,6 +6482,10 @@ USER QUESTION: {query}
 
             lang = self._resolve_language(session_id, query)
 
+            # Extract user profile from query (rank, PCM, interest) — same as
+            # generate_response so chat and voice pipelines keep shared state.
+            self._extract_user_profile(session_id, query)
+
             # Track language switches
             prev_lang = self._session_langs.get(session_id, "en")
             if lang != prev_lang:

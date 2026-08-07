@@ -1,0 +1,510 @@
+{
+  "entries": [
+    {
+      "key": "fees",
+      "keywords": [
+        "fee",
+        "fees",
+        "फीस",
+        "ফি",
+        "शुल्क",
+        "শুল্ক",
+        "cost",
+        "price",
+        "खर्च",
+        "খরচ"
+      ],
+      "languages": [],
+      "has_sub_answers": false
+    },
+    {
+      "key": "principal",
+      "keywords": [
+        "principal",
+        "प्रिंसिपल",
+        "প্রিন্সিপাল",
+        "প্রধান",
+        "head of college",
+        "অধ্যক্ষ"
+      ],
+      "languages": [
+        "en",
+        "hi",
+        "bn"
+      ],
+      "has_sub_answers": false
+    },
+    {
+      "key": "vice_principal",
+      "keywords": [
+        "vice principal",
+        "vice-principal",
+        "up-principal",
+        "deputy principal",
+        "উপ-প্রিন্সিপাল",
+        "उप-प्रिंसिपल"
+      ],
+      "languages": [
+        "en",
+        "hi",
+        "bn"
+      ],
+      "has_sub_answers": false
+    },
+    {
+      "key": "hod.cse",
+      "keywords": [
+        "cse"
+      ],
+      "languages": [
+        "en",
+        "hi",
+        "bn"
+      ],
+      "has_sub_answers": false
+    },
+    {
+      "key": "hod.it",
+      "keywords": [
+        "it"
+      ],
+      "languages": [
+        "en",
+        "hi",
+        "bn"
+      ],
+      "has_sub_answers": false
+    },
+    {
+      "key": "hod.ece",
+      "keywords": [
+        "ece"
+      ],
+      "languages": [
+        "en",
+        "hi",
+        "bn"
+      ],
+      "has_sub_answers": false
+    },
+    {
+      "key": "hod.ee",
+      "keywords": [
+        "ee"
+      ],
+      "languages": [
+        "en",
+        "hi",
+        "bn"
+      ],
+      "has_sub_answers": false
+    },
+    {
+      "key": "hod.me",
+      "keywords": [
+        "me"
+      ],
+      "languages": [
+        "en",
+        "hi",
+        "bn"
+      ],
+      "has_sub_answers": false
+    },
+    {
+      "key": "hod.ce",
+      "keywords": [
+        "ce"
+      ],
+      "languages": [
+        "en",
+        "hi",
+        "bn"
+      ],
+      "has_sub_answers": false
+    },
+    {
+      "key": "hod.csd",
+      "keywords": [
+        "csd"
+      ],
+      "languages": [
+        "en",
+        "hi",
+        "bn"
+      ],
+      "has_sub_answers": false
+    },
+    {
+      "key": "hod.aiml",
+      "keywords": [
+        "aiml"
+      ],
+      "languages": [
+        "en",
+        "hi",
+        "bn"
+      ],
+      "has_sub_answers": false
+    },
+    {
+      "key": "hod.ds",
+      "keywords": [
+        "ds"
+      ],
+      "languages": [
+        "en",
+        "hi",
+        "bn"
+      ],
+      "has_sub_answers": false
+    },
+    {
+      "key": "hod.cy",
+      "keywords": [
+        "cy"
+      ],
+      "languages": [
+        "en",
+        "hi",
+        "bn"
+      ],
+      "has_sub_answers": false
+    },
+    {
+      "key": "hod.mba",
+      "keywords": [
+        "mba"
+      ],
+      "languages": [
+        "en",
+        "hi",
+        "bn"
+      ],
+      "has_sub_answers": false
+    },
+    {
+      "key": "hod.mca",
+      "keywords": [
+        "mca"
+      ],
+      "languages": [
+        "en",
+        "hi",
+        "bn"
+      ],
+      "has_sub_answers": false
+    },
+    {
+      "key": "hod.default",
+      "keywords": [
+        "hod",
+        "head of department",
+        "विभाग अध्यक्ष",
+        "বিভাগীয় প্রধান",
+        "হোড"
+      ],
+      "languages": [
+        "en",
+        "hi",
+        "bn"
+      ],
+      "has_sub_answers": false
+    },
+    {
+      "key": "hod",
+      "keywords": [
+        "hod",
+        "head of department",
+        "विभाग अध्यक्ष",
+        "বিভাগীয় প্রধান",
+        "হোড"
+      ],
+      "languages": [],
+      "has_sub_answers": true
+    },
+    {
+      "key": "hostel",
+      "keywords": [
+        "hostel",
+        "हॉस्टल",
+        "হস্টেল",
+        "mess",
+        "food",
+        "खाना",
+        "খাবার"
+      ],
+      "languages": [
+        "en",
+        "hi",
+        "bn"
+      ],
+      "has_sub_answers": false
+    },
+    {
+      "key": "placement",
+      "keywords": [
+        "placement",
+        "प्लेसमेंट",
+        "প্লেসমেন্ট",
+        "company",
+        "recruit",
+        "package",
+        "salary"
+      ],
+      "languages": [
+        "en",
+        "hi",
+        "bn"
+      ],
+      "has_sub_answers": false
+    },
+    {
+      "key": "courses",
+      "keywords": [
+        "course",
+        "branch",
+        "btech",
+        "program",
+        "कोर्स",
+        "শাখা",
+        "internship",
+        "branch change"
+      ],
+      "languages": [
+        "en",
+        "hi",
+        "bn"
+      ],
+      "has_sub_answers": false
+    },
+    {
+      "key": "admission",
+      "keywords": [
+        "admission",
+        "apply",
+        "application",
+        "भर्ती",
+        "এডমিশন",
+        "age limit",
+        "eligibility"
+      ],
+      "languages": [
+        "en",
+        "hi",
+        "bn"
+      ],
+      "has_sub_answers": false
+    },
+    {
+      "key": "campus",
+      "keywords": [
+        "campus",
+        "acre",
+        "laboratory",
+        "lab",
+        "transportation",
+        "medical",
+        "club",
+        "canteen"
+      ],
+      "languages": [
+        "en",
+        "hi",
+        "bn"
+      ],
+      "has_sub_answers": false
+    },
+    {
+      "key": "wifi",
+      "keywords": [
+        "wifi",
+        "wi-fi",
+        "internet",
+        "network",
+        "वाई-फाई",
+        "ওয়াই-ফাই"
+      ],
+      "languages": [
+        "en",
+        "hi",
+        "bn"
+      ],
+      "has_sub_answers": false
+    },
+    {
+      "key": "faculty",
+      "keywords": [
+        "faculty",
+        "teacher",
+        "professor",
+        "शिक्षक",
+        "প্রফেসর"
+      ],
+      "languages": [
+        "en",
+        "hi",
+        "bn"
+      ],
+      "has_sub_answers": false
+    },
+    {
+      "key": "scholarship",
+      "keywords": [
+        "scholarship",
+        "छात्रवृत्ति",
+        "স্কলারশিপ",
+        "tfw",
+        "svmcm",
+        "kanyashree"
+      ],
+      "languages": [
+        "en",
+        "hi",
+        "bn"
+      ],
+      "has_sub_answers": false
+    },
+    {
+      "key": "documents",
+      "keywords": [
+        "document",
+        "दस्तावेज",
+        "ডকুমেন্ট",
+        "certificate",
+        "marksheet"
+      ],
+      "languages": [
+        "en",
+        "hi",
+        "bn"
+      ],
+      "has_sub_answers": false
+    },
+    {
+      "key": "online_learning",
+      "keywords": [
+        "online",
+        "virtual",
+        "remote",
+        "recorded lecture",
+        "hybrid"
+      ],
+      "languages": [
+        "en",
+        "hi",
+        "bn"
+      ],
+      "has_sub_answers": false
+    },
+    {
+      "key": "why_bcrec",
+      "keywords": [
+        "why bcrec",
+        "why choose",
+        "NBA",
+        "NAAC",
+        "GATE",
+        "alumni",
+        "क्यों बीसीआरईसी"
+      ],
+      "languages": [
+        "en",
+        "hi",
+        "bn"
+      ],
+      "has_sub_answers": false
+    },
+    {
+      "key": "international",
+      "keywords": [
+        "international",
+        "foreign",
+        "visa",
+        "dasa",
+        "DASA"
+      ],
+      "languages": [
+        "en",
+        "hi",
+        "bn"
+      ],
+      "has_sub_answers": false
+    },
+    {
+      "key": "policies",
+      "keywords": [
+        "fail",
+        "backlog",
+        "laptop",
+        "dress code",
+        "intake",
+        "education loan"
+      ],
+      "languages": [
+        "en",
+        "hi",
+        "bn"
+      ],
+      "has_sub_answers": false
+    },
+    {
+      "key": "hidden_charges",
+      "keywords": [
+        "hidden",
+        "hidden charge",
+        "transparent",
+        "छिपा शुल्क",
+        "লুকানো ফি"
+      ],
+      "languages": [
+        "en",
+        "hi",
+        "bn"
+      ],
+      "has_sub_answers": false
+    },
+    {
+      "key": "refund_policy",
+      "keywords": [
+        "refund",
+        "caution money",
+        "security deposit",
+        "रिफंड",
+        "রিফান্ড"
+      ],
+      "languages": [
+        "en",
+        "hi",
+        "bn"
+      ],
+      "has_sub_answers": false
+    },
+    {
+      "key": "application_status",
+      "keywords": [
+        "application status",
+        "result",
+        "seat allotment",
+        "counseling result"
+      ],
+      "languages": [
+        "en",
+        "hi",
+        "bn"
+      ],
+      "has_sub_answers": false
+    },
+    {
+      "key": "eligibility_by_rank",
+      "keywords": [],
+      "languages": [
+        "en",
+        "hi",
+        "bn"
+      ],
+      "has_sub_answers": false
+    }
+  ],
+  "total": 34
+}

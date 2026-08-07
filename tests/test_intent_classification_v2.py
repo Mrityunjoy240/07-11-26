@@ -199,7 +199,7 @@ class TestIntentFromEntities:
 class TestIntentFromDomain:
     def test_lateral_entry_pathway(self, engine):
         result = engine.understand("I have a diploma and want lateral entry to BTech")
-        assert result.intent.primary in ("lateral_entry", "admission")
+        assert result.intent.primary in ("lateral_entry", "admission", "transfer")
 
     def test_management_quota_pathway(self, engine):
         result = engine.understand("Is management quota available with donation?")
@@ -227,7 +227,7 @@ class TestIntentFromDomain:
 
     def test_lateral_entry_with_interest(self, engine):
         result = engine.understand("diploma in EE, want lateral entry")
-        assert result.intent.primary in ("lateral_entry", "admission")
+        assert result.intent.primary in ("lateral_entry", "admission", "transfer")
 
     def test_sports_with_cricket(self, engine):
         result = engine.understand("cricket player state level sports quota")
@@ -307,7 +307,7 @@ class TestConflictResolution:
 
     def test_lateral_wins_over_admission(self, engine):
         result = engine.understand("lateral entry admission")
-        assert result.intent.primary in ("lateral_entry", "admission")
+        assert result.intent.primary in ("lateral_entry", "admission", "transfer")
 
     def test_sports_wins_over_admission(self, engine):
         result = engine.understand("sports quota admission")

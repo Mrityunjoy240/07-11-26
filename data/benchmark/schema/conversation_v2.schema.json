@@ -10,7 +10,7 @@
   "properties": {
     "id": {
       "type": "string",
-      "pattern": "^BENCH_\\d{6}$",
+      "pattern": "^BENCH_(V21_)?\\d{6}$",
       "description": "Globally unique conversation ID. Pattern: BENCH_NNNNNN. Never restarts across batches."
     },
     "schema_version": {
@@ -23,7 +23,8 @@
       "enum": [
         "admission", "fees", "hostel", "placement", "scholarship",
         "management", "sports", "nri", "lateral", "transfer",
-        "distance", "counseling", "grievance", "mixed", "multilingual"
+        "distance", "counseling", "grievance", "mixed", "multilingual",
+        "career"
       ],
       "description": "Primary domain of the conversation. Determines file subdirectory."
     },
@@ -154,7 +155,9 @@
             "admission", "fee", "placement", "hostel", "scholarship",
             "grievance", "counseling", "counseling_info", "nri_admission", "management_quota",
             "sports_quota", "lateral_entry", "transfer", "distance_education",
-            "career_confusion", "general", "unknown"
+            "career_confusion", "general", "unknown",
+            "cutoff", "seats", "department", "document", "institution",
+            "safety", "loan", "greeting", "repeat"
           ]
         },
         "facts": {
@@ -217,7 +220,8 @@
             "needs_fee_information", "needs_placement_data",
             "needs_hostel_info", "expressing_anxiety",
             "comparing_options", "has_management_query",
-            "has_transfer_query", "has_grievance", "general_inquiry"
+            "has_transfer_query", "has_grievance", "general_inquiry",
+            "needs_personalized_guidance", "needs_reassurance"
           ]
         },
         "problems": {
@@ -264,7 +268,8 @@
             "provide_sports_info", "provide_distance_ed_info",
             "provide_lateral_entry_info", "provide_sports_quota_info",
             "provide_guidance", "provide_cutoff_info",
-            "reassure", "clarify"
+            "reassure", "clarify",
+            "explain_policy", "provide_program_info"
           ]
         },
         "priority": {

@@ -1,0 +1,251 @@
+{
+  "id": "BENCH_V21_000029",
+  "domain": "placement",
+  "difficulty": 4,
+  "primary_language": "en",
+  "languages": [
+    "en"
+  ],
+  "speaker_profile": "student",
+  "features": [
+    "topic_switch"
+  ],
+  "ground_truth": {
+    "rank": 8000,
+    "pcm_percentage": 90,
+    "category": "general",
+    "interest": "CSE",
+    "board": "cbse",
+    "exam": "jee",
+    "budget": null,
+    "location": "delhi"
+  },
+  "turns": [
+    {
+      "student": "I am from Delhi with 90% in PCM and rank 8000 in JEE. I want to know which colleges have the best CSE placements.",
+      "expected": {
+        "understanding": {
+          "intent": "placement",
+          "facts": {
+            "pcm_percentage": 90,
+            "rank": 8000,
+            "interest": "CSE",
+            "exam": "jee",
+            "location": "delhi"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": [
+            "category"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.71,
+          "confidence": "high",
+          "current_problem": "needs_placement_data",
+          "problems": [
+            "needs_placement_data"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_placement_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Direct placement query with strong profile",
+            "Can provide rank-specific college and placement recommendations"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "placement",
+                "CSE",
+                "colleges",
+                "rank"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "category",
+                "other_interests"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_placement_info",
+            "Student_asks_placement"
+          ]
+        }
+      },
+      "must_not": [
+        "guarantee_placement",
+        "recommend_without_category"
+      ],
+      "ideal_counselor_notes": "Student from Delhi with strong rank and PCM. Provide college-specific placement info and ask for category."
+    },
+    {
+      "student": "General category. I heard that NIT Delhi has good placements. Is that true? And what about IIIT Delhi?",
+      "expected": {
+        "understanding": {
+          "intent": "placement",
+          "facts": {
+            "category": "general"
+          },
+          "inference": {
+            "specific_colleges": [
+              "NIT Delhi",
+              "IIIT Delhi"
+            ],
+            "follow_up": true
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "needs_placement_data",
+          "problems": [
+            "needs_placement_data"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_placement_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Follow-up reference to specific colleges",
+            "Student heard about NIT Delhi and IIIT Delhi placements"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "NIT Delhi",
+                "IIIT Delhi"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "placement",
+                "the NIT Delhi",
+                "the IIIT Delhi",
+                "comparison"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_placement_info",
+            "Specific_college_query",
+            "Follow_up_reference"
+          ]
+        }
+      },
+      "must_not": [
+        "guarantee_placement_at_specific_college",
+        "dismiss_college_without_data"
+      ],
+      "ideal_counselor_notes": "Student asks about specific colleges (NIT Delhi and IIIT Delhi) after initial placement query. Provide placement info for both and compare."
+    },
+    {
+      "student": "Thanks. One more thing — my friend said that placement depends more on skills than college. Is that true? Should I focus on coding instead of worrying about which college?",
+      "expected": {
+        "understanding": {
+          "intent": "placement",
+          "facts": {},
+          "inference": {
+            "topic": "skills_vs_college",
+            "follow_up": true,
+            "reference_to_friend": true
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "decision",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "needs_placement_data",
+          "problems": [
+            "needs_placement_data"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_placement_info",
+          "priority": "normal",
+          "confidence": "high",
+          "why": [
+            "Follow-up reference to friend's advice",
+            "Opinion-based question about skills vs college"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "skills",
+                "college",
+                "placement",
+                "both"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_placement_info",
+            "Follow_up_reference",
+            "Opinion_query"
+          ]
+        }
+      },
+      "must_not": [
+        "disparage_college_importance",
+        "overemphasize_skills_only",
+        "guarantee_placement_with_skills"
+      ],
+      "ideal_counselor_notes": "Student follows up with an opinion question about skills vs college. Provide balanced view that both matter, and reference earlier college discussion."
+    }
+  ],
+  "expected_end_state": "incomplete",
+  "ideal_counselor_notes": "Difficulty 4 placement conversation with follow_up feature. Tests follow_up_reference behavior across turns, memory_use of prior context (specific colleges mentioned), and multi-constraint reasoning. Student references friend's advice in turn 3.",
+  "author_note": {
+    "primary_capability": "placement info with follow-up reference and memory use",
+    "expected_failure_mode": "memory_use — might not connect specific college names from turn 2 to turn 3, or might not reference prior context in follow-up",
+    "why_this_conversation": "Difficulty 4 conversation testing follow_up_reference behavior. Student progressively reveals info and asks follow-up questions referencing specific colleges and friend's advice."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

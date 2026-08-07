@@ -1,0 +1,101 @@
+{
+  "id": "BENCH_V21_000002",
+  "domain": "mixed",
+  "difficulty": 1,
+  "primary_language": "en",
+  "languages": [
+    "en"
+  ],
+  "speaker_profile": "student",
+  "features": [],
+  "ground_truth": {
+    "rank": null,
+    "pcm_percentage": null,
+    "category": "",
+    "interest": "",
+    "board": "",
+    "exam": "",
+    "budget": null,
+    "location": ""
+  },
+  "turns": [
+    {
+      "student": "Can you tell me the weather today?",
+      "expected": {
+        "understanding": {
+          "intent": "unknown",
+          "facts": {},
+          "inference": {},
+          "confidence": "high",
+          "missing": [
+            "rank",
+            "pcm_percentage",
+            "category",
+            "interest",
+            "board"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.0,
+          "confidence": "high",
+          "current_problem": "general_inquiry",
+          "problems": [
+            "general_inquiry"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "clarify",
+          "priority": "normal",
+          "confidence": "high",
+          "why": [
+            "Query is about weather, not college admissions",
+            "Politely redirect to admissions domain"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "clarify",
+              "content_contains": [
+                "admission",
+                "college"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=clarify",
+            "Out_of_scope_query"
+          ]
+        }
+      },
+      "must_not": [
+        "recommend_branch",
+        "hallucinate_cutoff",
+        "answer_weather"
+      ],
+      "ideal_counselor_notes": "Student asks about weather. This is out of scope. Politely redirect to admissions help."
+    }
+  ],
+  "expected_end_state": "incomplete",
+  "ideal_counselor_notes": "Out-of-scope query. System should clarify its purpose as an admission counselor, not answer weather questions.",
+  "author_note": {
+    "primary_capability": "out_of_scope handling",
+    "expected_failure_mode": "intent_classification — might be classified as 'general' instead of 'unknown'",
+    "why_this_conversation": "Tests that the system recognizes clearly off-topic queries and redirects without hallucinating answers."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

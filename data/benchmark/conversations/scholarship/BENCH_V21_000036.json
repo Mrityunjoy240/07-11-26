@@ -1,0 +1,210 @@
+{
+  "id": "BENCH_V21_000036",
+  "domain": "scholarship",
+  "difficulty": 4,
+  "primary_language": "en",
+  "languages": ["en"],
+  "speaker_profile": "parent",
+  "features": ["correction", "parent_mode"],
+  "ground_truth": {
+    "rank": 35000,
+    "pcm_percentage": 70,
+    "category": "obc",
+    "interest": "ME",
+    "board": "cbse",
+    "exam": "jee",
+    "budget": null,
+    "location": "pune"
+  },
+  "turns": [
+    {
+      "student": "My son got 35000 rank in JEE. PCM 70%. He is general category. What scholarships can he get?",
+      "expected": {
+        "understanding": {
+          "intent": "scholarship",
+          "facts": {
+            "rank": 35000,
+            "pcm_percentage": 70,
+            "category": "general",
+            "exam": "jee"
+          },
+          "inference": {
+            "parent_mode": true
+          },
+          "confidence": "high",
+          "missing": ["interest", "board"]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.43,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": ["needs_fee_information"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_scholarship_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Parent asking about scholarships for son",
+            "General category — fewer scholarship options than reserved categories"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": ["rank", "35000", "general"]
+            },
+            {
+              "action": "ask",
+              "content_contains": ["interest", "branch", "board"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_scholarship_info", "Parent_mode", "General_category"]
+        }
+      },
+      "must_not": [
+        "recommend_branch",
+        "assume_category_correction"
+      ],
+      "ideal_counselor_notes": "Parent provides scholarship query with general category. Need to collect remaining profile details and provide scholarship info."
+    },
+    {
+      "student": "Actually I made a mistake. He is OBC category, not general. He wants mechanical engineering. Board is CBSE.",
+      "expected": {
+        "understanding": {
+          "intent": "scholarship",
+          "facts": {
+            "category": "obc",
+            "interest": "ME",
+            "board": "cbse"
+          },
+          "inference": {
+            "parent_mode": true,
+            "confusion": true
+          },
+          "confidence": "medium",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "medium",
+          "current_problem": "needs_fee_information",
+          "problems": ["needs_fee_information"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_scholarship_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Parent corrected category from general to OBC",
+            "OBC opens up additional scholarship schemes",
+            "Must acknowledge correction gracefully"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "reassure",
+              "content_contains": ["no problem", "corrected", "OBC"]
+            },
+            {
+              "action": "inform",
+              "content_contains": ["OBC scholarship", "mechanical", "eligibility"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_scholarship_info", "Category_corrected", "OBC_eligible"]
+        }
+      },
+      "must_not": [
+        "blame_parent_for_mistake",
+        "ignore_correction",
+        "recommend_branch"
+      ],
+      "ideal_counselor_notes": "Parent corrected category from general to OBC. Must acknowledge correction gracefully and provide OBC-specific scholarship info for mechanical engineering."
+    },
+    {
+      "student": "How does he apply for the scholarship? Is there a separate form or is it automatic during admission?",
+      "expected": {
+        "understanding": {
+          "intent": "scholarship",
+          "facts": {},
+          "inference": {
+            "parent_mode": true
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": ["needs_fee_information"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_scholarship_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Parent asking about scholarship application process",
+            "Natural follow-up after eligibility discussion"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "recommend",
+              "content_contains": ["application", "process", "documents"]
+            },
+            {
+              "action": "inform",
+              "content_contains": ["deadline", "form", "online"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_scholarship_info", "Application_process_query"]
+        }
+      },
+      "must_not": [
+        "guarantee_application_outcome",
+        "hallucinate_specific_form_link"
+      ],
+      "ideal_counselor_notes": "Parent asks about scholarship application process. Explain the general application process, required documents, and deadlines."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "Parent providing scholarship query with category correction. Tests correction handling — parent says general first, corrects to OBC. Must handle gracefully without blaming.",
+  "author_note": {
+    "primary_capability": "correction handling in scholarship context with parent mode",
+    "expected_failure_mode": "correction — might not update category from general to OBC, or might blame parent for mistake",
+    "why_this_conversation": "Tests correction feature in scholarship context. Parent provides wrong category initially, corrects in next turn. Pipeline must update state and not penalize."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

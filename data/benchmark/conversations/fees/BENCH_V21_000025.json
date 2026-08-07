@@ -1,0 +1,269 @@
+{
+  "id": "BENCH_V21_000025",
+  "domain": "fees",
+  "difficulty": 3,
+  "primary_language": "en",
+  "languages": [
+    "en"
+  ],
+  "speaker_profile": "student",
+  "features": [
+    "missing_info",
+    "correction"
+  ],
+  "ground_truth": {
+    "rank": 28000,
+    "pcm_percentage": 70,
+    "category": "obc",
+    "interest": "ECE",
+    "board": "wbchse",
+    "exam": "wbjee",
+    "budget": 150000,
+    "location": "howrah"
+  },
+  "turns": [
+    {
+      "student": "What is the fee for ECE? I gave WBJEE and my rank is around 28000.",
+      "expected": {
+        "understanding": {
+          "intent": "fee",
+          "facts": {
+            "rank": 28000,
+            "interest": "ECE",
+            "exam": "wbjee"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": [
+            "pcm_percentage",
+            "category",
+            "board",
+            "budget"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.29,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": [
+            "needs_fee_information",
+            "needs_profile_completion"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_fee_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Direct fee query for ECE with WBJEE rank",
+            "Missing category, important for eligibility and fee concessions"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "fee",
+                "ECE",
+                "range"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "category",
+                "budget"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_fee_info",
+            "Student_asks_fees"
+          ]
+        }
+      },
+      "must_not": [
+        "recommend_branch",
+        "hallucinate_exact_fees",
+        "skip_category_question"
+      ],
+      "ideal_counselor_notes": "Student asks about ECE fees with WBJEE rank. Missing category is critical for both eligibility and fee concessions. Ask for it."
+    },
+    {
+      "student": "I am OBC. Budget is 1.5 lakh. But wait, I think my rank was 38000 not 28000, sorry about that.",
+      "expected": {
+        "understanding": {
+          "intent": "fee",
+          "facts": {
+            "category": "obc",
+            "budget": 150000,
+            "rank": 38000
+          },
+          "inference": {
+            "correction": {
+              "field": "rank",
+              "old_value": 28000,
+              "new_value": 38000
+            }
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": [
+            "needs_fee_information"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_fee_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student corrects rank from 28000 to 38000",
+            "Must use corrected rank with OBC category for fee and eligibility guidance"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "correction",
+                "rank",
+                "38000"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "fee",
+                "corrected",
+                "OBC",
+                "budget"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_fee_info",
+            "Rank_correction",
+            "Category_known"
+          ]
+        }
+      },
+      "must_not": [
+        "use_old_rank_28000",
+        "ignore_correction",
+        "guarantee_fee_under_budget"
+      ],
+      "ideal_counselor_notes": "Student corrects rank and provides OBC category and budget. Must acknowledge correction and use corrected rank (38000) for all guidance."
+    },
+    {
+      "student": "So with OBC and 38000 rank, can I get ECE in colleges within my 1.5 lakh budget? Or should I consider other branches?",
+      "expected": {
+        "understanding": {
+          "intent": "fee",
+          "facts": {},
+          "inference": {
+            "multi_constraint": true,
+            "constraints": [
+              "rank",
+              "category",
+              "budget",
+              "branch"
+            ]
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "decision",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": [
+            "needs_fee_information"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_fee_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Multi-constraint query: rank + category + budget + branch",
+            "Must check eligibility and fee together"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "eligibility",
+                "fee",
+                "budget",
+                "ECE"
+              ]
+            },
+            {
+              "action": "recommend",
+              "content_contains": [
+                "other_branches",
+                "flexibility",
+                "alternatives"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_fee_info",
+            "Multi_constraint"
+          ]
+        }
+      },
+      "must_not": [
+        "guarantee_admission",
+        "ignore_budget_constraint",
+        "hallucinate_exact_fees"
+      ],
+      "ideal_counselor_notes": "Student asks multi-constraint question combining rank, category, budget, and branch. Provide eligibility-based fee guidance and suggest exploring other branches if ECE doesn't fit budget."
+    }
+  ],
+  "expected_end_state": "incomplete",
+  "ideal_counselor_notes": "3-turn fee conversation with missing info (turn 1), correction (turn 2), and multi-constraint reasoning (turn 3). Tests rank correction handling, eligibility check with OBC category, and budget-constrained fee guidance.",
+  "author_note": {
+    "primary_capability": "fee explanation with correction handling and multi-constraint reasoning",
+    "expected_failure_mode": "correction — might use old rank 28000 instead of corrected 38000, or might not combine OBC + budget constraints",
+    "why_this_conversation": "Difficulty 3 conversation testing correction (rank fix), eligibility check with OBC category, and multi-constraint fee reasoning. Student corrects rank mid-conversation, adding complexity."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

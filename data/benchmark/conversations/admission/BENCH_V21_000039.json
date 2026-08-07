@@ -1,0 +1,167 @@
+{
+  "id": "BENCH_V21_000039",
+  "domain": "admission",
+  "difficulty": 2,
+  "primary_language": "hi",
+  "languages": ["hi", "en"],
+  "speaker_profile": "student",
+  "features": ["language_switch"],
+  "ground_truth": {
+    "rank": 22000,
+    "pcm_percentage": 78,
+    "category": "general",
+    "interest": "CSE",
+    "board": "cbse",
+    "exam": "wbjee",
+    "budget": null,
+    "location": "kolkata"
+  },
+  "turns": [
+    {
+      "student": "Mujhe counseling process ke baare mein jaanna hai. Mera rank 22000 hai WBJEE mein. Kaise hota hai counseling?",
+      "expected": {
+        "understanding": {
+          "intent": "counseling_info",
+          "facts": {
+            "rank": 22000,
+            "exam": "wbjee"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": ["pcm_percentage", "category", "interest", "board"]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.14,
+          "confidence": "high",
+          "current_problem": "needs_personalized_guidance",
+          "problems": ["needs_personalized_guidance"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_guidance",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student asking about counseling process in Hindi",
+            "Rank provided, can give general counseling guidance"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": ["rank", "22000", "WBJEE"]
+            },
+            {
+              "action": "inform",
+              "content_contains": ["counseling", "process", "rounds"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_guidance", "Student_asks_counseling"]
+        }
+      },
+      "must_not": [
+        "respond_in_english_only",
+        "recommend_branch"
+      ],
+      "ideal_counselor_notes": "Student asks about counseling process in Hindi with rank 22000. Provide general counseling process info in Hindi and ask for more details."
+    },
+    {
+      "student": "I am general category, 78% in PCM, CBSE board. I want CSE. Can you explain how the counseling rounds work and what choices I should fill?",
+      "expected": {
+        "understanding": {
+          "intent": "counseling_info",
+          "facts": {
+            "category": "general",
+            "pcm_percentage": 78,
+            "board": "cbse",
+            "interest": "CSE"
+          },
+          "inference": {
+            "language_switch": true
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "needs_personalized_guidance",
+          "problems": ["needs_personalized_guidance"]
+        },
+        "brain": {
+          "eligible_branches": ["CSE", "AIML", "IT", "ECE", "EE", "ME", "CE"],
+          "applicable": true,
+          "why": [
+            {
+              "condition": "rank_provided",
+              "met": true,
+              "detail": "Rank=22000"
+            },
+            {
+              "condition": "category_known",
+              "met": true,
+              "detail": "General"
+            },
+            {
+              "condition": "rank_within_margin",
+              "met": false,
+              "detail": "22000 > 15000*0.85=12750 for CSE/General — CSE may be difficult"
+            }
+          ]
+        },
+        "decision": {
+          "action": "provide_guidance",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student switched to English with full profile",
+            "Can now provide specific counseling guidance for CSE at rank 22000",
+            "CSE is borderline — need to be honest about chances"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "ask",
+              "content_contains": ["choice filling", "preferences", "colleges"]
+            },
+            {
+              "action": "recommend",
+              "content_contains": ["CSE", "borderline", "IT", "backup"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_guidance", "Language_switch", "Profile_complete"]
+        }
+      },
+      "must_not": [
+        "guarantee_admission",
+        "give_false_hope"
+      ],
+      "ideal_counselor_notes": "Student switched to English with full profile. CSE at rank 22000 general is borderline. Provide honest counseling guidance with backup options."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "Student asks about counseling in Hindi, switches to English with full profile. Key challenge: handling language switch and providing honest CSE guidance at borderline rank.",
+  "author_note": {
+    "primary_capability": "counseling guidance with Hindi-to-English language switch",
+    "expected_failure_mode": "language — might not handle Hindi input correctly, or might not provide honest CSE borderline assessment",
+    "why_this_conversation": "Tests counseling guidance with language switch. Student starts in Hindi, switches to English when providing detailed info."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

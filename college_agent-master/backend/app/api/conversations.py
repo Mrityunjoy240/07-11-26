@@ -1,12 +1,13 @@
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 from typing import List, Dict, Any
 from datetime import datetime, UTC
 import uuid
 
+from app.api.qa import require_tool_auth
 from app.database import get_db
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(require_tool_auth)])
 
 
 # Models

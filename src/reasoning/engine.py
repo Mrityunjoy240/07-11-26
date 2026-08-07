@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import re
+from time import perf_counter
 from typing import Any
 
 from src.conversation.state import ConversationState
@@ -15,8 +16,11 @@ from src.reasoning.models import (
     RuleExplanation,
     RuleEval,
 )
+from src.reasoning.context import ReasoningContext
 from src.understanding.models import UnderstandingResult
 from src.understanding.profile import is_field_set, PATHWAY_REQUIRED_FIELDS
+
+from src.reasoning.observation import observe, Observer
 
 logger = logging.getLogger(__name__)
 
@@ -61,10 +65,14 @@ INTENT_TO_PATHWAY = {
 class ReasoningEngine:
     VERSION = "v2"
 
-    def process(self, input: ReasoningInput) -> ReasoningResult:
+    def process(
+        self,
+        input: ReasoningInput,
+        observer: Observer | None = None,
+    ) -> ReasoningResult:
         return self.reason(
             input.understanding, input.state, input.college_brain,
-            debug=input.debug,
+            debug=input.debug, observer=observer,
         )
 
     def reason(
@@ -73,22 +81,25 @@ class ReasoningEngine:
         state: ConversationState | None = None,
         college_brain: Any | None = None,
         debug: bool = False,
+        observer: Observer | None = None,
     ) -> ReasoningResult:
-        stage = self._determine_stage(understanding, state)
-        intent = understanding.intent.primary
-        readiness = self._domain_readiness(intent, understanding, state)
+        t0 = perf_counter()
+        ctx = ReasoningContext.from_understanding_result(understanding)
+        stage = self._determine_stage(ctx, understanding, state)
+        intent = ctx.intent_primary
+        readiness = self._domain_readiness(ctx, ctx.intent_primary, understanding, state)
         if intent not in ANSWERABLE_GENERALLY and not readiness.ready:
             blocking = BLOCKING_MINIMUM_FIELDS.get(intent, readiness.missing_critical)
             readiness.blocked = any(m in readiness.missing_critical for m in blocking)
         else:
             readiness.blocked = False
-        eligibility = self._estimate_eligibility(understanding, state, college_brain)
-        problem = self._identify_problem(understanding, readiness, state)
-        unknowns = self._find_unknowns(understanding)
-        risks = self._identify_risks(understanding, readiness)
-        opportunities = self._identify_opportunities(understanding, state)
-        knowledge = self._determine_knowledge_needed(understanding, stage)
-        confidence = self._score_confidence(understanding, readiness)
+        eligibility = self._estimate_eligibility(ctx, understanding, state, college_brain)
+        problem = self._identify_problem(ctx, understanding, readiness, state)
+        unknowns = self._find_unknowns(ctx)
+        risks = self._identify_risks(ctx, understanding, readiness)
+        opportunities = self._identify_opportunities(ctx, understanding, state)
+        knowledge = self._determine_knowledge_needed(ctx, understanding, stage)
+        confidence = self._score_confidence(ctx, readiness, understanding=understanding)
 
         result = ReasoningResult(
             student_stage=stage,
@@ -104,10 +115,10 @@ class ReasoningEngine:
         )
 
         if debug:
-            trace = self._trace_problem(understanding, readiness)
+            trace = self._trace_problem(ctx, understanding, readiness)
             result.metadata["reasoning_diagnostics"] = ReasoningDiagnostics(
                 input_intent=intent,
-                intent_confidence=understanding.intent.confidence,
+                intent_confidence=ctx.intent_confidence,
                 dominant_signal=trace.get("signal_name", ""),
                 signal_score=trace.get("signal_score", 0.0),
                 profile_completeness=readiness.completeness,
@@ -119,6 +130,10 @@ class ReasoningEngine:
                 margin=trace.get("margin", 0.0),
                 winner=problem,
             )
+
+        if observer:
+            latency_ms = (perf_counter() - t0) * 1000
+            observer(observe(result, ctx, latency_ms))
 
         return result
 
@@ -146,28 +161,29 @@ class ReasoningEngine:
     # ── Stage detection ───────────────────────────────────────────────
 
     def _determine_stage(
-        self, understanding: UnderstandingResult, state: ConversationState | None
+        self, ctx: ReasoningContext, understanding: UnderstandingResult,
+        state: ConversationState | None,
     ) -> str:
         profile = state.profile if state else {}
         history_count = len(state.history) // 2 if state else 0
 
-        primary = str(understanding.intent.primary)
+        primary = ctx.intent_primary
         if "decision" in primary or "choice" in primary:
             return "decision"
         if "apply" in primary or "form" in primary:
             return "application"
 
-        has_rank = profile.get("rank") or self._has_field(understanding, "academic.rank")
-        has_interest = profile.get("interest") or self._has_field(understanding, "career.interest")
+        has_rank = profile.get("rank") or self._has_field(ctx, "academic.rank")
+        has_interest = profile.get("interest") or self._has_field(ctx, "career.interest")
         if history_count >= 4 and has_rank and has_interest:
             return "evaluation"
 
         known = set(profile.keys())
-        if self._has_field(understanding, "academic.rank"):
+        if self._has_field(ctx, "academic.rank"):
             known.add("rank")
-        if self._has_field(understanding, "academic.pcm_percentage"):
+        if self._has_field(ctx, "academic.pcm_percentage"):
             known.add("pcm_percentage")
-        if self._has_field(understanding, "career.interest"):
+        if self._has_field(ctx, "career.interest"):
             known.add("interest")
         required = ["rank", "pcm_percentage", "interest"]
         if all(r in known for r in required):
@@ -181,7 +197,8 @@ class ReasoningEngine:
     # ── Domain readiness ──────────────────────────────────────────────
 
     def _domain_readiness(
-        self, intent: str, understanding: UnderstandingResult, state: ConversationState | None
+        self, ctx: ReasoningContext,
+        intent: str, understanding: UnderstandingResult, state: ConversationState | None
     ) -> ReadinessResult:
         """Check if the student's profile has all critical fields for this intent's domain."""
         pathway = INTENT_TO_PATHWAY.get(intent, "regular")
@@ -189,14 +206,14 @@ class ReasoningEngine:
         if not required:
             return ReadinessResult(domain=pathway, ready=True, completeness=1.0)
 
-        profile = self._get_profile(understanding)
+        profile = self._get_profile(ctx)
         if profile is None:
             return ReadinessResult(
                 domain=pathway, ready=False,
                 missing_critical=list(required), completeness=0.0,
             )
 
-        missing = [f for f in required if not self._has_field(understanding, f)]
+        missing = [f for f in required if not self._has_field(ctx, f)]
         filled = len(required) - len(missing)
         completeness = filled / len(required)
 
@@ -237,17 +254,17 @@ class ReasoningEngine:
         prev = (state.metadata or {}).get("previous_problem", "") if state else ""
         if prev != "needs_personalized_guidance":
             return False
-        profile = understanding.profile or {}
+        profile = understanding.profile
         has_new_critical = bool(
-            profile.get("academic", {}).get("rank")
-            or profile.get("academic", {}).get("pcm")
-            or profile.get("personal", {}).get("category")
-            or profile.get("preferences", {}).get("interest")
+            profile.academic.rank
+            or profile.academic.pcm_percentage
+            or profile.personal.category
+            or profile.career.interest
         )
         return has_new_critical
 
     def _should_personalize_admission(
-        self, understanding: UnderstandingResult, readiness: ReadinessResult,
+        self, text: str, readiness: ReadinessResult,
         state: ConversationState | None,
     ) -> bool:
         """Check if admission guidance should transition to personalized guidance."""
@@ -256,7 +273,7 @@ class ReasoningEngine:
         prev = (state.metadata or {}).get("previous_problem", "") if state else ""
         if prev != "needs_admission_guidance":
             return False
-        if not self._is_decision_request(understanding.text):
+        if not self._is_decision_request(text):
             return False
         # Require at least 2 consecutive admission_guidance turns before transitioning
         guidance_turns = (state.metadata or {}).get("admission_guidance_turns", 0) if state else 0
@@ -267,24 +284,24 @@ class ReasoningEngine:
     # ── Eligibility ───────────────────────────────────────────────────
 
     def _estimate_eligibility(
-        self,
+        self, ctx: ReasoningContext,
         understanding: UnderstandingResult,
         state: ConversationState | None,
         college_brain: Any | None,
     ) -> EligibilityEstimate:
         if college_brain is not None:
-            return self._estimate_via_brain(understanding, state, college_brain)
-        return self._estimate_fallback(understanding, state)
+            return self._estimate_via_brain(ctx, understanding, state, college_brain)
+        return self._estimate_fallback(ctx, understanding, state)
 
     def _estimate_via_brain(
-        self,
+        self, ctx: ReasoningContext,
         understanding: UnderstandingResult,
         state: ConversationState | None,
         college_brain: Any,
     ) -> EligibilityEstimate:
-        rank = self._resolve_rank(understanding, state)
-        pcm = self._resolve_pcm(understanding, state)
-        category = self._resolve_category(understanding, state)
+        rank = self._resolve_rank(ctx, state)
+        pcm = self._resolve_pcm(ctx, state)
+        category = self._resolve_category(ctx, state)
         try:
             pr = college_brain.estimate_eligibility(
                 rank=rank, category=category, pcm=pcm,
@@ -303,9 +320,9 @@ class ReasoningEngine:
             )
 
     def _resolve_rank(
-        self, understanding: UnderstandingResult, state: ConversationState | None
+        self, ctx: ReasoningContext, state: ConversationState | None
     ) -> int | float | None:
-        val = self._get_field(understanding, "academic.rank")
+        val = self._get_field(ctx, "academic.rank")
         if val is not None:
             return val
         if state:
@@ -313,9 +330,9 @@ class ReasoningEngine:
         return None
 
     def _resolve_pcm(
-        self, understanding: UnderstandingResult, state: ConversationState | None
+        self, ctx: ReasoningContext, state: ConversationState | None
     ) -> float | None:
-        val = self._get_field(understanding, "academic.pcm_percentage")
+        val = self._get_field(ctx, "academic.pcm_percentage")
         if val is not None:
             return val
         if state:
@@ -323,9 +340,9 @@ class ReasoningEngine:
         return None
 
     def _resolve_category(
-        self, understanding: UnderstandingResult, state: ConversationState | None
+        self, ctx: ReasoningContext, state: ConversationState | None
     ) -> str:
-        val = self._get_field(understanding, "personal.category")
+        val = self._get_field(ctx, "personal.category")
         if val:
             return str(val)
         if state:
@@ -333,12 +350,12 @@ class ReasoningEngine:
         return "general"
 
     def _estimate_fallback(
-        self,
+        self, ctx: ReasoningContext,
         understanding: UnderstandingResult,
         state: ConversationState | None,
     ) -> EligibilityEstimate:
-        rank = self._resolve_rank(understanding, state)
-        pcm = self._resolve_pcm(understanding, state)
+        rank = self._resolve_rank(ctx, state)
+        pcm = self._resolve_pcm(ctx, state)
 
         if rank is None and pcm is None:
             return EligibilityEstimate(
@@ -389,11 +406,12 @@ class ReasoningEngine:
     # ── Problem identification ────────────────────────────────────────
 
     def _identify_problem(
-        self, understanding: UnderstandingResult, readiness: ReadinessResult,
+        self, ctx: ReasoningContext, understanding: UnderstandingResult,
+        readiness: ReadinessResult,
         state: ConversationState | None = None,
     ) -> str:
-        intent = understanding.intent.primary
-        dominant_signal, signal_score = understanding.signals.dominant
+        intent = ctx.intent_primary
+        dominant_signal, signal_score = ctx.signals.dominant
 
         if signal_score > 0.4 and dominant_signal == "anxiety":
             if signal_score > 0.7:
@@ -417,7 +435,7 @@ class ReasoningEngine:
         if intent == "admission":
             if self._should_revert_to_guidance(understanding, state):
                 return "needs_admission_guidance"
-            if self._should_personalize_admission(understanding, readiness, state):
+            if self._should_personalize_admission(ctx.text, readiness, state):
                 return "needs_personalized_guidance"
             # Collect category before giving admission guidance
             if "personal.category" in (readiness.missing_critical or []):
@@ -466,10 +484,11 @@ class ReasoningEngine:
         return "needs_personalized_guidance"
 
     def _trace_problem(
-        self, understanding: UnderstandingResult, readiness: ReadinessResult
+        self, ctx: ReasoningContext, understanding: UnderstandingResult,
+        readiness: ReadinessResult,
     ) -> dict:
-        intent = understanding.intent.primary
-        dominant_signal, signal_score = understanding.signals.dominant
+        intent = ctx.intent_primary
+        dominant_signal, signal_score = ctx.signals.dominant
         rules: list[RuleEval] = []
         explanations: list[RuleExplanation] = []
         signal_name = dominant_signal
@@ -483,7 +502,7 @@ class ReasoningEngine:
             im = 1.0 if matched else 0.0
             feats.append(_feat("intent_match", im, 0.6 if matched else 0.0,
                                f"intent is '{intent}', target is '{target_intent}'"))
-            feats.append(_feat("intent_confidence", understanding.intent.confidence, 0.2 if matched else 0.0,
+            feats.append(_feat("intent_confidence", ctx.intent_confidence, 0.2 if matched else 0.0,
                                "confidence of intent detection"))
             if dominant_signal in ("anxiety",) and signal_score > 0.4:
                 pen = -0.15 if matched else 0.0
@@ -606,7 +625,7 @@ class ReasoningEngine:
             else:
                 feats = [
                     _feat("intent_match", 1.0, 0.6, f"intent '{intent}' == target '{rule_key}'"),
-                    _feat("intent_confidence", understanding.intent.confidence, 0.2,
+                    _feat("intent_confidence", ctx.intent_confidence, 0.2,
                           "intent detection confidence"),
                 ]
                 if signal_score > 0.4 and dominant_signal == "anxiety":
@@ -683,19 +702,20 @@ class ReasoningEngine:
         }
 
     def _find_unknowns(
-        self, understanding: UnderstandingResult
+        self, ctx: ReasoningContext
     ) -> list[str]:
-        return list(understanding.missing_info.items)
+        return list(ctx.missing_info_items)
 
     def _identify_risks(
-        self, understanding: UnderstandingResult, readiness: ReadinessResult
+        self, ctx: ReasoningContext, understanding: UnderstandingResult,
+        readiness: ReadinessResult,
     ) -> list[str]:
         risks: list[str] = []
-        if understanding.signals.anxiety > 0.5:
+        if ctx.signals.anxiety > 0.5:
             risks.append("student_shows_anxiety")
-        if understanding.signals.confusion > 0.5:
+        if ctx.signals.confusion > 0.5:
             risks.append("student_shows_confusion")
-        if understanding.signals.frustration > 0.5:
+        if ctx.signals.frustration > 0.5:
             risks.append("student_shows_frustration")
         if readiness.blocked and len(readiness.missing_critical) >= 3:
             risks.append("insufficient_profile_for_guidance")
@@ -704,42 +724,45 @@ class ReasoningEngine:
         return risks
 
     def _identify_opportunities(
-        self, understanding: UnderstandingResult, state: ConversationState | None
+        self, ctx: ReasoningContext, understanding: UnderstandingResult,
+        state: ConversationState | None,
     ) -> list[str]:
         opportunities: list[str] = []
-        rank = self._resolve_rank(understanding, state)
+        rank = self._resolve_rank(ctx, state)
         if rank is not None and isinstance(rank, (int, float)) and rank <= 60000:
             opportunities.append("competitive_rank")
-        if self._has_field(understanding, "career.interest"):
+        if self._has_field(ctx, "career.interest"):
             opportunities.append("clear_interest_identified")
-        if understanding.intent.confidence > 0.7:
+        if ctx.intent_confidence > 0.7:
             opportunities.append("clear_intent_detected")
         return opportunities
 
     def _determine_knowledge_needed(
-        self, understanding: UnderstandingResult, stage: str
+        self, ctx: ReasoningContext, understanding: UnderstandingResult, stage: str
     ) -> list[str]:
         needed: list[str] = []
-        intent = understanding.intent.primary
+        intent = ctx.intent_primary
         if intent != "unknown":
             needed.append(f"{intent}_information")
         if stage in ("evaluation", "decision"):
             needed.append("comparison_data")
             needed.append("cutoff_data")
-        if understanding.signals.financial_concern > 0.3:
+        if ctx.signals.financial_concern > 0.3:
             needed.append("scholarship_data")
         if not needed:
             needed.append("general_information")
         return needed
 
     def _score_confidence(
-        self, understanding: UnderstandingResult, readiness: ReadinessResult
+        self, ctx: ReasoningContext, readiness: ReadinessResult,
+        understanding: UnderstandingResult | None = None,
     ) -> float:
-        score = understanding.confidence * 0.5
+        score = ctx.understanding_confidence * 0.5
         score += readiness.completeness * 0.3
-        has_rank = self._has_field(understanding, "academic.rank")
+        _understanding = understanding  # alias for unmigrated reads
+        has_rank = self._has_field(_understanding or ctx, "academic.rank")
         if has_rank:
             score += 0.1
-        if understanding.intent.confidence > 0.5:
+        if ctx.intent_confidence > 0.5:
             score += 0.1
         return min(1.0, score)

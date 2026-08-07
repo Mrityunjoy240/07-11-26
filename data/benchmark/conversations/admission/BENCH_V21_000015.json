@@ -1,0 +1,178 @@
+{
+  "id": "BENCH_V21_000015",
+  "domain": "admission",
+  "difficulty": 2,
+  "primary_language": "en",
+  "languages": [
+    "en"
+  ],
+  "speaker_profile": "student",
+  "features": [],
+  "ground_truth": {
+    "rank": 5000,
+    "pcm_percentage": 92,
+    "category": "general",
+    "interest": "CSE",
+    "board": "cbse",
+    "exam": "wbjee",
+    "budget": null,
+    "location": "kolkata"
+  },
+  "turns": [
+    {
+      "student": "How many seats are there for CSE in your college?",
+      "expected": {
+        "understanding": {
+          "intent": "seats",
+          "facts": {
+            "interest": "CSE"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": [
+            "rank",
+            "category"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.14,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance",
+          "problems": [
+            "needs_seat_information"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_program_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student asking about seat count for CSE"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "seats",
+                "CSE"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "the seats",
+                "CSE branch"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_program_info",
+            "Seat_query"
+          ]
+        }
+      },
+      "must_not": [
+        "hallucinate_exact_seats"
+      ],
+      "ideal_counselor_notes": "Seat count query for CSE. Provide general seat info and ask about profile for context."
+    },
+    {
+      "student": "I got 5000 rank in WBJEE, general category. Will I get a seat?",
+      "expected": {
+        "understanding": {
+          "intent": "seats",
+          "facts": {
+            "rank": 5000,
+            "category": "general"
+          },
+          "inference": {
+            "eligibility_query": true
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.43,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance",
+          "problems": []
+        },
+        "brain": {
+          "eligible_branches": [
+            "CSE"
+          ],
+          "applicable": true,
+          "why": [
+            {
+              "condition": "Rank 5000 General — well within CSE cutoff",
+              "met": true,
+              "detail": "Rank 5000 General — well within CSE cutoff"
+            }
+          ]
+        },
+        "decision": {
+          "action": "provide_program_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Rank 5000 General — strong chance for CSE seat"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "5000",
+                "general"
+              ]
+            },
+            {
+              "action": "recommend",
+              "content_contains": [
+                "seat",
+                "CSE",
+                "likely",
+                "the 5000"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_program_info",
+            "Eligibility_check"
+          ]
+        }
+      },
+      "must_not": [
+        "guarantee_seat"
+      ],
+      "ideal_counselor_notes": "Rank 5000 General — strong CSE candidate. Provide seat info with realistic assessment."
+    }
+  ],
+  "expected_end_state": "incomplete",
+  "ideal_counselor_notes": "2-turn seat query. Turn 1: general seat question. Turn 2: provides rank and asks about eligibility. Tests seat information retrieval with partial profile.",
+  "author_note": {
+    "primary_capability": "seat information retrieval",
+    "expected_failure_mode": "retrieval — might hallucinate exact seat numbers or guarantee admission",
+    "why_this_conversation": "Tests seat intent (new to v2.1). Simple 2-turn flow: seat query → eligibility check."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

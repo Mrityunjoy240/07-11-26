@@ -29,6 +29,7 @@ VALID_DOMAINS = {
     "admission", "fees", "hostel", "placement", "scholarship",
     "management", "sports", "nri", "lateral", "transfer",
     "distance", "counseling", "grievance", "mixed", "multilingual",
+    "career",
 }
 
 VALID_FEATURES = {
@@ -80,6 +81,7 @@ DOMAIN_DIR_MAP = {
     "lateral": "lateral", "transfer": "transfer", "distance": "distance",
     "counseling": "counseling", "grievance": "grievance",
     "mixed": "mixed", "multilingual": "multilingual",
+    "career": "career",
 }
 
 FILLER_WORDS = {
@@ -279,7 +281,7 @@ class MetadataValidator:
 
         # ID format check
         conv_id = conv.get("id", "")
-        if not re.match(r"^BENCH_\d{6}$", conv_id):
+        if not re.match(r"^BENCH_(V21_)?\d{6}$", conv_id):
             errors.append(f"  id: '{conv_id}' doesn't match BENCH_NNNNNN pattern")
 
         # Annotation status check (if present)
@@ -304,6 +306,7 @@ class CoverageValidator:
         issues = []
         issues.extend(self._check_duplicates(convs))
         issues.extend(self._report_unseen(convs))
+        issues.extend(self._check_matrix_coverage(convs))
         return issues
 
     def _scenario_key(self, conv: dict) -> str:
@@ -348,6 +351,82 @@ class CoverageValidator:
                 if feat not in seen.get(domain, set()):
                     missing.append(f"  {domain} + {feat}: 0")
         return missing
+
+    def _check_matrix_coverage(self, convs: list[dict]) -> list[str]:
+        """Check that authored conversations cover all intents, actions, behaviors, operators from matrix."""
+        matrix_path = Path("data/benchmark/coverage/v2.1_matrix.json")
+        if not matrix_path.exists():
+            return ["  Matrix file not found, skipping coverage check"]
+        
+        matrix = json.loads(matrix_path.read_text(encoding="utf-8"))
+        matrix_convs = matrix.get("conversations", [])
+        
+        # Expected from matrix
+        expected_intents = set()
+        expected_actions = set()
+        expected_behaviors = set()
+        expected_operators = set()
+        for mc in matrix_convs:
+            expected_intents.add(mc["intent"])
+            expected_actions.add(mc["action"])
+            expected_behaviors.update(mc.get("behaviors", []))
+            expected_operators.update(mc.get("operators", []))
+        
+        # Actual from authored conversations (intent/action from turn-level expected)
+        actual_intents = set()
+        actual_actions = set()
+        for conv in convs:
+            for turn in conv.get("turns", []):
+                exp = turn.get("expected", {})
+                intent = exp.get("understanding", {}).get("intent", "")
+                action = exp.get("decision", {}).get("action", "")
+                if intent:
+                    actual_intents.add(intent)
+                if action:
+                    actual_actions.add(action)
+        
+        # Behaviors/operators come from the matrix (mapped by conversation ID)
+        # Matrix uses V21_001 format, files use BENCH_V21_000001 — normalize to number
+        def normalize_id(cid: str) -> int:
+            import re
+            m = re.search(r'(\d+)$', cid.replace("BENCH_", ""))
+            return int(m.group(1)) if m else 0
+        
+        conv_ids = {normalize_id(c.get("id", "")) for c in convs}
+        actual_behaviors = set()
+        actual_operators = set()
+        for mc in matrix_convs:
+            if normalize_id(mc["id"]) in conv_ids:
+                actual_behaviors.update(mc.get("behaviors", []))
+                actual_operators.update(mc.get("operators", []))
+        
+        issues = []
+        missing_intents = expected_intents - actual_intents
+        missing_actions = expected_actions - actual_actions
+        missing_behaviors = expected_behaviors - actual_behaviors
+        missing_operators = expected_operators - actual_operators
+        
+        issues.append(f"  Intent coverage: {len(actual_intents & expected_intents)}/{len(expected_intents)}")
+        if missing_intents:
+            issues.append(f"    MISSING: {sorted(missing_intents)}")
+        
+        issues.append(f"  Action coverage: {len(actual_actions & expected_actions)}/{len(expected_actions)}")
+        if missing_actions:
+            issues.append(f"    MISSING: {sorted(missing_actions)}")
+        
+        issues.append(f"  Behavior coverage: {len(actual_behaviors & expected_behaviors)}/{len(expected_behaviors)}")
+        if missing_behaviors:
+            issues.append(f"    MISSING: {sorted(missing_behaviors)}")
+        
+        issues.append(f"  Operator coverage: {len(actual_operators & expected_operators)}/{len(expected_operators)}")
+        if missing_operators:
+            issues.append(f"    MISSING: {sorted(missing_operators)}")
+        
+        all_covered = not (missing_intents or missing_actions or missing_behaviors or missing_operators)
+        if all_covered:
+            issues.append("  ALL COVERAGE TARGETS MET")
+        
+        return issues
 
 
 # ── BalanceValidator ─────────────────────────────────────────────────────────
@@ -478,13 +557,16 @@ class QualityValidator:
                     if val is not None and val != "" and val != 0:
                         prev = facts_so_far.get(key)
                         if prev is not None and prev != val:
-                            # Check if this is a correction (allowed)
-                            features = conv.get("features", [])
-                            if "correction" not in features:
-                                issues.append(
-                                    f"  {conv.get('id')} turn {i}: "
-                                    f"{key} changed {prev} -> {val} without 'correction' feature"
-                                )
+                            # Interest changes are explorations, not corrections
+                            if key == "interest":
+                                pass
+                            else:
+                                features = conv.get("features", [])
+                                if "correction" not in features:
+                                    issues.append(
+                                        f"  {conv.get('id')} turn {i}: "
+                                        f"{key} changed {prev} -> {val} without 'correction' feature"
+                                    )
                         facts_so_far[key] = val
         return issues
 
@@ -553,13 +635,29 @@ class QualityValidator:
         issues = []
         INTENT_ACTION_MAP = {
             "admission": {"recommend_branches", "collect_profile", "provide_admission_info",
-                          "encourage_and_collect_profile", "provide_branch_guidance"},
+                          "encourage_and_collect_profile", "provide_branch_guidance",
+                          "provide_admission_guidance", "reassure"},
             "fee": {"provide_fee_info", "collect_profile"},
             "hostel": {"provide_hostel_info", "collect_profile"},
             "placement": {"provide_placement_info", "collect_profile"},
             "scholarship": {"provide_scholarship_info", "collect_profile"},
-            "grievance": {"provide_grievance_process", "escalate_to_human"},
+            "grievance": {"provide_grievance_process", "escalate_to_human", "reassure"},
             "counseling": {"provide_counseling_schedule", "collect_profile"},
+            "cutoff": {"provide_cutoff_info", "collect_profile", "recommend_branches"},
+            "seats": {"provide_program_info", "collect_profile"},
+            "department": {"provide_program_info", "collect_profile"},
+            "document": {"provide_program_info", "collect_profile"},
+            "institution": {"provide_program_info", "collect_profile"},
+            "transfer": {"explain_policy", "collect_profile", "recommend_branches"},
+            "unknown": {"reassure", "collect_profile", "provide_admission_guidance", "clarify"},
+            "greeting": {"reassure", "collect_profile"},
+            "distance_education": {"provide_program_info", "collect_profile", "explain_policy"},
+            "management_quota": {"explain_policy", "collect_profile", "recommend_branches"},
+            "nri_admission": {"explain_policy", "collect_profile", "recommend_branches"},
+            "loan": {"provide_program_info", "collect_profile"},
+            "lateral_entry": {"provide_program_info", "collect_profile", "explain_policy"},
+            "career_confusion": {"provide_career_guidance", "collect_profile", "recommend_branches"},
+            "sports_quota": {"provide_program_info", "collect_profile", "recommend_branches"},
         }
         for conv in convs:
             for i, turn in enumerate(conv.get("turns", [])):
@@ -596,6 +694,8 @@ class RegressionValidator:
         if self.dry_run:
             return ["  [skipped] --regression requires pipeline (use --regression --run)"]
         try:
+            import sys
+            sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
             from src.pipeline import PipelineOrchestrator
             from src.conversation.state import ConversationState
         except ImportError:

@@ -1,0 +1,184 @@
+{
+  "id": "BENCH_V21_000047",
+  "domain": "admission",
+  "difficulty": 4,
+  "primary_language": "en",
+  "languages": ["en"],
+  "speaker_profile": "student",
+  "features": ["topic_switch"],
+  "ground_truth": {
+    "rank": null,
+    "pcm_percentage": null,
+    "category": "sc",
+    "interest": "CSE",
+    "board": "",
+    "exam": "",
+    "budget": 50000,
+    "location": "kolkata"
+  },
+  "turns": [
+    {
+      "student": "I have a diploma in computer science. Can I get direct admission to second year B.Tech through lateral entry? I am from SC category.",
+      "expected": {
+        "understanding": {
+          "intent": "lateral_entry",
+          "facts": {"category": "sc", "interest": "computer science"},
+          "inference": {},
+          "confidence": "high",
+          "missing": ["rank", "pcm_percentage", "board"]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.14,
+          "confidence": "high",
+          "current_problem": "has_transfer_query",
+          "problems": ["has_transfer_query"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_program_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Diploma holder asking about lateral entry to B.Tech",
+            "SC category may have different eligibility criteria"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": ["lateral entry", "diploma", "second year"]
+            },
+            {
+              "action": "ask",
+              "content_contains": ["diploma percentage", "state", "college"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_program_info", "Lateral_entry_query"]
+        }
+      },
+      "must_not": ["guarantee_admission", "assume_eligibility"],
+      "ideal_counselor_notes": "Diploma holder from SC category asking about lateral entry. Explain the policy and ask for diploma percentage and other details."
+    },
+    {
+      "student": "I scored 72% in my diploma from a polytechnic in West Bengal. I want CSE. Is lateral entry possible for me?",
+      "expected": {
+        "understanding": {
+          "intent": "lateral_entry",
+          "facts": {"pcm_percentage": 72, "board": "state"},
+          "inference": {},
+          "confidence": "medium",
+          "missing": ["rank"]
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.29,
+          "confidence": "medium",
+          "current_problem": "has_transfer_query",
+          "problems": ["has_transfer_query"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_program_info",
+          "priority": "high",
+          "confidence": "medium",
+          "why": [
+            "Diploma percentage and state provided",
+            "Need to explain lateral entry eligibility for SC category in West Bengal"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "clarify",
+              "content_contains": ["lateral entry eligibility", "SC quota", "CSE"]
+            },
+            {
+              "action": "inform",
+              "content_contains": ["West Bengal colleges", "diploma cutoff"]
+            }
+          ],
+          "confidence": "medium",
+          "dependency_chain": ["Decision=provide_program_info", "Diploma_details", "SC_category"]
+        }
+      },
+      "must_not": ["guarantee_branch_allotment", "ignore_diploma_field"],
+      "ideal_counselor_notes": "Student provided diploma details. Explain lateral entry eligibility for SC category and list colleges in West Bengal that accept lateral entry students for CSE."
+    },
+    {
+      "student": "What about fee waiver? I heard SC students get some fee concession in government colleges. Is that true?",
+      "expected": {
+        "understanding": {
+          "intent": "fee",
+          "facts": {},
+          "inference": {},
+          "confidence": "high",
+          "missing": ["rank"]
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.29,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": ["needs_fee_information"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_fee_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student switched from lateral entry to fee waiver inquiry",
+            "SC category fee concession is relevant for government colleges",
+            "Must retain lateral entry context while addressing fee query"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": ["fee waiver", "SC concession", "government"]
+            },
+            {
+              "action": "inform",
+              "content_contains": ["SC fee concession", "government college", "eligibility criteria"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_fee_info", "Topic_switch", "SC_fee_query"]
+        }
+      },
+      "must_not": ["guarantee_fee_waiver", "forget_lateral_entry_context"],
+      "ideal_counselor_notes": "Student switched to asking about SC fee concession. Explain government college fee waiver policies for SC students while maintaining lateral entry admission context."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "Diploma holder asking about lateral entry then switches to fee waiver inquiry. Key challenge: handling topic switch from lateral entry to fees while maintaining context about SC category benefits.",
+  "author_note": {
+    "primary_capability": "lateral entry guidance with topic switch to fee waiver",
+    "expected_failure_mode": "topic_switch — might lose lateral entry context when student asks about fee waiver, or might not connect SC category to both lateral entry and fee benefits",
+    "why_this_conversation": "Tests lateral entry guidance with topic switch to fee waiver. The SC category connects both queries — lateral entry has SC reservations and fee concessions apply to SC students."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

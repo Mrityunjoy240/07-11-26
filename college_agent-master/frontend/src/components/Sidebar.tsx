@@ -20,6 +20,7 @@ import {
     Delete as DeleteIcon,
     Chat as ChatIcon,
 } from '@mui/icons-material';
+import { authHeaders } from '../apiAuth';
 
 interface Conversation {
     id: string;
@@ -51,7 +52,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
     const loadConversations = async () => {
         try {
-            const res = await fetch(`${API_BASE}/api/conversations`);
+            const res = await fetch(`${API_BASE}/api/conversations`, { headers: authHeaders() });
             if (res.ok) {
                 const data = await res.json();
                 setConversations(data);
@@ -65,6 +66,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         try {
             const res = await fetch(`${API_BASE}/api/conversations`, {
                 method: 'POST',
+                headers: authHeaders(),
             });
             if (res.ok) {
                 const data = await res.json();
@@ -89,6 +91,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         try {
             const res = await fetch(`${API_BASE}/api/conversations/${conversationToDelete}`, {
                 method: 'DELETE',
+                headers: authHeaders(),
             });
             if (res.ok) {
                 if (currentConversationId === conversationToDelete) {

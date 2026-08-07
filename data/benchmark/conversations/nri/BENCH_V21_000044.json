@@ -1,0 +1,184 @@
+{
+  "id": "BENCH_V21_000044",
+  "domain": "nri",
+  "difficulty": 4,
+  "primary_language": "en",
+  "languages": ["en"],
+  "speaker_profile": "student",
+  "features": ["topic_switch"],
+  "ground_truth": {
+    "rank": null,
+    "pcm_percentage": 78,
+    "category": "general",
+    "interest": "ECE",
+    "board": "cbse",
+    "exam": "",
+    "budget": null,
+    "location": "dubai"
+  },
+  "turns": [
+    {
+      "student": "I am an NRI student from Dubai. I want to study ECE engineering in India. How does the NRI admission process work?",
+      "expected": {
+        "understanding": {
+          "intent": "nri_admission",
+          "facts": {"interest": "ECE", "location": "dubai"},
+          "inference": {},
+          "confidence": "high",
+          "missing": ["rank", "pcm_percentage", "category", "board"]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.29,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance",
+          "problems": ["needs_admission_guidance"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "explain_policy",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "NRI student from Dubai asking about admission process",
+            "Need to explain NRI quota requirements and documents"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": ["NRI", "Dubai", "ECE"]
+            },
+            {
+              "action": "inform",
+              "content_contains": ["NRI quota", "admission process", "documents"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=explain_policy", "NRI_student_query"]
+        }
+      },
+      "must_not": ["guarantee_admission", "assume_nri_status"],
+      "ideal_counselor_notes": "NRI student from Dubai asking about ECE admission. Explain the NRI quota process and required documents, then ask for academic details."
+    },
+    {
+      "student": "I scored 78% in PCM, CBSE board. I have my passport and NRI sponsorship documents ready. What colleges offer ECE under NRI quota?",
+      "expected": {
+        "understanding": {
+          "intent": "nri_admission",
+          "facts": {"pcm_percentage": 78, "board": "cbse"},
+          "inference": {},
+          "confidence": "high",
+          "missing": ["rank", "category"]
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.57,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance",
+          "problems": ["needs_admission_guidance"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "explain_policy",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Good academic profile with NRI documents ready",
+            "Can recommend colleges with ECE under NRI quota"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": ["ECE colleges", "NRI quota", "fee structure"]
+            },
+            {
+              "action": "ask",
+              "content_contains": ["location preference", "budget range"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=explain_policy", "Profile_partial", "Documents_ready"]
+        }
+      },
+      "must_not": ["guarantee_seat", "ignore_document_verification"],
+      "ideal_counselor_notes": "NRI student provided academic details and has documents ready. List colleges with ECE under NRI quota and ask about location preference."
+    },
+    {
+      "student": "What about hostel facilities? I will be coming from Dubai alone, so accommodation is very important for me.",
+      "expected": {
+        "understanding": {
+          "intent": "hostel",
+          "facts": {},
+          "inference": {},
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.57,
+          "confidence": "high",
+          "current_problem": "needs_hostel_info",
+          "problems": ["needs_hostel_info"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_hostel_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "NRI student switching to hostel inquiry",
+            "Coming alone from Dubai — accommodation is critical concern",
+            "Must retain NRI admission context while addressing hostel query"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "clarify",
+              "content_contains": ["hostel", "accommodation", "Dubai"]
+            },
+            {
+              "action": "inform",
+              "content_contains": ["hostel facilities", "NRI hostel", "safety"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_hostel_info", "Topic_switch", "NRI_context"]
+        }
+      },
+      "must_not": ["forget_nri_context", "ignore_safety_concerns"],
+      "ideal_counselor_notes": "NRI student switched to hostel inquiry. Provide hostel information while maintaining NRI admission context from previous turns."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "NRI student from Dubai asking about ECE admission then switches to hostel inquiry. Key challenge: handling topic switch while maintaining NRI context and addressing accommodation concerns for an overseas student.",
+  "author_note": {
+    "primary_capability": "NRI admission guidance with topic switch to hostel",
+    "expected_failure_mode": "topic_switch — might lose NRI admission context when student asks about hostel facilities",
+    "why_this_conversation": "Tests NRI admission guidance with topic switch. The system must address hostel concerns while retaining NRI admission context for future reference."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

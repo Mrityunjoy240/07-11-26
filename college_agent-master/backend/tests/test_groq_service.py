@@ -799,3 +799,500 @@ class TestRegressionScenarios:
         """Structured lookup should return None for unknown queries."""
         result = groq_service._structured_lookup("what is the name of the college librarian", "en")
         assert result is None
+
+
+class TestUserProfileExtraction:
+    """Regression tests for _extract_user_profile alias matching."""
+
+    def test_me_positive_uppercase(self, groq_service):
+        groq_service._extract_user_profile("test-me-up", "I want ME branch")
+        state = groq_service._get_or_create_state("test-me-up")
+        assert state.preferred_branch == "ME"
+
+    def test_me_positive_capitalized(self, groq_service):
+        groq_service._extract_user_profile("test-me-cap", "ME branch ki fee kya hai")
+        state = groq_service._get_or_create_state("test-me-cap")
+        assert state.preferred_branch == "ME"
+
+    def test_me_negative_pronoun(self, groq_service):
+        groq_service._extract_user_profile("test-me-neg", "admission ke bare me")
+        state = groq_service._get_or_create_state("test-me-neg")
+        assert state.preferred_branch is None
+
+    def test_me_negative_tell_me(self, groq_service):
+        groq_service._extract_user_profile("test-me-tell", "tell me about admission")
+        state = groq_service._get_or_create_state("test-me-tell")
+        assert state.preferred_branch is None
+
+    def test_it_positive_uppercase(self, groq_service):
+        groq_service._extract_user_profile("test-it-up", "I like IT department")
+        state = groq_service._get_or_create_state("test-it-up")
+        assert state.preferred_branch == "IT"
+
+    def test_it_negative_pronoun(self, groq_service):
+        groq_service._extract_user_profile("test-it-neg", "tell me about it")
+        state = groq_service._get_or_create_state("test-it-neg")
+        assert state.preferred_branch is None
+
+    def test_it_negative_what_about_it(self, groq_service):
+        groq_service._extract_user_profile("test-it-what", "what about it")
+        state = groq_service._get_or_create_state("test-it-what")
+        assert state.preferred_branch is None
+
+    def test_mechanical_expands_to_me(self, groq_service):
+        groq_service._extract_user_profile("test-mech", "I like Mechanical Engineering")
+        state = groq_service._get_or_create_state("test-mech")
+        assert state.preferred_branch == "ME"
+
+    def test_interest_me_filtered(self, groq_service):
+        groq_service._extract_user_profile("test-int-me", "I like me")
+        state = groq_service._get_or_create_state("test-int-me")
+        assert state.interest is None
+
+    def test_interest_it_filtered(self, groq_service):
+        groq_service._extract_user_profile("test-int-it", "I like it")
+        state = groq_service._get_or_create_state("test-int-it")
+        assert state.interest is None
+
+
+# -----------------------------------------------------------------------
+# Grounding — refusal guard for no-data domains
+# -----------------------------------------------------------------------
+
+class TestGroundedRefusalGuard:
+    def test_canteen_menu_english(self, groq_service):
+        assert groq_service._grounded_refusal_guard(
+            "what is the canteen menu", "en"
+        )
+
+    def test_canteen_menu_hindi(self, groq_service):
+        refusal = groq_service._grounded_refusal_guard(
+            "canteen me kya khana milta hai", "hi"
+        )
+        assert refusal is not None
+        assert "verified" in refusal or "sahi" in refusal
+
+    def test_food_item_mention(self, groq_service):
+        assert groq_service._grounded_refusal_guard(
+            "canteen me pizza milta hai kya", "en"
+        )
+
+    def test_xerox_shop(self, groq_service):
+        assert groq_service._grounded_refusal_guard(
+            "xerox shop kahan hai", "hi"
+        )
+
+    def test_photocopy_near_campus(self, groq_service):
+        assert groq_service._grounded_refusal_guard(
+            "is there a photocopy shop near campus", "en"
+        )
+
+    def test_office_room_number(self, groq_service):
+        assert groq_service._grounded_refusal_guard(
+            "principal office room number kya hai", "hi"
+        )
+
+    def test_no_refusal_for_fee(self, groq_service):
+        assert groq_service._grounded_refusal_guard("CSE fee kitna hai", "hi") is None
+
+    def test_no_refusal_for_placement(self, groq_service):
+        assert groq_service._grounded_refusal_guard(
+            "highest placement package kya hai", "en"
+        ) is None
+
+    def test_no_refusal_for_scholarship(self, groq_service):
+        assert groq_service._grounded_refusal_guard(
+            "scholarship details batao", "hi"
+        ) is None
+
+
+class TestExistenceRefusalGuard:
+    def test_refuses_marine_engineering_branch(self, groq_service):
+        refusal = groq_service._existence_refusal_guard(
+            "does BCREC have a marine engineering branch", "en"
+        )
+        assert refusal is not None
+        assert "knowledge base" in refusal
+
+    def test_refuses_robotics_lab_open(self, groq_service):
+        refusal = groq_service._existence_refusal_guard(
+            "Robotics lab public ke liye khula hai", "hi"
+        )
+        assert refusal is not None
+
+    def test_refuses_cafeteria_24x7(self, groq_service):
+        refusal = groq_service._existence_refusal_guard(
+            "Cafeteria 24x7 hai", "hi"
+        )
+        assert refusal is not None
+
+    def test_refuses_submarine_engineering(self, groq_service):
+        refusal = groq_service._existence_refusal_guard(
+            "Kya BCREC me submarine engineering hai", "hi"
+        )
+        assert refusal is not None
+
+    def test_refuses_swimming_pool(self, groq_service):
+        refusal = groq_service._existence_refusal_guard(
+            "Swimming pool hai kya", "hi"
+        )
+        assert refusal is not None
+
+    def test_pass_through_gym(self, groq_service):
+        assert groq_service._existence_refusal_guard(
+            "is there a gym in the college", "en"
+        ) is None
+
+    def test_pass_through_canteen(self, groq_service):
+        assert groq_service._existence_refusal_guard(
+            "is there a canteen", "en"
+        ) is None
+
+    def test_pass_through_library_open(self, groq_service):
+        assert groq_service._existence_refusal_guard(
+            "is the library open", "en"
+        ) is None
+
+    def test_pass_through_hostel(self, groq_service):
+        assert groq_service._existence_refusal_guard(
+            "has the college got a hostel", "en"
+        ) is None
+
+    def test_pass_through_civil_engineering(self, groq_service):
+        assert groq_service._existence_refusal_guard(
+            "does BCREC have a civil engineering branch", "en"
+        ) is None
+
+    def test_non_existence_query_not_intercepted(self, groq_service):
+        assert groq_service._existence_refusal_guard(
+            "hostel fee kya hai", "hi"
+        ) is None
+
+    def test_has_a_backlog_statement_not_refused(self, groq_service):
+        # "has a backlog" (caller subject) is not a facility existence question
+        assert groq_service._existence_refusal_guard(
+            "If a student has a backlog, how does it affect scholarship at BCREC", "en"
+        ) is None
+
+    def test_student_subject_not_refused(self, groq_service):
+        assert groq_service._existence_refusal_guard(
+            "does a student have to pay the admission fee", "en"
+        ) is None
+
+    def test_abstract_chance_phrasing_not_refused(self, groq_service):
+        assert groq_service._existence_refusal_guard(
+            "is there any chance of getting hostel", "en"
+        ) is None
+
+    def test_sushi_passes_through_to_existing_guards(self, groq_service):
+        assert groq_service._existence_refusal_guard(
+            "does the canteen serve sushi", "en"
+        ) is None
+
+    def test_entity_is_known_gym(self, groq_service):
+        assert groq_service._existence_entity_is_known(
+            "is there a gym in the college"
+        ) is True
+
+    def test_entity_is_known_library(self, groq_service):
+        assert groq_service._existence_entity_is_known(
+            "is the library open"
+        ) is True
+
+    def test_entity_is_known_canteen(self, groq_service):
+        assert groq_service._existence_entity_is_known(
+            "is there a canteen"
+        ) is True
+
+    def test_entity_is_not_known_marine(self, groq_service):
+        assert groq_service._existence_entity_is_known(
+            "does BCREC have a marine engineering branch"
+        ) is False
+
+    def test_entity_is_not_known_swimming(self, groq_service):
+        assert groq_service._existence_entity_is_known(
+            "Swimming pool hai kya"
+        ) is False
+
+    def test_entity_is_not_known_abstract_chance(self, groq_service):
+        assert groq_service._existence_entity_is_known(
+            "is there any chance of getting hostel"
+        ) is False
+
+    def test_entity_is_not_known_non_existence_query(self, groq_service):
+        assert groq_service._existence_entity_is_known(
+            "hostel fee kya hai"
+        ) is False
+
+    def test_known_facility_24x7_still_refused(self, groq_service):
+        # known entity but unverified 24x7 claim must still be refused
+        assert groq_service._existence_refusal_guard(
+            "Cafeteria 24x7 hai", "hi"
+        ) is not None
+
+    def test_documented_24x7_facility_not_refused(self, groq_service):
+        # medical documents 24/7 emergency access, so its 24x7 claim passes
+        assert groq_service._existence_refusal_guard(
+            "medical sara din khula hai", "en"
+        ) is None
+
+    def test_hours_evidence_medical_true(self, groq_service):
+        assert groq_service._existence_has_hours_evidence("medical") is True
+
+    def test_hours_evidence_cafeteria_false(self, groq_service):
+        assert groq_service._existence_has_hours_evidence("cafeteria") is False
+
+
+# -----------------------------------------------------------------------
+# Low-confidence hallucination guard + confidence tiers
+# -----------------------------------------------------------------------
+
+class TestConfidenceTier:
+    def test_high_tier(self, groq_service):
+        assert groq_service._confidence_tier(0.50) == "high"
+
+    def test_medium_tier(self, groq_service):
+        assert groq_service._confidence_tier(0.30) == "medium"
+
+    def test_low_tier(self, groq_service):
+        assert groq_service._confidence_tier(0.10) == "low"
+
+
+class TestLowConfidenceGuard:
+    def test_refuses_unknown_factual_swimming_pool(self, groq_service):
+        refusal = groq_service._low_confidence_guard(
+            "does BCREC have a swimming pool", "en", 0.10, ""
+        )
+        assert refusal is not None
+        assert "verified" in refusal
+
+    def test_refuses_unknown_factual_playground(self, groq_service):
+        refusal = groq_service._low_confidence_guard(
+            "playground timings kya hai", "hi", 0.10, ""
+        )
+        assert refusal is not None
+
+    def test_refuses_bengali_unknown_detail(self, groq_service):
+        refusal = groq_service._low_confidence_guard(
+            "swimming pool ache ki", "bn", 0.05, ""
+        )
+        assert refusal is not None
+
+    def test_covered_domain_not_refused(self, groq_service):
+        assert groq_service._low_confidence_guard(
+            "backlog policy kya hai", "hi", 0.10, ""
+        ) is None
+
+    def test_kb_covered_term_not_refused(self, groq_service):
+        assert groq_service._low_confidence_guard(
+            "hostel fee kya hai", "hi", 0.10, ""
+        ) is None
+
+    def test_retrieved_token_not_refused(self, groq_service):
+        assert groq_service._low_confidence_guard(
+            "sports facilities kya hai", "en", 0.10, "Sports facilities include ..."
+        ) is None
+
+    def test_non_factual_chitchat_skipped(self, groq_service):
+        assert groq_service._low_confidence_guard(
+            "hello sir namaste", "hi", 0.05, ""
+        ) is None
+
+    def test_medium_confidence_never_refused(self, groq_service):
+        assert groq_service._low_confidence_guard(
+            "random unknown topic", "en", 0.30, ""
+        ) is None
+
+    def test_unknown_refusal_text_language(self, groq_service):
+        assert "verified" in groq_service._refusal_text("hi", "unknown")
+        assert "verified" in groq_service._refusal_text("bn", "unknown")
+
+
+# -----------------------------------------------------------------------
+# Short-follow-up resolution — "kitna?", "36 lpa?", "aur?", "highest?"
+# -----------------------------------------------------------------------
+
+class TestShortFollowupResolution:
+    def test_kitna_after_placement(self, groq_service):
+        groq_service._record_topic("what is the highest package?", "s-f1")
+        expanded = groq_service._resolve_short_followup("kitna?", "s-f1")
+        assert expanded is not None
+        assert "highest placement package" in expanded
+
+    def test_number_after_highest_package(self, groq_service):
+        groq_service._record_topic("what is the highest package?", "s-f2")
+        expanded = groq_service._resolve_short_followup("36 lpa?", "s-f2")
+        assert expanded is not None
+        assert "highest placement package 36 LPA" in expanded
+
+    def test_fee_followup_uses_fee_label(self, groq_service):
+        groq_service._record_topic("CSE fee kitna hai", "s-f3")
+        expanded = groq_service._resolve_short_followup("kitna?", "s-f3")
+        assert expanded is not None
+        assert "total fee" in expanded
+
+    def test_aur_continues_last_domain(self, groq_service):
+        groq_service._record_topic("hostel fee kitna hai", "s-f4")
+        expanded = groq_service._resolve_short_followup("aur?", "s-f4")
+        assert expanded is not None
+        assert "hostel" in expanded
+
+    def test_fresh_session_no_resolution(self, groq_service):
+        groq_service.clear_session("s-f5")
+        assert groq_service._resolve_short_followup("kitna?", "s-f5") is None
+
+    def test_normal_query_not_resolved(self, groq_service):
+        groq_service._record_topic("what is the highest package?", "s-f6")
+        assert groq_service._resolve_short_followup(
+            "what is the CSE fee", "s-f6"
+        ) is None
+
+    def test_why_after_placement(self, groq_service):
+        groq_service._record_topic("highest package kya hai", "s-f7")
+        expanded = groq_service._resolve_short_followup("why?", "s-f7")
+        assert expanded is not None
+        assert "Why?" in expanded
+
+    def test_why_hindi(self, groq_service):
+        groq_service._record_topic("CSE placement", "s-f8")
+        expanded = groq_service._resolve_short_followup("kyun?", "s-f8")
+        assert expanded is not None
+        assert "Why?" in expanded
+
+    def test_which_is_better_two_branches(self, groq_service):
+        groq_service._append_session_turn("s-f9", "CSE placement kya hai", "CSE 93.6%")
+        groq_service._append_session_turn("s-f9", "AIML placement kya hai", "AIML 85%")
+        groq_service._record_topic("AIML placement kya hai", "s-f9")
+        expanded = groq_service._resolve_short_followup("which is better?", "s-f9")
+        assert expanded is not None
+        assert "Compare" in expanded
+        assert "AIML" in expanded
+        assert "CSE" in expanded
+
+    def test_which_is_better_hindi(self, groq_service):
+        groq_service._append_session_turn("s-f10", "CSE fee", "5 lakh")
+        groq_service._append_session_turn("s-f10", "ECE fee", "5 lakh")
+        groq_service._record_topic("ECE fee", "s-f10")
+        expanded = groq_service._resolve_short_followup("kaun sa better hai?", "s-f10")
+        assert expanded is not None
+        assert "Compare" in expanded
+
+    def test_which_is_better_no_branch_history(self, groq_service):
+        groq_service._record_topic("scholarship details", "s-f11")
+        expanded = groq_service._resolve_short_followup("which is better?", "s-f11")
+        assert expanded is not None
+        assert "Which is better?" in expanded
+
+    def test_still_eligible_after_scholarship(self, groq_service):
+        groq_service._record_topic("SVMCM scholarship eligibility", "s-f12")
+        expanded = groq_service._resolve_short_followup("still eligible?", "s-f12")
+        assert expanded is not None
+        assert "still eligible" in expanded
+
+    def test_average_after_placement(self, groq_service):
+        groq_service._record_topic("AIML placement", "s-f13")
+        expanded = groq_service._resolve_short_followup("Average?", "s-f13")
+        assert expanded is not None
+        assert "average placement package" in expanded
+
+    def test_median_after_placement(self, groq_service):
+        groq_service._record_topic("AIML placement", "s-f14")
+        expanded = groq_service._resolve_short_followup("Median?", "s-f14")
+        assert expanded is not None
+        assert "median placement package" in expanded
+
+    def test_kaunsi_after_scholarship(self, groq_service):
+        groq_service._record_topic("SVMCM scholarship", "s-f15")
+        expanded = groq_service._resolve_short_followup("Kaunsi?", "s-f15")
+        assert expanded is not None
+        assert "Which scholarship schemes" in expanded
+
+    def test_eligibility_after_scholarship(self, groq_service):
+        groq_service._record_topic("SVMCM scholarship", "s-f16")
+        expanded = groq_service._resolve_short_followup("Eligibility?", "s-f16")
+        assert expanded is not None
+        assert "eligibility for" in expanded
+
+    def test_renewal_after_scholarship(self, groq_service):
+        groq_service._record_topic("SVMCM scholarship", "s-f17")
+        expanded = groq_service._resolve_short_followup("Renewal?", "s-f17")
+        assert expanded is not None
+        assert "renewed" in expanded
+
+    def test_backlog_conditional_after_scholarship(self, groq_service):
+        groq_service._record_topic("SVMCM scholarship", "s-f18")
+        expanded = groq_service._resolve_short_followup("Backlog ho to?", "s-f18")
+        assert expanded is not None
+        assert "backlog" in expanded
+
+
+# -----------------------------------------------------------------------
+# Conversation policy — graceful exits and thanks
+# -----------------------------------------------------------------------
+
+class TestConversationPolicy:
+    def test_exit_hindi_choro(self, groq_service):
+        response = groq_service._detect_exit_intent("Choro me dekh lunga", "hi")
+        assert response is not None
+        assert "Theek hai" in response
+
+    def test_exit_english_bye(self, groq_service):
+        response = groq_service._detect_exit_intent("bye", "en")
+        assert response is not None
+        assert "Goodbye" in response
+
+    def test_exit_not_triggered_on_long_question(self, groq_service):
+        assert groq_service._detect_exit_intent(
+            "baad me admission kaise hoga", "hi"
+        ) is None
+
+    def test_policy_tokens_not_rejected_as_stt_noise(self, groq_service):
+        # Exit/thanks/ack tokens must never be sent to the word-count gate that
+        # returns the "please rephrase" STT-noise clarification.
+        for token in ("bye", "thanks", "okay", "goodbye", "shukriya"):
+            result = groq_service._validate_transcript(token, f"t-exit-{token}")
+            assert result is None or "didn't catch" not in result
+
+    def test_thanks_hindi(self, groq_service):
+        response = groq_service._detect_thanks_intent("shukriya", "hi")
+        assert response is not None
+
+    def test_thanks_banglish(self, groq_service):
+        response = groq_service._detect_thanks_intent("dhonnobad", "bn")
+        assert response is not None
+
+    def test_thanks_not_triggered_on_long_factual_question(self, groq_service):
+        assert groq_service._detect_thanks_intent(
+            "thanks for the placement details but what about the fees", "en"
+        ) is None
+
+    def test_ack_okay(self, groq_service):
+        response = groq_service._detect_ack_intent("okay", "en")
+        assert response is not None
+        assert "Okay" in response
+
+    def test_ack_theek_hai(self, groq_service):
+        response = groq_service._detect_ack_intent("theek hai", "hi")
+        assert response is not None
+        assert "Theek hai" in response
+
+    def test_ack_bangla(self, groq_service):
+        response = groq_service._detect_ack_intent("thik ache", "bn")
+        assert response is not None
+        assert "Thik ache" in response
+
+    def test_ack_not_triggered_on_question(self, groq_service):
+        assert groq_service._detect_ack_intent("okay, what is the fee", "en") is None
+
+
+# -----------------------------------------------------------------------
+# Grounding telemetry
+# -----------------------------------------------------------------------
+
+class TestGroundingTelemetry:
+    def test_collect_returns_defaults_when_no_retrieval(self, groq_service):
+        meta = groq_service._collect_retrieval_telemetry()
+        assert meta["retrieval_score"] == 0.0
+        assert meta["documents_used"] == 0
+        assert isinstance(meta["source_file"], list)
+        assert isinstance(meta["chunk_ids"], list)

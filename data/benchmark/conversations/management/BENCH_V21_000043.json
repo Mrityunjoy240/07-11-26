@@ -1,0 +1,183 @@
+{
+  "id": "BENCH_V21_000043",
+  "domain": "management",
+  "difficulty": 4,
+  "primary_language": "en",
+  "languages": ["en"],
+  "speaker_profile": "parent",
+  "features": ["parent_mode", "missing_info", "correction"],
+  "ground_truth": {
+    "rank": null,
+    "pcm_percentage": 65,
+    "category": "general",
+    "interest": "CSE",
+    "board": "cbse",
+    "exam": "",
+    "budget": 500000,
+    "location": "mumbai"
+  },
+  "turns": [
+    {
+      "student": "My son scored 65% in PCM, CBSE board. He wants CSE but his JEE rank is very low. Is management quota available? What are the fees?",
+      "expected": {
+        "understanding": {
+          "intent": "management_quota",
+          "facts": {"pcm_percentage": 65, "board": "cbse", "interest": "CSE"},
+          "inference": {"parent_mode": true},
+          "confidence": "high",
+          "missing": ["rank", "category", "budget", "location"]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.43,
+          "confidence": "high",
+          "current_problem": "has_management_query",
+          "problems": ["has_management_query"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "explain_policy",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Parent explicitly asking about management quota for son",
+            "Low PCM score makes management route relevant"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": ["concern", "son"]
+            },
+            {
+              "action": "inform",
+              "content_contains": ["management quota", "process", "fees"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=explain_management_quota_policy", "Parent_mode"]
+        }
+      },
+      "must_not": ["guarantee_admission", "recommend_without_budget"],
+      "ideal_counselor_notes": "Parent seeking management quota for son with low score. Explain the process and fees, then ask about budget and location to narrow down options."
+    },
+    {
+      "student": "We are based in Mumbai. Our budget is around 2 lakhs for management quota. Which colleges can he get CSE in?",
+      "expected": {
+        "understanding": {
+          "intent": "management_quota",
+          "facts": {"budget": 200000, "location": "mumbai"},
+          "inference": {"parent_mode": true},
+          "confidence": "high",
+          "missing": ["rank", "category"]
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.71,
+          "confidence": "high",
+          "current_problem": "has_management_query",
+          "problems": ["has_management_query"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "explain_policy",
+          "priority": "high",
+          "confidence": "medium",
+          "why": [
+            "Budget of 2 lakhs is low for management quota CSE",
+            "Need to be honest about realistic options within this budget"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "clarify",
+              "content_contains": ["2 lakhs", "management quota", "CSE"]
+            },
+            {
+              "action": "ask",
+              "content_contains": ["total budget", "other funding"]
+            }
+          ],
+          "confidence": "medium",
+          "dependency_chain": ["Decision=explain_management_quota_policy", "Budget_insufficient"]
+        }
+      },
+      "must_not": ["overpromise", "hide_fee_reality"],
+      "ideal_counselor_notes": "Parent provided budget of 2 lakhs which is low for management quota CSE. Be honest about the budget shortfall and ask if there is additional funding available."
+    },
+    {
+      "student": "Sorry, I made a mistake. Our total budget is 5 lakhs, not 2 lakhs. We can go up to 5 lakhs. Which colleges in Mumbai have management quota for CSE?",
+      "expected": {
+        "understanding": {
+          "intent": "management_quota",
+          "facts": {"budget": 500000},
+          "inference": {"parent_mode": true},
+          "confidence": "high",
+          "missing": ["rank", "category"]
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.71,
+          "confidence": "high",
+          "current_problem": "has_management_query",
+          "problems": ["has_management_query"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "explain_policy",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Budget corrected to 5 lakhs — realistic for management quota CSE",
+            "Can now provide specific college options in Mumbai"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "reassure",
+              "content_contains": ["budget updated", "5 lakhs"]
+            },
+            {
+              "action": "recommend",
+              "content_contains": ["Mumbai colleges", "management quota CSE", "fee range"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=explain_management_quota_policy", "Budget_corrected", "Parent_mode"]
+        }
+      },
+      "must_not": ["ignore_correction", "guarantee_seat"],
+      "ideal_counselor_notes": "Parent corrected budget from 2 to 5 lakhs. With corrected budget, provide realistic management quota CSE options in Mumbai."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "Parent navigating management quota with budget correction. Key challenge: handling budget correction gracefully and providing realistic options once correct budget is known.",
+  "author_note": {
+    "primary_capability": "management quota guidance with parent mode and budget correction",
+    "expected_failure_mode": "correction — might not update budget from 2L to 5L, or might have already given misleading advice based on wrong budget",
+    "why_this_conversation": "Tests management quota explanation with parent mode and budget correction. The budget correction in turn 3 tests that the system gracefully handles corrected information."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

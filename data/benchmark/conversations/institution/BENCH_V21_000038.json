@@ -1,0 +1,136 @@
+{
+  "id": "BENCH_V21_000038",
+  "domain": "admission",
+  "difficulty": 1,
+  "primary_language": "en",
+  "languages": ["en"],
+  "speaker_profile": "student",
+  "features": [],
+  "ground_truth": {
+    "rank": null,
+    "pcm_percentage": null,
+    "category": "",
+    "interest": "",
+    "board": "",
+    "exam": "",
+    "budget": null,
+    "location": ""
+  },
+  "turns": [
+    {
+      "student": "What are the affiliations of your college? Which university is it affiliated to?",
+      "expected": {
+        "understanding": {
+          "intent": "institution",
+          "facts": {},
+          "inference": {},
+          "confidence": "high",
+          "missing": ["rank", "pcm_percentage", "category", "interest", "board"]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.0,
+          "confidence": "high",
+          "current_problem": "general_inquiry",
+          "problems": ["general_inquiry"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_program_info",
+          "priority": "normal",
+          "confidence": "high",
+          "why": [
+            "Direct factual query about college affiliations",
+            "Can answer from knowledge base without profile"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": ["affiliation", "university", "college"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_program_info", "Direct_factual_query"]
+        }
+      },
+      "must_not": [
+        "recommend_branch",
+        "hallucinate_university_name"
+      ],
+      "ideal_counselor_notes": "Direct factual query about college affiliations. Answer from knowledge base. No profile needed."
+    },
+    {
+      "student": "Is the college NAAC accredited? What grade did it get?",
+      "expected": {
+        "understanding": {
+          "intent": "institution",
+          "facts": {},
+          "inference": {},
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.0,
+          "confidence": "high",
+          "current_problem": "general_inquiry",
+          "problems": ["general_inquiry"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_program_info",
+          "priority": "normal",
+          "confidence": "high",
+          "why": [
+            "Follow-up factual query about NAAC accreditation",
+            "Can answer from knowledge base"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "ask",
+              "content_contains": ["specific", "program", "branch"]
+            },
+            {
+              "action": "inform",
+              "content_contains": ["NAAC", "accreditation", "grade"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_program_info", "Accreditation_query"]
+        }
+      },
+      "must_not": [
+        "recommend_branch",
+        "hallucinate_accreditation_grade"
+      ],
+      "ideal_counselor_notes": "Student asks about NAAC accreditation. Provide accreditation info from knowledge base. Simple 2-turn factual retrieval."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "Basic institution info query about affiliations and accreditation. Pure factual retrieval with no profile needed.",
+  "author_note": {
+    "primary_capability": "institution information retrieval",
+    "expected_failure_mode": "retrieval — might not find affiliation or accreditation details in KB",
+    "why_this_conversation": "Tests basic institution factual retrieval. Student asks about affiliations and accreditation — two common institutional queries."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

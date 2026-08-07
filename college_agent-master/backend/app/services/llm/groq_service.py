@@ -127,6 +127,10 @@ class ConversationState:
     preferred_branch: str | None = None
     board: str | None = None
     state: str | None = None
+    # Short-follow-up resolution — what the last substantive query was about
+    last_domain: str | None = None
+    last_attr: str | None = None
+    last_question: str | None = None
 
 
 # Which facets each domain supports (used for cross-domain follow-up resolution).
@@ -267,6 +271,7 @@ _DEPT_COMPATIBLE_INTS: frozenset = frozenset(
 )
 
 from app.services.normalization import normalize_query, normalize_for_tts
+from app.services.shadow_routing import record_shadow
 
 # ---------------------------------------------------------------------------
 # Phase 0 — Hallucination guard configuration
@@ -339,9 +344,9 @@ FILLER_ONLY_PATTERNS = (
     r"^(হ্যাঁ জী|না জী|আচ্ছা জী|ঠিক আছে|ঠিক আছে জী)$",
 )
 
-CLARIFICATION_REPEAT_EN = "I didn't quite catch that. Could you please repeat your question?"
-CLARIFICATION_REPEAT_HI = "मैं आपकी बात ठीक से समझ नहीं पाया। कृपया अपना प्रश्न दोहराएँ।"
-CLARIFICATION_REPEAT_BN = "আমি আপনার কথা ঠিক বুঝতে পারিনি। অনুগ্রহ করে আপনার প্রশ্নটি আবার বলুন।"
+CLARIFICATION_REPEAT_EN = "I didn't quite catch that. Could you please rephrase it in Bengali or English?"
+CLARIFICATION_REPEAT_HI = "मैं आपकी बात ठीक से समझ नहीं पाया। कृपया बंगाली या अंग्रेज़ी में दोबारा कहें।"
+CLARIFICATION_REPEAT_BN = "আমি আপনার কথা ঠিক বুঝতে পারিনি। অনুগ্রহ করে বাংলা বা ইংরেজিতে আবার বলুন।"
 
 # Patterns for detecting "repeat what you just said" intent — skip RAG entirely
 REPEAT_PATTERNS = (
@@ -643,10 +648,8 @@ OUT_OF_DOMAIN_RESPONSE_BN = (
 DEPARTMENT_NAMES = frozenset(
     {
         "cse",
-        "it",
         "ece",
         "ee",
-        "me",
         "ce",
         "csd",
         "aiml",
@@ -673,16 +676,41 @@ FALLBACK_TIER1_EN = (
     "Could you try asking in a different way?"
 )
 FALLBACK_TIER1_HI = (
-    "मैं आपके लिए यह जाँच रहा हूँ। हो सकता है मेरे पास यह सटीक जानकारी न हो। कृपया इसे अलग तरीके से पूछकर देखें।"
+    "Main aapke liye yeh check kar raha hoon. Ho sakta hai mere paas iski sahi jankari na ho. "
+    "Kripya ise alag tarike se poochh kar dekhen."
 )
 FALLBACK_TIER1_BN = (
-    "আমি আপনার জন্য এটি যাচাই করছি। আমার কাছে এই সঠিক তথ্য নাও থাকতে পারে। "
-    "অনুগ্রহ করে অন্যভাবে জিজ্ঞাসা করার চেষ্টা করুন।"
+    "Ami apnar jonno eita check korchi. Hoito amar kache ei thik jana na thakbe. "
+    "Doya kore onno bhabe jiggesh kore dekhen."
+)
+
+# Tier 2 — used only when Tier 1 was already shown this session, so the
+# same fallback message is never repeated twice in a row.
+FALLBACK_TIER2_EN = (
+    "I'm sorry, I couldn't understand that. Could you please rephrase in "
+    "Bengali or English? Or call the college at 0343-2501353 for help."
+)
+FALLBACK_TIER2_HI = (
+    "Maaf kijiye, main samajh nahi paya. Kripya Bengali ya English me fir se kahein. "
+    "Ya madad ke liye college ko 0343-2501353 par call karein."
+)
+FALLBACK_TIER2_BN = (
+    "Dukkhito, ami bujhte parini. Doya kore Bangla ba English e abar bolun. "
+    "Ba sahajyo r jonno college e 0343-2501353 number e call korun."
 )
 
 FALLBACK_ANSWER_EN = FALLBACK_TIER1_EN
 FALLBACK_ANSWER_HI = FALLBACK_TIER1_HI
 FALLBACK_ANSWER_BN = FALLBACK_TIER1_BN
+
+LOW_CONF_HEDGE = (
+    "CONFIDENCE NOTE: Automated retrieval found only weak matches for this "
+    "question. Answer ONLY using facts that are explicitly written in the "
+    "COLLEGE DATA or VERIFIED RETRIEVED DOCUMENTS blocks above. If the exact "
+    "detail asked is not present there, say 'I don't have that verified "
+    "information' and suggest asking the college reception or help desk. "
+    "Do NOT guess, extrapolate, or combine unrelated facts."
+)
 
 UNKNOWN_INFO_RESPONSE_EN = (
     "I don't have that information right now. Please call the college at 0343-2501353 and they will help you."
@@ -698,9 +726,9 @@ _HOD_UNKNOWN_EN = "I don't have the HOD details for that department right now. W
 _HOD_UNKNOWN_HI = "Us department ke HOD ke baare mein mere paas abhi jankari nahi hai. Kya aap college ka number chahenge?"
 _HOD_UNKNOWN_BN = "ওই বিভাগের HOD সম্পর্কে আমার কাছে এখন তথ্য নেই। আপনি কি কলেজের নম্বর চান?"
 
-CLARIFY_REPEAT_EN = "Sorry, I didn't catch that clearly. Could you please repeat?"
-CLARIFY_REPEAT_HI = "Maaf kijiye, main achhe se samajh nahi paya. Kya aap dobara bata sakte hain?"
-CLARIFY_REPEAT_BN = "দুঃখিত, আমি স্পষ্টভাবে বুঝতে পারিনি। আপনি কি আবার বলতে পারেন?"
+CLARIFY_REPEAT_EN = "Sorry, I didn't catch that clearly. Could you please rephrase it in Bengali or English?"
+CLARIFY_REPEAT_HI = "Maaf kijiye, main achhe se samajh nahi paya. Kya aap Bengali ya English me dobara bol sakte hain?"
+CLARIFY_REPEAT_BN = "দুঃখিত, আমি স্পষ্টভাবে বুঝতে পারিনি। আপনি কি বাংলা বা ইংরেজিতে আবার বলতে পারেন?"
 
 # Structured arithmetic — fee group definitions per department
 # Maps department code -> (total_fees, admission_fee, per_semester)
@@ -823,29 +851,44 @@ LANGUAGE RULES:
 4. Only switch language if the user explicitly switches. Detect from the current query context.
 
 PERSONALIZED COUNSELLING:
-5. When the user shares ANY profile data (rank, percentage, interest, board, state), EXTRACT and REMEMBER it. Never ask again.
-6. Combine all known profile data to recommend branches. Consider rank, PCM %, and stated interest together.
+5. When the user EXPLICITLY shares profile data (rank, percentage, interest, board, state), EXTRACT and REMEMBER it. Never ask again.
+6. Combine only known profile data to recommend branches. Consider rank, PCM %, and stated interest together.
 7. For each recommendation: explain WHY it fits, mention placement, mention eligibility probability, suggest backup branches.
 8. Never answer just one part of a profile question. Cover: recommended branches, explanation, placement, eligibility, probability.
 9. If profile data is partial, use what you have and ask for the missing piece naturally.
 
+NEVER FABRICATE CALLER ATTRIBUTES:
+10. NEVER invent, guess, or assume the caller's rank, percentage, board, or state. Mention these ONLY if the caller explicitly stated them in this conversation.
+11. If the caller has not provided their rank/percentage/board/state, do NOT mention any number or value for them. Say "I don't have your details yet" and ask for what you need.
+12. Do not quote eligibility numbers or cutoffs as "your" numbers unless they come from the caller or from verified BCREC data for the general case. Frame college cutoffs as college data, never as the caller's own marks.
+13. Profile context in this conversation is limited to what the caller actually said. Never extrapolate from a phone number, a fee amount, or a question (e.g. never read "rank" from the word "rank" in a generic query).
+
 CONTEXT & FOLLOW-UP RULES:
-10. Follow-up words like "and?", "then?", "what about...", "hostel?", "placement?" refer to the LAST discussed topic. Continue it.
-11. Never restart the conversation. Every answer builds on what was said before.
-12. If the user asks "What did I tell you?" or similar, recall their profile and last topic accurately.
+14. Follow-up words like "and?", "then?", "what about...", "hostel?", "placement?" refer to the LAST discussed topic. Continue it.
+15. Never restart the conversation. Every answer builds on what was said before.
+16. If the user asks "What did I tell you?" or similar, recall their profile and last topic accurately.
+
+OPEN-ENDED INTENTS — ASK FIRST, DO NOT ASSUME:
+17. If the caller says "I need help" or "help me" without saying what for, ask what help they need. Do not guess a topic.
+18. If the caller says "I want admission" (or similar) without naming a course, ask which department or course they want first. Do not assume a branch.
+19. If the caller's input is unclear or cannot be understood, apologize ONCE and ask them to rephrase in Bengali or English. Never repeat the same fallback message twice in a row.
 
 ANSWER STRUCTURE:
-13. Be complete. Cover all parts of multi-part questions in order. Do not skip any.
-14. Be concise but thorough — 3-5 sentences is fine for complex answers. More is OK if the question has many parts.
-15. Never repeat the same sentence verbatim. Never use filler like "Based on the context".
-16. End with a relevant follow-up ONLY if it adds value. Never force one. Never repeat a follow-up already answered.
-17. If the user is confused, clarify step by step. Do not ask another question until they understand.
+20. Be complete. Cover all parts of multi-part questions in order. Do not skip any.
+21. Be concise but thorough — 3-5 sentences is fine for complex answers. More is OK if the question has many parts.
+22. Never repeat the same sentence verbatim. Never use filler like "Based on the context".
+23. End with a relevant follow-up ONLY if it adds value. Never force one. Never repeat a follow-up already answered.
+24. If the user is confused, clarify step by step. Do not ask another question until they understand.
 
 HALLUCINATION PREVENTION:
-18. AIML, CSE, ECE, EE, ME, CE, CSD, DS, CY are B.Tech branches (full 4-year programs). They do NOT have sub-courses like ML/DL/NLP inside them.
-19. If a user mispronounces (e.g. "EML" → AIML), infer from conversation context, not sound.
-20. If you don't know the correct Hindi word, use English instead. Never invent words or borrow from Bengali.
-21. Use simple, common words only.
+25. AIML, CSE, ECE, EE, ME, CE, CSD, DS, CY are B.Tech branches (full 4-year programs). They do NOT have sub-courses like ML/DL/NLP inside them.
+26. If a user mispronounces (e.g. "EML" → AIML), infer from conversation context, not sound.
+27. If you don't know the correct Hindi word, use English instead. Never invent words or borrow from Bengali.
+28. Use simple, common words only.
+
+TURN DISCIPLINE:
+29. Never claim you have talked to the user before. Never add conversational filler like "let's talk", "good talking to you", or "aami aapke saath baat korte parilam". Respond directly to the current question only.
+30. If the user makes a bare statement without a question (e.g. "I have a back/backlog"), ask ONE targeted follow-up to clarify it. Never ramble or guess a topic.
 
 DATA REFERENCE:
 BRANCHES: CSE, IT, ECE, EE, ME, CE, AIML, CSD (Data Science), CY (Cyber Security).
@@ -1025,8 +1068,8 @@ MAX_BACKOFF_SEC = 10.0
 # Model fallback list — tried in order on rate limit
 # Primary: llama-3.1-8b-instant (fast, good quality)
 # Fallback: groq/compound-mini (lighter, different backend = separate rate limit pool)
-# Fallback: qwen/qwen3-32b (good multilingual, may have separate rate limits)
-FALLBACK_MODELS = ["llama-3.1-8b-instant", "groq/compound-mini", "qwen/qwen3-32b"]
+# Fallback: qwen/qwen3.6-27b (good multilingual, may have separate rate limits)
+FALLBACK_MODELS = ["llama-3.1-8b-instant", "groq/compound-mini", "qwen/qwen3.6-27b"]
 
 
 @dataclass
@@ -1276,6 +1319,11 @@ class GroqService:
         # After 3+ follow-ups without a clear new intent, the bot re-asks what the user wants.
         self._session_follow_up_count: Dict[str, int] = {}
 
+        # Per-session counters for clarification / fallback messages so the SAME
+        # "please rephrase" message is never repeated twice in a row.
+        self._clarify_counts: Dict[str, int] = {}
+        self._fallback_counts: Dict[str, int] = {}
+
         # Core knowledge is read from disk on EVERY request (no stale cache across processes).
         self.core_kb = {}
 
@@ -1373,7 +1421,7 @@ class GroqService:
             f"LLM call failed after all retries ({time.time()-t_start:.1f}s). "
             f"Returning fallback for query='{query[:60]}'"
         )
-        return "I'm sorry, I'm having trouble connecting. Please call 0343-2501353."
+        return self._safe_fallback(lang, session_id)
 
     # -----------------------------------------------------------------------
     # Phase 4 — Cache helpers
@@ -1560,6 +1608,10 @@ class GroqService:
                     score += 1
                 if meta.get("language") == "en" and language != "en":
                     score -= 0.5
+                src = meta.get("source", "")
+                src_stem = src.split(".")[0].lower()
+                if src_stem and any(w in src_stem for w in query_words if len(w) > 2):
+                    score += 1.5
                 return score
 
             ranked = sorted(results, key=semantic_score, reverse=True)
@@ -1590,12 +1642,13 @@ class GroqService:
                 meta = doc.metadata if hasattr(doc, "metadata") else {}
                 section = meta.get("section", "")
                 sub = meta.get("subsection", "")
-                dedup_key = f"{section}:{sub}"
+                src = meta.get("source", "")
+                dedup_key = f"{src}:{section}:{sub}"
                 if dedup_key in seen_sections:
                     text = doc.page_content if hasattr(doc, "page_content") else str(doc)
                     discarded.append(
                         {
-                            "reason": f"duplicate section:subsection ({dedup_key})",
+                            "reason": f"duplicate source:section:subsection ({dedup_key})",
                             "section": section,
                             "subsection": sub,
                             "preview": text[:150],
@@ -1606,8 +1659,10 @@ class GroqService:
                 text = doc.page_content if hasattr(doc, "page_content") else str(doc)
                 if "[" in text and "]" in text:
                     text = text.split("]", 1)[-1].strip()
+                if len(text) > 700:
+                    text = text[:700].rsplit(" ", 1)[0] + "..."
                 context_chunks.append(text)
-                if len(context_chunks) >= 8:
+                if len(context_chunks) >= 4:
                     break
 
             self._last_retrieval_data = {
@@ -1630,6 +1685,812 @@ class GroqService:
             }
             return "", 0.0
 
+    # -----------------------------------------------------------------------
+    # Grounding — deterministic refusal for domains with NO verified data
+    # -----------------------------------------------------------------------
+
+    def _grounded_refusal_guard(self, query: str, lang: str) -> str | None:
+        """Refuse confidently for details we have no verified data for.
+
+        Covers the production-blocking hallucinations (canteen menu items,
+        xerox/shops near campus, office room numbers) that have ZERO entries
+        anywhere in the KB. Returns a refusal in the caller's language, or None.
+        """
+        q = query.lower()
+        canteen_words = ("canteen", "kantin", "mess", "food", "khana", "khaana",
+                         "khanar", "খাবার", "খানা", "khabar")
+        menu_words = ("pizza", "burger", "pasta", "sandwich", "sandwitch", "momo",
+                      "brownie", "falooda", "chowmein", "chow mein", "noodles",
+                      "fries", "fried rice", "cutlet", "roll", "paratha", "chaat",
+                      "idli", "dosa", "menu", "kya khana", "kya kha", "khane ko kya",
+                      "food available", "kya milta khane")
+        if any(w in q for w in menu_words) and any(w in q for w in canteen_words):
+            return self._refusal_text(lang, "menu")
+
+        shop_words = ("xerox", "photocopy", "photostat", "print shop", "printing",
+                      "stationery", "stationary", "lamination", "book shop",
+                      "bookstore", "cycle shop", "bike shop", "tea shop", "dhaba",
+                      "shop near", "dukan", "shop kahan", "shop kaha", "shops")
+        if any(w in q for w in shop_words):
+            return self._refusal_text(lang, "shop")
+
+        room_words = ("room number", "cabin", "office room", "office kahan",
+                      "office kaha", "principal office", "cabin number",
+                      "office number", "kis room", "which room")
+        location_nouns = ("office", "room", "cabin", "principal", "hod", "dean",
+                          "reception")
+        if any(w in q for w in room_words) and any(w in q for w in location_nouns):
+            return self._refusal_text(lang, "location")
+        return None
+
+    def _refusal_text(self, lang: str, kind: str) -> str:
+        messages = {
+            "menu": {
+                "en": "I don't have verified information about the canteen menu, so I won't guess. Please ask at the college help desk or reception for the current menu.",
+                "hi": "Canteen ke menu ke baare mein mere paas verified information nahi hai, isliye main guess nahi karta. Sahi jaankari ke liye college reception ya help desk se poochh lijiye.",
+                "bn": "Canteen er menu niye amar kache verified kono jana nei, tai ami andaja kori na. Thik jana jonno college er reception ba help desk e jiggesh korun.",
+            },
+            "shop": {
+                "en": "I don't have verified information about shops near the college, so I won't guess. Please ask at the college reception or help desk for accurate details.",
+                "hi": "College ke paas ke shops ke baare mein mere paas verified information nahi hai, isliye main guess nahi karta. Sahi jaankari ke liye college reception ya help desk se sampark karein.",
+                "bn": "College er kache thaka dokan gulo niye amar kache verified kono jana nei, tai ami andaja kori na. Thik jana jonno college er reception ba help desk e jogajog korun.",
+            },
+            "location": {
+                "en": "I don't have verified information about that specific location or room number, so I won't guess. Please ask at the college reception or help desk.",
+                "hi": "Is room number ya location ke baare mein mere paas verified information nahi hai, isliye main guess nahi karta. College reception ya help desk se poochh lijiye.",
+                "bn": "Oi room number ba location niye amar kache verified kono jana nei, tai ami andaja kori na. College er reception ba help desk e jiggesh korun.",
+            },
+            "unknown": {
+                "en": "I don't have verified information about that specific detail, so I won't guess. Please ask the college reception or help desk for accurate details.",
+                "hi": "Is khass jaankari ke baare mein mere paas verified information nahi hai, isliye main guess nahi karta. Sahi jaankari ke liye college reception ya help desk se poochh lijiye.",
+                "bn": "Ei bisoye thik thik verified kono jana amar kache nei, tai ami andaja kori na. Thik jana jonno college er reception ba help desk e jiggesh korun.",
+            },
+            "existence": {
+                "en": "That is not listed in the college knowledge base, so I cannot confirm it. Please ask at the college reception or help desk for accurate details.",
+                "hi": "Ye baat college knowledge base mein listed nahi hai, isliye main iski pushti nahi kar sakta. Sahi jaankari ke liye college reception ya help desk se poochh lijiye.",
+                "bn": "Ei bisoyta college knowledge base e listed nei, tai ami eta nishchit korte pari na. Thik jana jonno college er reception ba help desk e jiggesh korun.",
+            },
+            "hours": {
+                "en": "That facility's 24x7 operation is not listed in the college knowledge base, so I cannot confirm it. Please ask at the college reception or help desk.",
+                "hi": "Is facility ke 24x7 chalu rehne ke baare mein college knowledge base mein koi verified jaankari nahi hai, isliye main guess nahi karta. Sahi jaankari ke liye college reception ya help desk se poochh lijiye.",
+                "bn": "Ei facility 24x7 khola thaka niye college knowledge base e kono verified jana nei, tai ami andaja kori na. Thik jana jonno college er reception ba help desk e jiggesh korun.",
+            },
+        }
+        return messages.get(kind, {}).get(lang, messages[kind]["en"])
+
+    # -----------------------------------------------------------------------
+    # Existence-question guard — refuse claims about facilities/entities that
+    # are not listed anywhere in the college knowledge base, and refuse
+    # unverified 24x7/round-the-clock claims even for listed facilities.
+    # -----------------------------------------------------------------------
+
+    _EXISTENCE_ENTITY_PATTERNS = [
+        # "is there a <entity> ...", "are there any <entity> ..."
+        re.compile(
+            r"\b(is|are)\s+there\s+(?:a\s+|an\s+|any\s+)?(.+?)"
+            r"(?:\s+(?:in|at|for|on|near|inside|within|across)\s+\S.*)?$",
+            re.IGNORECASE,
+        ),
+        # "does <college> have <entity> ...", "do/did <college> have <entity> ..."
+        # (subject must be the institution, not the caller, so "does a student
+        #  have a backlog" is never treated as an existence question)
+        re.compile(
+            r"\b(?:does|do|did)\s+(?:(?:the\s+|this\s+)?"
+            r"(?:bcrec|college|campus|institute|institution|university)\s+)+"
+            r"have\s+(?:a\s+|an\s+|any\s+)?(.+?)"
+            r"(?:\s+(?:in|at|for|on|near|inside)\s+\S.*)?$",
+            re.IGNORECASE,
+        ),
+        # "has <college> (got) <entity> ..."
+        re.compile(
+            r"\bhas\s+(?:(?:the\s+|this\s+)?"
+            r"(?:bcrec|college|campus|institute|institution|university)\s+)+"
+            r"(?:got\s+)?(?:a\s+|an\s+|any\s+)?(.+?)"
+            r"(?:\s+(?:in|at|for|on|near|inside)\s+\S.*)?$",
+            re.IGNORECASE,
+        ),
+        # "is/are <the> <entity> open|available|present|offered|started|there"
+        re.compile(
+            r"^(?:is|are)\s+(?:the\s+|a\s+|an\s+)?(.+?)\s+"
+            r"(?:open|available|present|offered|started|there)\s*\??$",
+            re.IGNORECASE,
+        ),
+        # "is <entity> available/present/open ..."
+        re.compile(
+            r"^is\s+(?:there\s+)?(?:a\s+|an\s+|the\s+|any\s+)?(.+?)\s*"
+            r"(?:available|present|open)\??$",
+            re.IGNORECASE,
+        ),
+        # "kya <...> hai/hain/ache/আছে" — Hindi/Bengali existence "is there ..."
+        re.compile(
+            r"^kya\s+(.+?)\s+(?:hai|hain|ache|আছে)\s*\??$",
+            re.IGNORECASE,
+        ),
+        # "<entity> hai kya / nahi hai / hai na / ache ki / ..."
+        re.compile(
+            r"^(.+?)\s+(?:hai kya|nahi hai|hai na|ache ki|ache na|"
+            r"milta hai kya|available hai kya|milta kya)\s*\??$",
+            re.IGNORECASE,
+        ),
+        # "<entity> 24x7/24 hours/khula/open ... (hai)?"
+        re.compile(
+            r"^(.+?)\s+(?:24x7|24/7|24 hours|24 hour|round the clock|khula|khuli|"
+            r"khola|open|sara din|whole day)\s*(?:hai|hain|ache|আছে)?\s*\??$",
+            re.IGNORECASE,
+        ),
+    ]
+
+    _FULL_TIME_CLAIM_RE = re.compile(
+        r"\b(24x7|24\s*/\s*7|24\s*hours?|round[-\s]?the[-\s]?clock|sara din|"
+        r"whole day|all day|all night|always open|full time|throughout the day)\b",
+        re.IGNORECASE,
+    )
+
+    def _existence_entity(self, query: str) -> str | None:
+        """Extract the candidate entity from an existence-form question, or None."""
+        q = query.strip().lower().rstrip("?").rstrip("!")
+        for pat in self._EXISTENCE_ENTITY_PATTERNS:
+            m = pat.search(q)
+            if m:
+                for group in reversed(m.groups()):
+                    if group:
+                        return group.strip()
+        return None
+
+    def _clean_existence_entity(self, entity: str) -> str:
+        """Normalize an extracted entity phrase to its core noun phrase."""
+        e = entity.strip().lower()
+        e = re.sub(r"\s+", " ", e)
+        e = re.sub(
+            r"\s+(?:khula|khuli|khola|open|available|present|offered|started|there|"
+            r"24x7|24/7|24 hours|24 hour|round the clock|sara din|whole day|"
+            r"hai|hain|ache|আছে)\s*$",
+            "",
+            e,
+        )
+        e = re.sub(
+            r"^(?:(?:there|any|some|the|a|an|one|is|are|it|bcrec|college|campus)\s+)+",
+            "",
+            e,
+        )
+        e = re.sub(r"\b(?:bcrec|college|campus|mein|me|my|pe|par|per|in|at|on|the|ka|ki|ke|ko|se)\b", " ", e)
+        e = re.sub(r"\s{2,}", " ", e).strip()
+        return e
+
+    def _existence_corpus(self) -> str:
+        """Flatten every string value in the canonical KB for existence checks."""
+        if getattr(self, "_existence_corpus_cache", None) is not None:
+            return self._existence_corpus_cache
+        kb = self._read_kb()
+        parts: list = []
+
+        def _walk(node):
+            if isinstance(node, dict):
+                for value in node.values():
+                    _walk(value)
+            elif isinstance(node, list):
+                for value in node:
+                    _walk(value)
+            elif isinstance(node, str):
+                parts.append(node.lower())
+
+        try:
+            _walk(kb)
+        except Exception as e:
+            logger.error(f"Failed to flatten KB for existence corpus: {e}")
+        corpus = "\n".join(parts)
+        self._existence_corpus_cache = corpus
+        return corpus
+
+    def _existence_mentions(self, entity: str) -> bool:
+        """True if the entity (or all of its significant tokens) appears in the KB."""
+        corpus = self._existence_corpus()
+        if entity in corpus:
+            return True
+        tokens = [t for t in re.findall(r"[a-z0-9]{4,}", entity) if t not in self._STOPWORDS]
+        if not tokens:
+            return False
+        return all(t in corpus for t in tokens)
+
+    def _existence_refusal_guard(self, query: str, lang: str) -> str | None:
+        """Deterministically refuse existence claims about unlisted facilities.
+
+        Covers the production-blocking existence hallucinations:
+          - "does BCREC have a marine engineering branch?"  (not in KB)
+          - "Robotics lab public ke liye khula hai?"          (not in KB)
+          - "Cafeteria 24x7 hai?"                            (24x7 never verified)
+        while passing through listed facilities (gym, canteen, mess, library,
+        hostel, scholarships, departments) so grounded answers still flow.
+        """
+        entity = self._existence_entity(query)
+        if not entity:
+            return None
+        clean = self._clean_existence_entity(entity)
+        if not clean or len(clean) < 2:
+            return None
+        # Skip abstract/procedural phrasing that isn't a facility existence claim.
+        if re.search(r"\b(chance|possibility|provision|scope|availability)\b", clean):
+            return None
+        if not self._existence_mentions(clean):
+            logger.info(
+                f"EXISTENCE REFUSAL (not in KB): '{query[:80]}' -> entity '{clean}'"
+            )
+            return self._refusal_text(lang, "existence")
+        if self._FULL_TIME_CLAIM_RE.search(query):
+            if not self._existence_has_hours_evidence(clean):
+                logger.info(
+                    f"EXISTENCE REFUSAL (unverified 24x7 claim): '{query[:80]}' -> entity '{clean}'"
+                )
+                return self._refusal_text(lang, "hours")
+            # Full-time hours are actually documented for this entity in the KB —
+            # let the LLM ground the answer against the verified docs.
+            return None
+        return None
+
+    def _existence_has_hours_evidence(self, entity: str) -> bool:
+        """True when the KB documents round-the-clock hours for the entity
+        itself (e.g. medical emergency access), so its 24x7 claim is grounded
+        rather than refused. Uses the canonical KB structure so an unrelated
+        '24x7 cctv security' record never vouches for a cafeteria claim."""
+        full_time = re.compile(
+            r"\b(24x7|24\s*/\s*7|24\s*hours?|round[-\s]?the[-\s]?clock|sara din|"
+            r"whole day|all day|always open)\b",
+            re.IGNORECASE,
+        )
+        e = entity.strip().lower()
+
+        def _node_has_full_time(node) -> bool:
+            if isinstance(node, str):
+                return bool(full_time.search(node))
+            if isinstance(node, list):
+                return any(_node_has_full_time(x) for x in node)
+            if isinstance(node, dict):
+                return any(_node_has_full_time(v) for v in node.values())
+            return False
+
+        def _scan(node):
+            if not isinstance(node, dict):
+                return False
+            for key, value in node.items():
+                k = str(key).lower().replace("_", " ").strip()
+                if e == k or (len(e) >= 5 and e in k):
+                    if _node_has_full_time(value):
+                        return True
+                if _scan(value):
+                    return True
+            return False
+
+        try:
+            return _scan(self._read_canonical_kb())
+        except Exception as exc:
+            logger.error(f"Failed to check 24x7 evidence for '{entity}': {exc}")
+            return False
+
+    def _existence_entity_is_known(self, query: str) -> bool:
+        """True when the query is an existence-form question about a facility
+        that IS listed in the KB. Used to skip the downstream low-confidence
+        refusal so grounded answers about known facilities (gym, library,
+        canteen, mess, hostel) still flow through to the LLM."""
+        entity = self._existence_entity(query)
+        if not entity:
+            return False
+        clean = self._clean_existence_entity(entity)
+        if not clean or len(clean) < 2:
+            return False
+        if re.search(r"\b(chance|possibility|provision|scope|availability)\b", clean):
+            return False
+        return self._existence_mentions(clean)
+
+    # -----------------------------------------------------------------------
+    # Retrieval confidence tiers + low-confidence hallucination guard
+    # -----------------------------------------------------------------------
+
+    _LOW_CONF_THRESHOLD = 0.25
+    _HIGH_CONF_THRESHOLD = 0.35
+
+    _QUERY_ALIASES = {
+        "placement": "placement", "package": "package", "lpa": "package",
+        "salary": "package", "ctc": "package", "naukri": "placement",
+        "fee": "fee", "fees": "fee", "tuition": "fee", "kharcha": "fee",
+        "installment": "fee", "semester": "fee", "fee structure": "fee",
+        "hostel": "hostel", "dorm": "hostel", "hostel fee": "hostel",
+        "scholarship": "scholarship", "scolarship": "scholarship",
+        "stipend": "scholarship", "borshok": "scholarship",
+        "backlog": "backlog", "arrear": "backlog", "kt": "backlog",
+        "cutoff": "cutoff", "cut off": "cutoff", "percentile": "cutoff",
+        "joss": "cutoff", "rank": "cutoff",
+        "admission": "admission", "counselling": "admission",
+        "principal": "principal", "hod": "hod", "dean": "dean",
+        "canteen": "canteen", "mess": "canteen", "menu": "menu",
+        "library": "library", "ragging": "ragging", "safety": "safety",
+        "anti ragging": "ragging",
+    }
+
+    _STOPWORDS = frozenset({
+        "and", "the", "for", "with", "from", "this", "that", "what", "which",
+        "when", "where", "why", "how", "who", "about", "please", "some", "any",
+        "kya", "ka", "ki", "ke", "ko", "kaise", "kahan", "kaha", "kitna",
+        "kitne", "kitni", "hai", "hain", "ho", "tha", "thee", "me", "main",
+        "mera", "meri", "mere", "aap", "tum", "uska", "is", "in", "on", "of",
+        "to", "a", "an", "bcrec", "college", "have", "has", "does", "did",
+        "are", "is", "was", "were", "will", "can", "koto", "kore", "kon",
+        "kis", "kiski", "kiska", "apna", "mere", "liye",
+    })
+
+    def _looks_like_factual_ask(self, query: str) -> bool:
+        """True if the query demands specific factual info (not chit-chat)."""
+        q = query.lower()
+        markers = (
+            "?", "kya", "kitna", "kitne", "kitni", "how", "what", "which",
+            "when", "where", "why", "kahan", "kaha", "kaise", "koto",
+            "available", "facility", "is there", "are there", "does", "has",
+            "exists", "hai", "hain", "hoti", "hota", "how much", "how many",
+            "ache", "keno", "kobe", "kon", "আছে", "কি", "কোন", "কেন",
+        )
+        if any(m in q for m in markers):
+            return True
+        dom, _ = self._classify_domain_and_attr(query)
+        return dom is not None
+
+    def _confidence_tier(self, conf: float) -> str:
+        if conf >= self._HIGH_CONF_THRESHOLD:
+            return "high"
+        if conf >= self._LOW_CONF_THRESHOLD:
+            return "medium"
+        return "low"
+
+    def _kb_covers_query(self, query: str, retrieval_context: str) -> bool:
+        """True if significant query terms appear in the verified corpus."""
+        kb_text = self._format_kb_context().lower()
+        verified = (kb_text + "\n" + (retrieval_context or "")).lower()
+        tokens = set(re.findall(r"[a-z0-9]+", query.lower()))
+        tokens.difference_update(self._STOPWORDS)
+        tokens = {t for t in tokens if len(t) >= 3}
+        for tok in tokens:
+            if tok in verified:
+                return True
+            alias = self._QUERY_ALIASES.get(tok)
+            if alias and alias in verified:
+                return True
+        q = query.lower()
+        for phrase, canonical in self._QUERY_ALIASES.items():
+            if " " in phrase and phrase in q and canonical in verified:
+                return True
+        return False
+
+    def _low_confidence_guard(
+        self, query: str, lang: str, conf: float, retrieval_context: str
+    ) -> str | None:
+        """Deterministically refuse factual asks when retrieval is weak AND the
+        verified corpus (static KB + retrieved docs) does not cover the topic.
+
+        Prevents LLM hallucination on topics like 'swimming pool', 'playground
+        timings' or unlisted specifics, while letting genuinely-answerable
+        queries through when the KB/retrieval contains their terms.
+        """
+        if conf >= self._LOW_CONF_THRESHOLD:
+            return None
+        if not self._looks_like_factual_ask(query):
+            return None
+        dom, _ = self._classify_domain_and_attr(query)
+        if dom:
+            return None
+        if self._kb_covers_query(query, retrieval_context):
+            return None
+        logger.info(
+            f"LOW CONFIDENCE REFUSAL (conf={conf:.3f}, no KB coverage): '{query[:80]}'"
+        )
+        return self._refusal_text(lang, "unknown")
+
+    # -----------------------------------------------------------------------
+    # Short-follow-up resolution — "kitna?", "36 lpa?", "aur?", "highest?"
+    # -----------------------------------------------------------------------
+
+    _DOMAIN_LABELS = {
+        "placement": "placement package",
+        "fee": "total course fee",
+        "hostel": "hostel fee and facilities",
+        "admission": "admission process",
+        "scholarship": "scholarship details",
+        "cutoff": "cutoff",
+        "department": "departments and their courses",
+        "backlog": "backlog policy",
+        "hod": "HOD details",
+        "contact": "contact details",
+        "safety": "safety and anti-ragging",
+        "college_info": "college details",
+    }
+
+    def _classify_domain_and_attr(self, query: str) -> tuple[str | None, str | None]:
+        """Map a query to (domain, attr_label) so short follow-ups can resolve against it."""
+        q = query.lower()
+        domain = None
+        for name, kws in (
+            ("scholarship", ("scholarship", "stipend", "scolarship", "financial aid", "borshok")),
+            ("placement", ("placement", "package", "lpa", "recruit", "recruiter", "placed",
+                           "company", "ctc", "salary", "annual package", "naukri")),
+            ("backlog", ("backlog", "back paper", "arrear", "fail", "supplementary", "kt")),
+            ("hostel", ("hostel", "mess", "dorm", "hostel fee")),
+            ("cutoff", ("cutoff", "cut off", "percentile", "joss")),
+            ("fee", ("fee", "fees", "tuition", "semester fee", "admission fee", "installment", "kharcha")),
+            ("admission", ("admission", "apply", "counselling", "application", "admission form", "entrance")),
+            ("department", ("department", "branch", "course", "program", "aiml", "csd", "mtech")),
+        ):
+            if any(kw in q for kw in kws):
+                domain = name
+                break
+        if domain is None:
+            return None, None
+        attr = None
+        if any(kw in q for kw in ("package", "lpa", "ctc", "salary", "annual package")):
+            attr = "placement package"
+        elif any(kw in q for kw in ("rate", "percentage", "percent", "per cent")):
+            attr = "placement rate"
+        elif any(kw in q for kw in ("fee", "fees", "tuition", "installment")):
+            attr = "total fee"
+        elif any(kw in q for kw in ("cutoff", "rank", "percentile", "joss")):
+            attr = "cutoff"
+        elif any(kw in q for kw in ("scholarship", "stipend")):
+            attr = "scholarship"
+        elif domain == "placement":
+            attr = "placement package"
+        elif domain == "fee":
+            attr = "total fee"
+        elif domain == "hostel":
+            attr = "hostel fee and facilities"
+        if any(w in q for w in ("highest", "max", "best", "sabse zyada", "sabse jyada", "সর্বোচ্চ")):
+            if attr:
+                attr = f"highest {attr}"
+        return domain, attr
+
+    def _record_topic(self, query: str, session_id: str) -> None:
+        """Store the topic (domain + attr) of the current query for short-follow-up resolution."""
+        state = self._get_or_create_state(session_id)
+        dom, attr = self._classify_domain_and_attr(query)
+        if dom:
+            state.last_domain = dom
+            if attr:
+                state.last_attr = attr
+        state.last_question = query
+
+    def _extract_branches_from_history(self, session_id: str, recent_n: int = 8) -> list:
+        """Collect distinct branch codes mentioned across recent user turns.
+
+        Used to resolve comparative follow-ups ("which is better?") against the
+        branches the caller actually named, e.g. 'CSE -> AIML -> which is better?'.
+        """
+        found: list = []
+        seen: set = set()
+        turns = self._sessions.get(session_id, [])
+        texts = []
+        state = self._get_or_create_state(session_id)
+        if state.last_question:
+            texts.append(state.last_question)
+        for turn in turns[-recent_n:]:
+            if isinstance(turn, dict) and turn.get("role") == "user":
+                texts.append(turn.get("content", ""))
+        corpus = " ".join(texts).lower()
+        for alias in sorted(DEPT_CODE_MAP, key=len, reverse=True):
+            if re.search(rf"\b{re.escape(alias)}\b", corpus):
+                code = DEPT_CODE_MAP[alias]
+                if code not in seen:
+                    seen.add(code)
+                    found.append(code)
+        return found
+
+    def _resolve_short_followup(self, query: str, session_id: str) -> str | None:
+        """Expand short/elliptical follow-ups to a full query using session state.
+
+        Production cases:
+          - "36 lpa?" after "Highest package? -> 9 LPA"  -> asks whether the highest
+            package is 36 LPA, so the next turn corrects with the verified figure.
+          - "kitna?" after branch placements               -> "What is the highest
+            placement package?"
+          - "aur?", "uska?", "highest?"                    -> continue the last domain.
+        Returns the expanded query, or None if not a short follow-up.
+        """
+        state = self._get_or_create_state(session_id)
+        prev_domain = state.last_domain
+        if not prev_domain:
+            return None
+        prev_attr = state.last_attr or self._DOMAIN_LABELS.get(prev_domain, prev_domain)
+        q = query.strip()
+        q_lower = q.lower()
+
+        # Bare number with optional unit: "36 lpa?", "70%?", "40k?", "20000"
+        m = re.fullmatch(r"([0-9][0-9,.]*)\s*(lpa|lakh|%|percent|per cent|k|thousand|rs\.?)?\s*\??", q_lower)
+        if m:
+            value = m.group(1).replace(",", "")
+            unit_raw = (m.group(2) or "").strip().rstrip(".")
+            unit = {
+                "lpa": "LPA", "lakh": "Lakh", "%": "%", "percent": "%",
+                "per cent": "%", "k": "k", "thousand": "thousand",
+                "rs": "rupees",
+            }.get(unit_raw, "")
+            expanded = (
+                f"Is the {prev_attr} {value} {unit}? If the verified college data "
+                f"differs, state the correct figure clearly. If not, confirm it."
+            ).replace("  ", " ")
+            logger.info(f"[{session_id}] Short follow-up '{q}' -> '{expanded}' (domain={prev_domain})")
+            return expanded.strip()
+
+        # Question-word / quantity follow-ups: "kitna?", "how much?", "kya?"
+        qw_pattern = (
+            r"\s*(kitna|kitne|kitni|kutna|koto|how much|how many|kya hua|kya hai|"
+            r"kya hota|kya ho|kya\b|bolo|batao|bataiye|boliye|bolo aur|বলে|কত|কী হলো|কি হলো|"
+            r"কী হয়|কি হয়)\s*\??\s*"
+        )
+        if re.fullmatch(qw_pattern, q_lower, re.IGNORECASE):
+            attr = "highest placement package" if prev_domain == "placement" else prev_attr
+            expanded = f"What is the {attr}? Answer from verified college data only."
+            logger.info(f"[{session_id}] Short follow-up '{q}' -> '{expanded}' (domain={prev_domain})")
+            return expanded
+
+        # Continuation follow-ups: "aur?", "aur batao?", "uska?", "details", "more"
+        if re.fullmatch(
+            r"(?:aur(?:\s+kya|\s+batao|\s+bataiye|\s+bolo|\s+sunao)?|"
+            r"aage(?:\s+batao)?|and(?:\s+then)?|more(?:\s+details)?|details|"
+            r"tell me more|uska(?:\s+kya)?|uske baare(?:\s+mein)?|uske baare me|"
+            r"iske baare(?:\s+mein)?|wo(?:\s+wala)?|আর(?:\s+কী)?|আরও)\s*\??",
+            q_lower,
+        ):
+            expanded = (
+                f"Tell me more about {prev_domain}: {prev_attr}. "
+                f"Answer from verified college data only."
+            )
+            logger.info(f"[{session_id}] Short follow-up '{q}' -> '{expanded}' (domain={prev_domain})")
+            return expanded
+
+        # Reason follow-up: "why?", "kyun?", "karon?"
+        if re.fullmatch(
+            r"\s*(why|why is that|why so|kyun|kyo|kyn|kis liye|kis karan|karon|"
+            r"karon ki|keno|কেন|क्यों)\s*\??\s*",
+            q_lower,
+            re.IGNORECASE,
+        ):
+            expanded = (
+                f"Why? Explain the reason behind the {prev_attr} of {prev_domain} at BCREC "
+                f"using only verified college data. If the verified data does not contain "
+                f"the reason, state the facts you have and say the specific reason is not "
+                f"documented."
+            )
+            logger.info(f"[{session_id}] Short follow-up '{q}' -> '{expanded}' (domain={prev_domain})")
+            return expanded
+
+        # Comparative follow-up: "which is better?", "kaun sa better?", "best branch?"
+        if re.fullmatch(
+            r"\s*(which(?:\s+one)?(?:\s+is)?\s+(?:better|best)|which is better|"
+            r"kaun sa better|kaun sa behtar|konsa better|konsa behtar|kon ta bhalo|"
+            r"better kya|behtar kaun|sabse achha kaun|sabse badhiya|best course|"
+            r"better hai|konsa sahi|কোনটা ভালো)\s*(?:hai|hain|ache|আছে)?\s*\??\s*",
+            q_lower,
+            re.IGNORECASE,
+        ):
+            branches = self._extract_branches_from_history(session_id)
+            if len(branches) >= 2:
+                b1, b2 = branches[-2], branches[-1]
+                expanded = (
+                    f"Compare {b1} and {b2} at BCREC on {prev_attr}. Using verified college "
+                    f"data only, state which is better and give the numbers that support it."
+                )
+            else:
+                expanded = (
+                    f"Which is better? Compare the last topics discussed ({prev_domain}: "
+                    f"{prev_attr}) using verified college data only and give a clear verdict."
+                )
+            logger.info(f"[{session_id}] Short follow-up '{q}' -> '{expanded}' (domain={prev_domain})")
+            return expanded
+
+        # Eligibility follow-up: "still eligible?", "ab bhi eligible hoon?"
+        if re.search(
+            r"\b(still|ab bhi|tobi|tabe)\s+eligible|eligible\s*(hoon|hu|ami|am|hai|ache|আছে)?\s*\??\s*$",
+            q_lower,
+        ):
+            expanded = (
+                f"Considering my earlier question about {prev_attr} ({prev_domain}) at BCREC, "
+                f"am I still eligible? Answer from verified college data only, and say clearly "
+                f"if the eligibility rule is not documented."
+            )
+            logger.info(f"[{session_id}] Short follow-up '{q}' -> '{expanded}' (domain={prev_domain})")
+            return expanded
+
+        # Comparative single-word follow-ups: "highest?", "best?", "minimum?"
+        if re.fullmatch(
+            r"\s*(highest|best|maximum|max|top|lowest|minimum|sabse zyada|sabse jyada|"
+            r"sabse kam|sabse achha|সেরা|সর্বোচ্চ)\s*\??\s*",
+            q_lower,
+            re.IGNORECASE,
+        ):
+            attr = f"highest {self._DOMAIN_LABELS.get(prev_domain, prev_domain)}"
+            expanded = f"What is the {attr}? Answer from verified college data only."
+            logger.info(f"[{session_id}] Short follow-up '{q}' -> '{expanded}' (domain={prev_domain})")
+            return expanded
+
+        # Statistical attribute follow-ups: "average?", "median?", "avg?", "mean?"
+        if re.fullmatch(
+            r"\s*(average|avg|median|mean|average package|median package|avg package)\s*\??\s*",
+            q_lower,
+            re.IGNORECASE,
+        ):
+            stat = "median" if q_lower.startswith("median") else "average"
+            base_attr = prev_attr
+            for _prefix in ("highest ", "best ", "maximum ", "minimum ", "lowest "):
+                if base_attr.startswith(_prefix):
+                    base_attr = base_attr[len(_prefix):]
+                    break
+            expanded = (
+                f"What is the {stat} {base_attr} at BCREC? "
+                f"Answer from verified college data only."
+            ).replace("  ", " ")
+            logger.info(f"[{session_id}] Short follow-up '{q}' -> '{expanded}' (domain={prev_domain})")
+            return expanded
+
+        # "Which one?" follow-ups: "kaunsi?", "kaun si?", "konsi?", "konsa?", "which one?"
+        if re.fullmatch(
+            r"\s*(kaun si|kaunsi|kaun sa|kaunsa|konsi|konsa|kon si|kon sa|which one|"
+            r"which is this|কোনটা|কোনটি)\s*\??\s*",
+            q_lower,
+            re.IGNORECASE,
+        ):
+            if prev_domain == "scholarship":
+                expanded = (
+                    "Which scholarship schemes are available at BCREC? List each scheme "
+                    "with its amount and eligibility from verified college data only."
+                )
+            elif prev_domain == "placement":
+                expanded = (
+                    f"Which {prev_attr} figures apply at BCREC? Enumerate the placement "
+                    f"details by branch from verified college data only."
+                )
+            else:
+                expanded = (
+                    f"Which of the {prev_attr} ({prev_domain}) options apply at BCREC? "
+                    f"Enumerate them from verified college data only."
+                )
+            logger.info(f"[{session_id}] Short follow-up '{q}' -> '{expanded}' (domain={prev_domain})")
+            return expanded
+
+        # Eligibility facet follow-up: "eligibility?", "criteria?", "eligibility kya hai?"
+        if re.fullmatch(
+            r"\s*(eligibility|eligibility criteria|eligibility kya|eligibility kya hai|"
+            r"eligibility kya hoti hai|criteria|criteria kya|criteria kya hai)\s*\??\s*",
+            q_lower,
+            re.IGNORECASE,
+        ):
+            expanded = (
+                f"What is the eligibility for {prev_attr} ({prev_domain}) at BCREC? "
+                f"Answer from verified college data only, and say clearly if the "
+                f"eligibility rule is not documented."
+            )
+            logger.info(f"[{session_id}] Short follow-up '{q}' -> '{expanded}' (domain={prev_domain})")
+            return expanded
+
+        # Renewal facet follow-up: "renewal?", "renew?", "renewal kya hai?"
+        if re.fullmatch(
+            r"\s*(renewal|renewal kya|renewal kya hai|renewal process|renewal rules|"
+            r"renewal conditions|renew|har saal|har bar|dobara)\s*\??\s*",
+            q_lower,
+            re.IGNORECASE,
+        ):
+            expanded = (
+                f"How is the {prev_attr} renewed at BCREC? Explain the renewal conditions "
+                f"from verified college data only, and say clearly if renewal rules are "
+                f"not documented."
+            )
+            logger.info(f"[{session_id}] Short follow-up '{q}' -> '{expanded}' (domain={prev_domain})")
+            return expanded
+
+        # Backlog-conditional follow-up: "backlog ho to?", "agar backlog hai to?"
+        if re.fullmatch(
+            r"\s*backlog(?:\s+(?:hai|ho|hua))?\s+to\s*\??\s*",
+            q_lower,
+        ) or re.search(
+            r"\b(backlog|arrear|kt|back paper|supplementary)\b.*\b(ho to|hai to|hua to|"
+            r"hone par|ho jaye to|rah gaya to|raha to)\b",
+            q_lower,
+        ):
+            expanded = (
+                f"If a student has a backlog, how does it affect {prev_attr} "
+                f"({prev_domain}) at BCREC? Explain the backlog policy from verified "
+                f"college data only, and say clearly if the policy is not documented."
+            )
+            logger.info(f"[{session_id}] Short follow-up '{q}' -> '{expanded}' (domain={prev_domain})")
+            return expanded
+
+        return None
+
+    # -----------------------------------------------------------------------
+    # Conversation policy — graceful exits and thanks
+    # -----------------------------------------------------------------------
+
+    def _detect_exit_intent(self, query: str, lang: str) -> str | None:
+        q = query.strip().lower().rstrip("?").rstrip("!").strip()
+        if not q or len(q) > 40:
+            return None
+        exact = {
+            "choro", "chhor", "chor do", "chhor do", "rehne do", "rehne de",
+            "koi baat nahi", "koi baat nahin", "koi baat nhi", "dekh lunga",
+            "dekh lenge", "abhi nahi", "abhi nhi", "skip", "leave it",
+            "forget it", "never mind", "dismiss", "cancel", "bye", "goodbye",
+            "good bye", "alvida", "tata", "tata bye", "ok bye", "okay bye",
+            "chalta hoon", "chalta hun", "chaliye", "chalte hain", "no thanks",
+            "বাই", "আলবিদা",
+        }
+        if q in exact:
+            return self._exit_text(lang)
+        for opener in (
+            "choro", "chhor", "rehne do", "rehne de", "baad me dekh", "baad mein dekh",
+            "abhi nahi", "abhi nhi", "dekh lunga", "dekh lenge",
+        ):
+            if q.startswith(opener):
+                return self._exit_text(lang)
+        return None
+
+    def _exit_text(self, lang: str) -> str:
+        return {
+            "hi": "Theek hai. Agar baad me koi aur sawal ho to bataiye. Alvida.",
+            "bn": "Thik ache. Pore kono sawal thakle janaben. Biday.",
+            "en": "Okay. If you have any more questions later, just ask. Goodbye.",
+        }.get(lang, "Okay. If you have any more questions later, just ask. Goodbye.")
+
+    def _detect_thanks_intent(self, query: str, lang: str) -> str | None:
+        q = query.strip().lower().rstrip("?").rstrip("!").strip()
+        if not q or len(q) > 30:
+            return None
+        thanks = ("thank you", "thanks", "thank u", "thnx", "tnx", "ty",
+                  "shukriya", "dhanyawad", "dhanyabad", "dhonnobad",
+                  "ধন্যবাদ", "শুকরিয়া")
+        if any(t in q for t in thanks):
+            return {
+                "hi": "Aapka swagat hai. Aur koi madad chahiye ho to bataiye.",
+                "bn": "Apnake swagat. Aar kono sahajjo lage to janaben.",
+                "en": "You're welcome. Let me know if you need anything else.",
+            }.get(lang, "You're welcome. Let me know if you need anything else.")
+        return None
+
+    def _detect_ack_intent(self, query: str, lang: str) -> str | None:
+        """Standalone acknowledgments ('okay', 'fine', 'theek hai') — short,
+        content-free utterances. Return a brief ack instead of searching the KB."""
+        q = query.strip().lower().rstrip("?").rstrip("!").strip()
+        if not q or len(q) > 24:
+            return None
+        acks = {
+            "okay", "ok", "okkk", "fine", "alright", "right", "good", "hn",
+            "hmm", "haan", "ha", "achha", "acha", "theek", "theek hai",
+            "thik", "thik hai", "thik ache", "thik aase", "bhalo", "bhalo ache",
+            "sahi", "sahi hai", "ठीक", "ठीक है",
+            "ঠিক", "ঠিক আছে", "আচ্ছা", "jarur", "han ji",
+        }
+        if q not in acks:
+            return None
+        return {
+            "hi": "Theek hai. Aur kuch poochhna ho to bataiye.",
+            "bn": "Thik ache. Aar kichu jiggesh korar thakle janaben.",
+            "en": "Okay. Let me know if you have any more questions.",
+        }.get(lang, "Okay. Let me know if you have any more questions.")
+
+    # -----------------------------------------------------------------------
+    # Grounding telemetry — retrieval score / documents used / sources
+    # -----------------------------------------------------------------------
+
+    def _collect_retrieval_telemetry(self) -> dict:
+        data = getattr(self, "_last_retrieval_data", None) or {}
+        top = data.get("top_10_raw") or []
+        sources: list = []
+        chunk_ids: list = []
+        for t in top:
+            src = t.get("source") or ""
+            if src and src not in sources:
+                sources.append(src)
+            cid = t.get("document_id") or ""
+            if cid and cid not in chunk_ids:
+                chunk_ids.append(cid)
+        return {
+            "retrieval_score": round(float(data.get("confidence", 0.0)), 3),
+            "documents_used": int(data.get("chunks_passed", 0)),
+            "source_file": sources[:3],
+            "chunk_ids": chunk_ids[:5],
+        }
 
     def _format_kb_context(self) -> str:
         """Read canonical KB and return a compact structured data block for injection."""
@@ -1698,6 +2559,66 @@ class GroqService:
             elif available is False:
                 parts.append("- Hostel: not available")
 
+            infra = kb.get("infrastructure", {})
+            if isinstance(infra, dict):
+
+                def _infra_val(x):
+                    if isinstance(x, dict) and "value" in x:
+                        return x["value"]
+                    return x
+
+                infra_parts = []
+                library = _infra_val(infra.get("library")) or {}
+                if isinstance(library, dict):
+                    books = _infra_val(library.get("books"))
+                    desc = _infra_val(library.get("description"))
+                    journals = _infra_val(library.get("journals"))
+                    if books or desc:
+                        lib_bits = ["Library"]
+                        if desc:
+                            lib_bits.append(str(desc))
+                        if books:
+                            lib_bits.append(f"{books} books")
+                        if journals:
+                            lib_bits.append(str(journals))
+                        infra_parts.append("; ".join(lib_bits))
+                canteen = _infra_val(infra.get("canteen")) or {}
+                if isinstance(canteen, dict) and _infra_val(canteen.get("available")) is True:
+                    infra_parts.append("Canteen: available on campus")
+                sports = _infra_val(infra.get("sports")) or {}
+                if isinstance(sports, dict):
+                    gym = _infra_val(sports.get("gym"))
+                    ground = _infra_val(sports.get("ground"))
+                    outdoor = _infra_val(sports.get("outdoor")) or []
+                    indoor = _infra_val(sports.get("indoor")) or []
+                    bits = []
+                    if gym:
+                        bits.append(str(gym))
+                    if ground:
+                        bits.append(str(ground))
+                    if outdoor:
+                        bits.append("outdoor: " + ", ".join(outdoor))
+                    if indoor:
+                        bits.append("indoor: " + ", ".join(indoor))
+                    if bits:
+                        infra_parts.append("Sports: " + "; ".join(bits))
+                wifi = _infra_val(infra.get("wifi")) or {}
+                coverage = _infra_val(wifi.get("coverage"))
+                if coverage:
+                    infra_parts.append(f"WiFi: {coverage}")
+                medical = _infra_val(infra.get("medical")) or {}
+                if isinstance(medical, dict) and _infra_val(medical.get("available")) is True:
+                    emergency = _infra_val(medical.get("emergency"))
+                    hospital = _infra_val(medical.get("hospital"))
+                    med_bits = ["Medical: available on campus"]
+                    if emergency:
+                        med_bits.append(str(emergency))
+                    if hospital:
+                        med_bits.append(str(hospital))
+                    infra_parts.append("; ".join(med_bits))
+                if infra_parts:
+                    parts.append("- Infrastructure: " + " | ".join(infra_parts))
+
             placements = kb.get("placements", {})
             overall = placements.get("overall_rate_2025", {}).get("value", "")
             avg_pkg = placements.get("average_package", {}).get("value", "")
@@ -1728,6 +2649,36 @@ class GroqService:
             if branch_rates:
                 parts.append("- Branch rates: " + ", ".join(branch_rates))
 
+            scholarships = kb.get("scholarships", {})
+            schemes = scholarships.get("schemes", {})
+            schol_parts = []
+            if isinstance(schemes, dict):
+                for key, data in schemes.items():
+                    if not isinstance(data, dict):
+                        continue
+                    name = (data.get("name", {}) or {}).get("value", "") or key
+                    bits = [name]
+                    benefit = (data.get("benefit", {}) or {}).get("value", "")
+                    amount = (data.get("amount", {}) or {}).get("value", "")
+                    seats = (data.get("seats", {}) or {}).get("value", "")
+                    eligible = (data.get("eligible", {}) or {}).get("value", "")
+                    if amount:
+                        bits.append(f"amount {amount}")
+                    if benefit:
+                        bits.append(benefit)
+                    if seats:
+                        bits.append(seats)
+                    if eligible:
+                        bits.append(f"eligible: {eligible}")
+                    schol_parts.append("; ".join(bits))
+            if schol_parts:
+                parts.append("- Scholarships: " + " | ".join(schol_parts))
+            schol_elig = scholarships.get("eligibility", {})
+            merit = (schol_elig.get("merit", {}) or {}).get("value", "")
+            means = (schol_elig.get("means", {}) or {}).get("value", "")
+            if merit or means:
+                parts.append(f"- Scholarship eligibility: {merit}; {means}")
+
             ar = kb.get("anti_ragging", {})
             if isinstance(ar, dict) and ar.get("policy", {}).get("value"):
                 parts.append("- Anti-ragging: strict policy enforced")
@@ -1741,31 +2692,93 @@ class GroqService:
             logger.error(f"Failed to format KB context: {e}")
             return ""
 
+    def _is_self_referential(self, query: str) -> bool:
+        """True if the caller is talking about themselves (first-person)."""
+        return bool(
+            re.search(
+                r"\b(i|me|my|mine|myself|i'm|i am|i have|i got|i scored|"
+                r"hum|hamara|hamari|hamare|mera|meri|mere|mujhe|main|"
+                r"ami|amar|amra|mora|আমি|আমার|মোর|আমাদের)\b",
+                query,
+                re.IGNORECASE,
+            )
+        )
+
     def _extract_user_profile(self, session_id: str, query: str) -> None:
-        """Extract rank, PCM, interest from query and store in session state."""
+        """Extract caller-stated profile data (rank, PCM, board, state, interest).
+
+        Caller ATTRIBUTES (rank, percentage, board, state) are only extracted
+        from explicit first-person statements so college data (e.g. "91%
+        placement") is never mistaken for the caller's own marks. Department
+        interest is tracked as a conversation topic for follow-up resolution.
+        """
         state = self._get_or_create_state(session_id)
         q = query.strip().lower()
+        self_ref = self._is_self_referential(query)
 
-        rank_match = re.search(r'rank\\s*(?:is|:)?\\s*(\\d+)', q)
-        if rank_match:
-            state.rank = int(rank_match.group(1))
+        # rank — only when the caller states their OWN rank.
+        if self_ref:
+            rank_match = re.search(r"\brank\s*(?:is|:)?\s*(\d+)", q)
+            if rank_match:
+                state.rank = int(rank_match.group(1))
 
-        pct_match = re.search(r'(?:pcm|percentage|percent|%)\\s*(\\d+)', q)
-        if pct_match:
-            state.pcm_percent = float(pct_match.group(1))
-        pct_match2 = re.search(r'(\\d+)\\s*(?:%|percent)', q)
-        if pct_match2:
-            state.pcm_percent = float(pct_match2.group(1))
+        # PCM % — only when the caller states their OWN percentage.
+        if self_ref:
+            pct_match = re.search(
+                r"(?:my\s+|i\s+(?:have|got|scored|secured)\s+)?"
+                r"(?:pcm|percentage|percent)\s*(?:is|:)?\s*(\d+(?:\.\d+)?)",
+                q,
+            )
+            if not pct_match:
+                pct_match = re.search(
+                    r"(?:my\s+|i\s+(?:have|got|scored|secured)\s+)?"
+                    r"(\d+(?:\.\d+)?)\s*(?:%|percent)",
+                    q,
+                )
+            if pct_match:
+                state.pcm_percent = float(pct_match.group(1))
+
+        # board — only when the caller states their OWN board.
+        if self_ref:
+            board_map = {
+                "wbchse": "WBCHSE",
+                "west bengal board": "WBCHSE",
+                "bengal board": "WBCHSE",
+                "cbse": "CBSE",
+                "central board": "CBSE",
+                "icse": "ICSE",
+                "isc": "ISC",
+                "state board": "State Board",
+            }
+            for alias, code in board_map.items():
+                if re.search(rf"\b{re.escape(alias)}\b", q):
+                    state.board = code
+                    break
+
+        # state — only when the caller states where they are from.
+        if self_ref:
+            state_map = {
+                "west bengal": "WB",
+                "w b": "WB",
+                "bihar": "Bihar",
+                "jharkhand": "Jharkhand",
+                "uttar pradesh": "UP",
+                "up ": "UP",
+            }
+            for alias, code in state_map.items():
+                if re.search(rf"\b{re.escape(alias)}\b", q):
+                    state.state = code
+                    break
 
         interest_patterns = [
-            r'(?:interest|interested|like|love|prefer)\\s+(?:in\\s+)?(\\w+(?:\\s+\\w+){0,3})',
-            r'(\\w+(?:\\s+\\w+)?)\\s+(?:interest|field|stream)',
+            r'(?:interest|interested|like|love|prefer)\s+(?:in\s+)?(\w+(?:\s+\w+){0,3})',
+            r'(\w+(?:\s+\w+)?)\s+(?:interest|field|stream)',
         ]
         for pat in interest_patterns:
             m = re.search(pat, q)
             if m:
                 interest = m.group(1).strip().lower()
-                if interest not in ('it', 'this', 'that', 'the', 'a', 'an'):
+                if interest not in ('it', 'me', 'this', 'that', 'the', 'a', 'an'):
                     state.interest = interest
                     break
 
@@ -1774,17 +2787,21 @@ class GroqService:
             'it': 'IT', 'information technology': 'IT',
             'ece': 'ECE', 'electronics': 'ECE',
             'ee': 'EE', 'electrical': 'EE',
-            'me': 'ME', 'mechanical': 'ME',
+            'mechanical': 'ME', 'me': 'ME',
             'ce': 'CE', 'civil': 'CE',
             'aiml': 'AIML', 'ai': 'AIML', 'artificial intelligence': 'AIML',
             'ds': 'DS', 'data science': 'DS',
             'cy': 'CY', 'cyber security': 'CY',
             'csd': 'CSD',
         }
+        _ambig = frozenset({'it', 'me'})
         for alias, code in dept_map.items():
-            if alias in q:
-                state.preferred_branch = code
-                break
+            if not re.search(rf"(?<!\w){re.escape(alias)}(?!\w)", q):
+                continue
+            if alias in _ambig and alias.upper() not in query:
+                continue
+            state.preferred_branch = code
+            break
 
     def _format_profile_context(self, session_id: str) -> str:
         """Format stored user profile as a context string for LLM injection."""
@@ -1803,7 +2820,12 @@ class GroqService:
         if state.state is not None:
             parts.append(f"User state: {state.state}")
         if parts:
-            return "USER PROFILE (extracted from conversation - use this for personalized advice, never ask for these again): " + "; ".join(parts)
+            return (
+                "USER PROFILE — only the values the caller EXPLICITLY stated in this "
+                "conversation are listed below. NEVER invent, guess, or repeat any of "
+                "these attributes if they are not listed. Never ask again for a listed "
+                "value. Values: " + "; ".join(parts)
+            )
         return ""
 
     def _build_messages(
@@ -1922,23 +2944,29 @@ USER QUESTION: {query}
 
         # 3. Check language of short queries using keyword markers
         word_count = len(query.strip().split())
-        from app.utils.language_detect import BANGLA_ROMAN_WORDS, HINDI_ROMAN_WORDS
+        from app.utils.language_detect import (
+            BANGLA_ROMAN_WORDS,
+            HINDI_ROMAN_WORDS,
+            count_markers,
+        )
         text_lower = query.lower()
         text_words = set(re.sub(r"[^\w\s]", " ", text_lower).split())
-        bn_kw = len(text_words & BANGLA_ROMAN_WORDS)
-        hi_kw = len(text_words & HINDI_ROMAN_WORDS)
+        bn_kw = count_markers(text_words, BANGLA_ROMAN_WORDS)
+        hi_kw = count_markers(text_words, HINDI_ROMAN_WORDS)
 
         if word_count <= 3:
-            # For short queries, switch lang if there are strong keyword markers
-            if bn_kw >= 2 and current_lang != "bn" and session_id not in self._session_langs:
+            # For short queries, switch lang on strong keyword markers.
+            # The >=2 rule applies even mid-session (a caller switching languages
+            # is strong evidence); only the weak 1-marker rule is first-message-only.
+            if bn_kw >= 2 and current_lang != "bn":
                 logger.info(f"[{session_id}] Language change: {current_lang} → bn (reason: keyword markers={bn_kw} in short query)")
                 self._session_langs[session_id] = "bn"
                 return "bn"
-            if hi_kw >= 2 and current_lang != "hi" and session_id not in self._session_langs:
+            if hi_kw >= 2 and current_lang != "hi":
                 logger.info(f"[{session_id}] Language change: {current_lang} → hi (reason: keyword markers={hi_kw} in short query)")
                 self._session_langs[session_id] = "hi"
                 return "hi"
-            # Weak-but-clear signal: 1 exclusive marker for a language
+            # Weak-but-clear signal: 1 exclusive marker for a language (first message only)
             if bn_kw >= 1 and hi_kw == 0 and session_id not in self._session_langs:
                 logger.info(f"[{session_id}] Language change: {current_lang} → bn (reason: exclusive Bangla marker={bn_kw} in short query)")
                 self._session_langs[session_id] = "bn"
@@ -1955,13 +2983,11 @@ USER QUESTION: {query}
             return current_lang
 
         # 5. Detected differs from current — check evidence strength.
-        # If language was explicitly set (not default "en"), lock it — resist switches
-        # via weak keyword markers to prevent random flipping mid-conversation.
-        lang_was_explicitly_set = session_id in self._session_langs and current_lang != "en"
-
+        # A strong signal (>=2 real keyword markers) switches even mid-session;
+        # a lone marker is not enough to flip an explicitly-set language.
         kw_count = bn_kw if detected == "bn" else hi_kw
 
-        if kw_count >= 2 and not lang_was_explicitly_set:
+        if kw_count >= 2:
             logger.info(
                 f"[{session_id}] Language change: {current_lang} → {detected} "
                 f"(reason: {detected} keyword markers={kw_count}, current_lang markers were "
@@ -1991,12 +3017,16 @@ USER QUESTION: {query}
         """
         q = query.strip()
         if not q:
-            return CLARIFICATION_REPEAT_EN
+            return self._clarify_repeat_message(
+                self._session_langs.get(session_id, "en"), session_id
+            )
 
         # Strip trailing punctuation for pattern matching (STT sometimes adds periods)
         q_clean = re.sub(r"[.?!,;]+$", "", q).strip()
         if not q_clean:
-            return CLARIFICATION_REPEAT_EN
+            return self._clarify_repeat_message(
+                self._session_langs.get(session_id, "en"), session_id
+            )
 
         word_count = len(q.split())
         q_lower = q_clean.lower()
@@ -2015,6 +3045,15 @@ USER QUESTION: {query}
 
         # 2. Greeting — handled by _is_greeting later, pass through.
         if any(re.match(p, q_lower) for p in GREETING_PATTERNS):
+            return None
+
+        # 2.6 Conversation-policy tokens (exit / thanks / ack) — let the policy
+        #     handlers later in the flow catch them instead of the word-count gate.
+        if (
+            self._detect_exit_intent(q_lower, "en")
+            or self._detect_thanks_intent(q_lower, "en")
+            or self._detect_ack_intent(q_lower, "en")
+        ):
             return None
 
         # 2.5 Ambiguous single-word query — ask clarification instead of guessing
@@ -2053,11 +3092,7 @@ USER QUESTION: {query}
             logger.info(
                 f"[{session_id}] Transcript filtered: too short '{q}' (word_count={word_count})"
             )
-            if current_lang == "hi":
-                return CLARIFICATION_REPEAT_HI
-            if current_lang == "bn":
-                return CLARIFICATION_REPEAT_BN
-            return CLARIFICATION_REPEAT_EN
+            return self._clarify_repeat_message(current_lang, session_id)
 
         # 4. Incomplete sentence fragment — ends on a trailing word
         #    that suggests the user was cut off mid-sentence.
@@ -2069,11 +3104,7 @@ USER QUESTION: {query}
                         f"[{session_id}] Transcript filtered: incomplete fragment '{q}' "
                         f"(word_count={word_count})"
                     )
-                    if current_lang == "hi":
-                        return CLARIFICATION_REPEAT_HI
-                    if current_lang == "bn":
-                        return CLARIFICATION_REPEAT_BN
-                    return CLARIFICATION_REPEAT_EN
+                    return self._clarify_repeat_message(current_lang, session_id)
 
         return None  # pass through — transcript looks valid
 
@@ -2276,7 +3307,7 @@ USER QUESTION: {query}
             q,
         ):
             return "admission"
-        if re.search(r"\b(installments?|installments?|emi|payment\s*plan|pay\s*in\s*part)\b", q):
+        if re.search(r"\b(installments?|instalments?|emi|payment\s*plan|pay\s*in\s*part)\b", q):
             return "installment"
         if re.search(r"\b(safety|safe|ragging|security|women.*safe)\b", q):
             return "safety"
@@ -3251,7 +4282,7 @@ USER QUESTION: {query}
                 )
             return (
                 "I understand you have some concerns. "
-                "I can share factual information about BCRECs placements, faculty, fees, or academics. "
+                "I can share factual information about BCREC's placements, faculty, fees, or academics. "
                 "Is there a specific area you would like to discuss?"
             )
 
@@ -3365,7 +4396,7 @@ USER QUESTION: {query}
                 )
 
         # --- Installment / payment plan (checked BEFORE fee to catch "pay fee in installments") ---
-        if re.search(r"\b(installments?|installments?|emi|payment\s*plan|pay\s*in\s*part)\b", q):
+        if re.search(r"\b(installments?|instalments?|emi|payment\s*plan|pay\s*in\s*part)\b", q):
             payment = kb.get("fees_summary", {}).get("payment_modes", {}).get("value", "")
             if payment:
                 logger.info(f"HANDLER: installment matched for query='{q[:60]}'")
@@ -3441,6 +4472,10 @@ USER QUESTION: {query}
                     f"with a total capacity of {capacity} students."
                 )
             logger.info(f"HANDLER: hostel (unavailable) matched for query='{q[:60]}'")
+            if lang == "hi":
+                return "BCREC mein hostel accommodation abhi available nahi hai."
+            if lang == "bn":
+                return "BCREC এ হোস্টেল থাকার ব্যবস্থা বর্তমানে নেই।"
             return "Hostel accommodation is not currently available at BCREC."
 
         # --- Fee lookup (routed through _handle_fee_query abstraction) ---
@@ -3512,7 +4547,7 @@ USER QUESTION: {query}
         # --- Faculty name resolution ---
         if re.search(r"\b(professor|faculty|teacher|sir|madam|dr\.?|prof\.?)\b", q):
             logger.info(f"HANDLER: faculty matched for query='{q[:60]}'")
-            return self._resolve_faculty_name(q, kb)
+            return self._resolve_faculty_name(q, kb, lang)
 
         # --- Placement lookup ---
         if re.search(r"\b(placements?|placed|recruit|package|lpa|job|company)\b", q):
@@ -3573,7 +4608,7 @@ USER QUESTION: {query}
                     if lang == "bn":
                         return f"{dept_code} এ {intake} টি seats আছে।"
                     return f"{dept_code} has {intake} seats."
-                return UNKNOWN_INFO_RESPONSE_EN
+                return self._lang_response_unknown(lang)
 
         # --- Cutoff / rank info ---
         if re.search(r"\b(cutoff|cut.off|rank|closing.rank|opening.rank)\b", q):
@@ -3607,6 +4642,16 @@ USER QUESTION: {query}
                         f"{co['2025']} in 2025. "
                         f"The estimated 2026 rank is {co['2026_est']}. These are approximate."
                     )
+            if lang == "hi":
+                return (
+                    "Mere paas us department ka specific cutoff data nahi hai. "
+                    "Accurate rank information ke liye college admission office se contact karein."
+                )
+            if lang == "bn":
+                return (
+                    "আমার কাছে ওই ডিপার্টমেন্টের নির্দিষ্ট cutoff তথ্য নেই। "
+                    "সঠিক rank জানতে কলেজের ভর্তি অফিসে যোগাযোগ করুন।"
+                )
             return "I don't have the specific cutoff data for that department. Please contact the college admission office for accurate rank information."
 
         # --- Establishment / founded / history ---
@@ -4097,7 +5142,7 @@ USER QUESTION: {query}
             idx.append((vp.lower(), vp, "Vice Principal"))
         return idx
 
-    def _resolve_faculty_name(self, query: str, kb: dict) -> str | None:
+    def _resolve_faculty_name(self, query: str, kb: dict, lang: str = "en") -> str | None:
         """Try to resolve a faculty/staff name in the query using exact match,
         alias table, and fuzzy matching."""
         q = query.strip().lower()
@@ -4118,7 +5163,11 @@ USER QUESTION: {query}
                         break
                 if "principal" in canonical.lower():
                     dept_name = " (Principal, BCREC)"
-                return f"Kya aap {canonical}{dept_name} ke baare mein poochh rahe hain?"
+                if lang == "hi":
+                    return f"Kya aap {canonical}{dept_name} ke baare mein poochh rahe hain?"
+                if lang == "bn":
+                    return f"আপনি কি {canonical}{dept_name} সম্পর্কে জানতে চাচ্ছেন?"
+                return f"Are you asking about {canonical}{dept_name}?"
 
         # 2. Build faculty index and try difflib fuzzy matching
         faculty_idx = self._build_faculty_index(kb)
@@ -4186,13 +5235,26 @@ USER QUESTION: {query}
                     best_display = display_name
                     best_dept = dept_code
 
+        if best_score >= 0.85:
+            dept_suffix = f" ({best_dept})" if best_dept else ""
+            if lang == "hi":
+                return f"{best_display}{dept_suffix} hain."
+            if lang == "bn":
+                return f"{best_display}{dept_suffix}।"
+            return f"It's {best_display}{dept_suffix}."
         if best_score >= 0.7:
             dept_suffix = f" ({best_dept})" if best_dept else ""
-            if best_score < 0.85:
+            if lang == "hi":
                 return f"Kya aap {best_display}{dept_suffix} ke baare mein poochh rahe hain?"
-                return f"{best_display}{dept_suffix} hain."
+            if lang == "bn":
+                return f"আপনি কি {best_display}{dept_suffix} সম্পর্কে জানতে চাচ্ছেন?"
+            return f"Are you asking about {best_display}{dept_suffix}?"
         if best_score >= 0.5:
-            return f"Kya aap {best_display} ke baare mein poochh rahe hain?"
+            if lang == "hi":
+                return f"Kya aap {best_display} ke baare mein poochh rahe hain?"
+            if lang == "bn":
+                return f"আপনি কি {best_display} সম্পর্কে জানতে চাচ্ছেন?"
+            return f"Are you asking about {best_display}?"
         return None
 
     # -----------------------------------------------------------------------
@@ -4222,6 +5284,18 @@ USER QUESTION: {query}
         """Calculate total fee for a department programmatically."""
         if dept_code.upper() in FEE_GROUP_MAP:
             total, admission, per_sem = FEE_GROUP_MAP[dept_code.upper()]
+            if lang == "hi":
+                return (
+                    f"{dept_code.upper()} ka total fee {self._format_inr(total, lang)} hai. "
+                    f"Isme admission fee {self._format_inr(admission, lang)} "
+                    f"aur per semester fee {self._format_inr(per_sem, lang)} shamil hai."
+                )
+            if lang == "bn":
+                return (
+                    f"{dept_code.upper()} এর মোট ফি {self._format_inr(total, lang)}। "
+                    f"এর মধ্যে ভর্তি ফি {self._format_inr(admission, lang)} "
+                    f"এবং প্রতি সেমিস্টার ফি {self._format_inr(per_sem, lang)}।"
+                )
             return (
                 f"The total fee for {dept_code.upper()} is "
                 f"{self._format_inr(total, lang)}. "
@@ -4235,9 +5309,29 @@ USER QUESTION: {query}
         if dept_code.upper() in FEE_GROUP_MAP:
             total, admission, per_sem = FEE_GROUP_MAP[dept_code.upper()]
             if per_sem > 0:
+                if lang == "hi":
+                    return (
+                        f"{dept_code.upper()} ka semester fee "
+                        f"{self._format_inr(per_sem, lang)} hai."
+                    )
+                if lang == "bn":
+                    return (
+                        f"{dept_code.upper()} এর সেমিস্টার ফি "
+                        f"{self._format_inr(per_sem, lang)}।"
+                    )
                 return (
                     f"The semester fee for {dept_code.upper()} is "
                     f"{self._format_inr(per_sem, lang)}."
+                )
+            if lang == "hi":
+                return (
+                    f"{dept_code.upper()} ka total fee {self._format_inr(total, lang)} hai. "
+                    f"Semester breakdown ke liye college se contact karein."
+                )
+            if lang == "bn":
+                return (
+                    f"{dept_code.upper()} এর মোট ফি {self._format_inr(total, lang)}। "
+                    f"সেমিস্টার ব্রেকডাউনের জন্য কলেজে যোগাযোগ করুন।"
                 )
             return (
                 f"The total fee for {dept_code.upper()} is "
@@ -4526,13 +5620,149 @@ USER QUESTION: {query}
         text = normalize_for_tts(text)
         return text
 
-    def _safe_fallback(self, lang: str) -> str:
-        """Return a polite, language-appropriate fallback message."""
+    def _safe_fallback(self, lang: str, session_id: str = "default") -> str:
+        """Return a polite, language-appropriate fallback message.
+
+        Escalates per session so the exact same fallback is never repeated:
+        the first time the user is asked to rephrase in Bengali/English; on
+        repeat the user is offered the college phone number instead.
+        """
+        count = self._fallback_counts.get(session_id, 0)
+        self._fallback_counts[session_id] = count + 1
         if lang == "hi":
-            return FALLBACK_ANSWER_HI
+            return FALLBACK_TIER1_HI if count == 0 else FALLBACK_TIER2_HI
         if lang == "bn":
-            return FALLBACK_ANSWER_BN
-        return FALLBACK_ANSWER_EN
+            return FALLBACK_TIER1_BN if count == 0 else FALLBACK_TIER2_BN
+        return FALLBACK_TIER1_EN if count == 0 else FALLBACK_TIER2_EN
+
+    def _clarify_repeat_message(self, lang: str, session_id: str) -> str:
+        """Apologize once + ask to rephrase in Bengali/English; escalate on repeat.
+
+        Guarantees the same clarification message is not emitted twice in a row.
+        """
+        count = self._clarify_counts.get(session_id, 0)
+        self._clarify_counts[session_id] = count + 1
+        if count == 0:
+            return {
+                "hi": CLARIFY_REPEAT_HI,
+                "bn": CLARIFY_REPEAT_BN,
+            }.get(lang, CLARIFY_REPEAT_EN)
+        return {
+            "hi": FALLBACK_TIER2_HI,
+            "bn": FALLBACK_TIER2_BN,
+        }.get(lang, FALLBACK_TIER2_EN)
+
+    def _detect_open_intent(self, query: str, lang: str) -> str | None:
+        """Deterministic clarification for open-ended intents.
+
+        "I need help" -> ask what help is needed.
+        "I want admission" -> ask which department/course first.
+
+        Returns a clarification message, or None to let the LLM handle the
+        query normally. Never guesses a topic or caller attributes.
+        """
+        q = re.sub(r"[^\w\s]", " ", query.strip().lower())
+        q = re.sub(r"\s+", " ", q).strip()
+
+        # Topic keywords that make an intent specific (then pass through to LLM).
+        # NOTE: bare "me"/"it" are excluded because they are pronouns, not branches.
+        _topics = re.compile(
+            r"\b(admission|fee|fees|placement|hostel|scholarship|document|cutoff|"
+            r"counselling|contact|phone|email|campus|library|sports|seat|"
+            r"eligibility|exam|branch|course|department|programme|program|cse|"
+            r"ece|ee|ce|aiml|ds|cy|csd|computer|mechanical|electrical|"
+            r"electronics|civil|science|engineering)\b"
+        )
+        # No topic keyword present yet -> ask what help is needed.
+        if re.search(
+            r"\b(help|healp|help\s+me|i\s+need\s+help|need\s+help|"
+            r"help\s+(chahiye|chai|karo|karna|koro|lagbe)|"
+            r"madad|madad\s+(chahiye|chaho|karo|karna)|"
+            r"madat|madat\s+(chahiye|chaho|karo|karna|chyea)|"
+            r"sahajjo|sahajja|sahayata)\b",
+            q,
+        ):
+            if not _topics.search(q):
+                return {
+                    "hi": (
+                        "Ji, main aapki kya madad kar sakta hoon? "
+                        "Admission, fees, placement ya kisi aur cheez ke baare mein?"
+                    ),
+                    "bn": (
+                        "জি, আমি আপনাকে কীভাবে সাহায্য করতে পারি? "
+                        "ভর্তি, ফি, প্লেসমেন্ট নাকি অন্য কিছু সম্পর্কে?"
+                    ),
+                }.get(
+                    lang,
+                    "Of course! How can I help you — admission, fees, placement, "
+                    "or something else?",
+                )
+        # "I want admission" without a named course -> ask which department first.
+        if re.search(
+            r"\b(want\s+(to\s+take\s+)?admission|take\s+admission|"
+            r"admission\s+(chahiye|lagbe|lene|le\s*na)|bharti)\b",
+            q,
+        ):
+            if not re.search(
+                r"\b(cse|ece|ee|me|ce|it|aiml|ds|cy|csd|computer|mechanical|"
+                r"electrical|electronics|civil|branch|course|department)\b", q
+            ):
+                return {
+                    "hi": (
+                        "Bilkul! Aap kis department ya course ke liye admission lena "
+                        "chahte hain? CSE, ECE, Mechanical, ya koi aur?"
+                    ),
+                    "bn": (
+                        "অবশ্যই! আপনি কোন বিভাগ বা কোর্সে ভর্তি হতে চান? "
+                        "CSE, ECE, Mechanical নাকি অন্য কিছু?"
+                    ),
+                }.get(
+                    lang,
+                    "Sure! Which department or course are you interested in — "
+                    "CSE, ECE, Mechanical, or something else?",
+                )
+        return None
+
+    def _detect_backlog_open_statement(self, query: str, lang: str) -> str | None:
+        """Deterministic follow-up for vague "I have a back/backlog" statements.
+
+        "amar back aseche", "mera backlog he", "ak sub me back aya he" -> ask which
+        subject/semester. Questions about backlog *policy* (what/how/clear/kitna)
+        pass through to the LLM or the structured policy handler.
+        """
+        q = re.sub(r"[^\w\s]", " ", query.strip().lower())
+        q = re.sub(r"\s+", " ", q).strip()
+
+        if not re.search(r"\b(back|backlog|back.?paper|arrear)\b", q):
+            return None
+
+        # Only first-person possession statements ("I have a back", "amar back").
+        if not self._is_self_referential(query):
+            return None
+
+        # Questions asking about policy/details go to the LLM / policy handler.
+        if re.search(
+            r"\b(policy|rules|rule|clear|clearance|how|what|when|why|where|"
+            r"kya|kya\s+hai|kaise|kese|kivabe|kivay|kemone|kemon|kitna|kitne|"
+            r"kitni|details?|info|semester|subject|exam|scheme|seats?)\b",
+            q,
+        ):
+            return None
+
+        return {
+            "hi": (
+                "Aapka backlog kis subject ya semester ka hai? "
+                "Batayen, main uske baare mein jaankari dunga."
+            ),
+            "bn": (
+                "আপনার ব্যাক কোন সাবজেক্টের বা কোন সেমিস্টারের? "
+                "বলুন, আমি সেই সম্পর্কে তথ্য দেব।"
+            ),
+        }.get(
+            lang,
+            "Which subject or semester is your backlog in? "
+            "Tell me and I can give you the details.",
+        )
 
     def _lang_response_unknown(self, lang: str) -> str:
         return {
@@ -4638,7 +5868,7 @@ USER QUESTION: {query}
                 query = re.sub(r'\bkeno\b', 'why', query, flags=re.IGNORECASE)
                 logger.info(f"[{session_id}] Banglish normalization: 'keno' -> 'why'")
 
-            # 0.5 Yes/no continuation — "yes"/"no" after "Would you like" clarification re-routes
+            # 0.5 Yes/no continuation — "yes"/"no" after a clarification prompt re-routes
             # to the ambiguous word that triggered the clarification prompt
             if history:
                 q_lower = query.strip().lower()
@@ -4646,7 +5876,22 @@ USER QUESTION: {query}
                 is_no = q_lower in ("no", "nah", "nope", "नहीं", "जी नहीं", "না", "জী না")
                 if is_yes or is_no:
                     last_assistant = self._get_last_assistant_response(history)
-                    if last_assistant and "would you like" in last_assistant.lower():
+                    _last_lower = (last_assistant or "").lower()
+                    _clarification_markers = (
+                        "would you like" in _last_lower
+                        or "madad kar sakta" in _last_lower
+                        or "chahte hain" in _last_lower
+                        or "chahenge" in _last_lower
+                        or "kis department" in _last_lower
+                        or "kis cheez" in _last_lower
+                        or "ke baare mein poochh" in _last_lower
+                        or "কীভাবে সাহায্য" in _last_lower
+                        or "কোন বিভাগ" in _last_lower
+                        or "কোন কোর্স" in _last_lower
+                        or "কোন সাবজেক্ট" in _last_lower
+                        or "কোন সেমিস্টার" in _last_lower
+                    )
+                    if last_assistant and _clarification_markers:
                         if is_yes:
                             last_user_q = self._get_last_user_question(history)
                             if last_user_q:
@@ -4700,6 +5945,20 @@ USER QUESTION: {query}
                     "hallucination_validated": True, "tokens": {"prompt": 0, "completion": 0}, "cache_hit": False,
                 }
 
+            # 1.75 Short follow-up resolution — "kitna?", "36 lpa?", "aur?", "highest?"
+            # Runs BEFORE transcript validation so elliptical follow-ups ("kitna?",
+            # "36 lpa?") are expanded into full questions instead of being rejected
+            # as too-short STT noise.
+            resolved_query = self._resolve_short_followup(query, session_id)
+            if resolved_query:
+                telemetry.log_special_event(
+                    session_id,
+                    turn_number=turn_number,
+                    event_type="SHORT_FOLLOWUP_RESOLVED",
+                    details={"original": query[:100], "resolved": resolved_query[:120]},
+                )
+                query = resolved_query
+
             # 0.75 Transcript validation — reject STT noise / fragments before RAG+LLM
             validation_result = self._validate_transcript(query, session_id)
             if validation_result is not None:
@@ -4729,11 +5988,7 @@ USER QUESTION: {query}
             # 0.5 STT noise detection — catch garbage/repeated tokens before processing
             if self._detect_noisy_transcript(query):
                 lang = self._session_langs.get(session_id, "en")
-                clarify = {
-                    "en": CLARIFY_REPEAT_EN,
-                    "hi": CLARIFY_REPEAT_HI,
-                    "bn": CLARIFY_REPEAT_BN,
-                }.get(lang, CLARIFY_REPEAT_EN)
+                clarify = self._clarify_repeat_message(lang, session_id)
                 logger.info(f"[{session_id}] Noisy transcript detected: '{query[:80]}'")
                 telemetry.log_turn_input(
                     session_id,
@@ -4820,6 +6075,79 @@ USER QUESTION: {query}
                     "cache_hit": False,
                 }
 
+            # 2.05 Standalone acknowledgment ("okay", "fine", "theek hai") — no RAG
+            ack_response = self._detect_ack_intent(query, lang)
+            if ack_response:
+                logger.info(f"ACK INTENT (lang={lang}): '{query[:60]}'")
+                telemetry.log_turn_input(
+                    session_id,
+                    turn_number=turn_number,
+                    raw_transcript=query,
+                    detected_language=lang,
+                    detected_intent="acknowledgment",
+                )
+                self._append_session_turn(session_id, query, ack_response)
+                return {
+                    "answer": ack_response,
+                    "voice_text": ack_response,
+                    "source": "conversation_policy_ack",
+                    "model": "none",
+                    "latency_ms": round((time.time() - start) * 1000),
+                    "hallucination_validated": True,
+                    "tokens": {"prompt": 0, "completion": 0},
+                    "cache_hit": False,
+                }
+
+            # 2.1 Open-ended intents — ask first, never assume a topic or caller data.
+            open_clarify = self._detect_open_intent(query, lang)
+            if open_clarify:
+                logger.info(
+                    f"OPEN-INTENT CLARIFICATION (lang={lang}): '{query[:60]}'"
+                )
+                telemetry.log_turn_input(
+                    session_id,
+                    turn_number=turn_number,
+                    raw_transcript=query,
+                    detected_language=lang,
+                    detected_intent="clarification",
+                )
+                self._append_session_turn(session_id, query, open_clarify)
+                return {
+                    "answer": open_clarify,
+                    "voice_text": open_clarify,
+                    "source": "open_intent_clarification",
+                    "model": "none",
+                    "latency_ms": round((time.time() - start) * 1000),
+                    "hallucination_validated": True,
+                    "tokens": {"prompt": 0, "completion": 0},
+                    "cache_hit": False,
+                }
+
+            # 2.2 Vague "I have a back/backlog" statement — ask which subject/semester.
+            backlog_open = self._detect_backlog_open_statement(query, lang)
+            if backlog_open:
+                logger.info(
+                    f"BACKLOG-OPEN CLARIFICATION (lang={lang}): '{query[:60]}'"
+                )
+                telemetry.log_turn_input(
+                    session_id,
+                    turn_number=turn_number,
+                    raw_transcript=query,
+                    detected_language=lang,
+                    detected_intent="clarification",
+                )
+                self._append_session_turn(session_id, query, backlog_open)
+                return {
+                    "answer": backlog_open,
+                    "voice_text": backlog_open,
+                    "source": "backlog_open_clarification",
+                    "model": "none",
+                    "latency_ms": round((time.time() - start) * 1000),
+                    "hallucination_validated": True,
+                    "tokens": {"prompt": 0, "completion": 0},
+                    "cache_hit": False,
+                }
+
             # 2.25 Out-of-domain detection — block clearly off-topic queries before retrieval/LLM
             if self._is_out_of_domain(query):
                 ood_response = {
@@ -4840,6 +6168,45 @@ USER QUESTION: {query}
                     "answer": ood_response,
                     "voice_text": ood_response,
                     "source": "out_of_domain",
+                    "model": "none",
+                    "latency_ms": round((time.time() - start) * 1000),
+                    "hallucination_validated": True,
+                    "tokens": {"prompt": 0, "completion": 0},
+                    "cache_hit": False,
+                }
+
+            # 2.45 Conversation policy — graceful exit ("Choro me dekh lunga", "bye")
+            exit_response = self._detect_exit_intent(query, lang)
+            if exit_response:
+                logger.info(f"EXIT INTENT (lang={lang}): '{query[:60]}'")
+                telemetry.log_turn_input(
+                    session_id,
+                    turn_number=turn_number,
+                    raw_transcript=query,
+                    detected_language=lang,
+                    detected_intent="exit",
+                )
+                self._append_session_turn(session_id, query, exit_response)
+                return {
+                    "answer": exit_response,
+                    "voice_text": exit_response,
+                    "source": "conversation_policy_exit",
+                    "model": "none",
+                    "latency_ms": round((time.time() - start) * 1000),
+                    "hallucination_validated": True,
+                    "tokens": {"prompt": 0, "completion": 0},
+                    "cache_hit": False,
+                }
+
+            # 2.46 Conversation policy — thanks ("shukriya", "dhanyawad")
+            thanks_response = self._detect_thanks_intent(query, lang)
+            if thanks_response:
+                logger.info(f"THANKS INTENT (lang={lang}): '{query[:60]}'")
+                self._append_session_turn(session_id, query, thanks_response)
+                return {
+                    "answer": thanks_response,
+                    "voice_text": thanks_response,
+                    "source": "conversation_policy_thanks",
                     "model": "none",
                     "latency_ms": round((time.time() - start) * 1000),
                     "hallucination_validated": True,
@@ -4880,6 +6247,49 @@ USER QUESTION: {query}
                     }
                 logger.info("REPEAT HIT but no history — falling through to normal flow")
 
+            # 2.85 Shadow routing — silent signal detection (emotion+grievance ≥0.8)
+            record_shadow(query, session_id=session_id, turn_number=turn_number)
+
+            # 2.88 Grounding — record topic, retrieve verified context, refuse no-data domains
+            self._record_topic(query, session_id)
+            retrieval_context, retrieval_conf = self._retrieve_context(query)
+            grounding_meta = self._collect_retrieval_telemetry()
+            grounding_meta["confidence_tier"] = self._confidence_tier(retrieval_conf)
+            refusal = self._grounded_refusal_guard(query, lang)
+            existence_known = False
+            if not refusal:
+                existence_known = self._existence_entity_is_known(query)
+                refusal = self._existence_refusal_guard(query, lang)
+            if not refusal and not existence_known:
+                refusal = self._low_confidence_guard(
+                    query, lang, retrieval_conf, retrieval_context
+                )
+            if refusal:
+                logger.info(
+                    f"GROUNDED REFUSAL (lang={lang}, conf={retrieval_conf}): '{query[:80]}'"
+                )
+                telemetry.log_turn_input(
+                    session_id,
+                    turn_number=turn_number,
+                    raw_transcript=query,
+                    detected_language=lang,
+                    detected_intent="grounded_refusal",
+                )
+                self._append_session_turn(session_id, query, refusal)
+                refusal_payload = {
+                    "answer": refusal,
+                    "voice_text": refusal,
+                    "source": "grounded_refusal",
+                    "model": "none",
+                    "latency_ms": round((time.time() - start) * 1000),
+                    "hallucination_validated": True,
+                    "tokens": {"prompt": 0, "completion": 0},
+                    "cache_hit": False,
+                    "retrieval_used": bool(retrieval_context),
+                }
+                refusal_payload.update(grounding_meta)
+                return refusal_payload
+
             # 2.9 LLM — single path for ALL queries
             # Structured lookup has been removed. The LLM handles everything with
             # full context: conversation history, college KB data, and user profile.
@@ -4900,6 +6310,16 @@ USER QUESTION: {query}
             kb_context = self._format_kb_context()
             if kb_context:
                 messages.append({"role": "system", "content": kb_context})
+            if retrieval_context:
+                messages.append(
+                    {
+                        "role": "system",
+                        "content": (
+                            "VERIFIED RETRIEVED DOCUMENTS (highest-confidence source matches; "
+                            "use them when relevant, never contradict them):\n" + retrieval_context
+                        ),
+                    }
+                )
             profile_context = self._format_profile_context(session_id)
             if profile_context:
                 messages.append({"role": "system", "content": profile_context})
@@ -4909,6 +6329,20 @@ USER QUESTION: {query}
                     content = turn.get("content", "")
                     if role in ("user", "assistant") and content:
                         messages.append({"role": role, "content": content})
+            messages.append(
+                {
+                    "role": "system",
+                    "content": (
+                        "GROUNDING RULE: Only state facts that appear in the COLLEGE DATA or "
+                        "VERIFIED RETRIEVED DOCUMENTS blocks above. Never invent fees, scholarships, "
+                        "menus, shop locations, placement packages, or policies. If the exact detail "
+                        "is not present in that verified data, say you don't have that verified "
+                        "information and suggest asking the college reception or help desk."
+                    ),
+                }
+            )
+            if grounding_meta.get("confidence_tier") in ("medium", "low"):
+                messages.append({"role": "system", "content": LOW_CONF_HEDGE})
             messages.append({"role": "user", "content": query + lang_hint})
 
             # Call LLM with tools — let it decide whether to use tools or answer directly
@@ -4934,7 +6368,9 @@ USER QUESTION: {query}
                 "hallucination_validated": True,
                 "tokens": {"prompt": 0, "completion": 0},
                 "cache_hit": False,
+                "retrieval_used": bool(retrieval_context),
             }
+            response_payload.update(grounding_meta)
 
             self._append_session_turn(session_id, query, answer)
 
@@ -5002,6 +6438,19 @@ USER QUESTION: {query}
                 )
                 query = norm_log.normalized_text
 
+            # 1.75 Short follow-up resolution — "kitna?", "36 lpa?", "aur?", "highest?"
+            # Runs BEFORE transcript validation so elliptical follow-ups are expanded
+            # into full questions instead of being rejected as too-short STT noise.
+            resolved_query = self._resolve_short_followup(query, session_id)
+            if resolved_query:
+                telemetry.log_special_event(
+                    session_id,
+                    turn_number=turn_number,
+                    event_type="SHORT_FOLLOWUP_RESOLVED",
+                    details={"original": query[:100], "resolved": resolved_query[:120]},
+                )
+                query = resolved_query
+
             # 0.5 Transcript validation — reject STT noise / fragments
             validation_result = self._validate_transcript(query, session_id)
             if validation_result is not None:
@@ -5024,11 +6473,7 @@ USER QUESTION: {query}
             # 0.5 STT noise detection (Task 7)
             if self._detect_noisy_transcript(query):
                 lang = self._session_langs.get(session_id, "en")
-                clarify = {
-                    "en": CLARIFY_REPEAT_EN,
-                    "hi": CLARIFY_REPEAT_HI,
-                    "bn": CLARIFY_REPEAT_BN,
-                }.get(lang, CLARIFY_REPEAT_EN)
+                clarify = self._clarify_repeat_message(lang, session_id)
                 logger.info(f"[{session_id}] Noisy transcript (stream): '{query[:80]}'")
                 for word in clarify.split():
                     yield word + " "
@@ -5076,6 +6521,76 @@ USER QUESTION: {query}
                     await asyncio.sleep(0.02)
                 return
 
+            # 2.45 Conversation policy — graceful exit ("Choro me dekh lunga", "bye")
+            exit_response = self._detect_exit_intent(query, lang)
+            if exit_response:
+                logger.info(f"EXIT INTENT (stream, lang={lang}): '{query[:60]}'")
+                telemetry.log_turn_input(
+                    session_id,
+                    turn_number=turn_number,
+                    raw_transcript=query,
+                    detected_language=lang,
+                    detected_intent="exit",
+                )
+                for word in exit_response.split():
+                    yield word + " "
+                    await asyncio.sleep(0.02)
+                return
+
+            # 2.455 Standalone acknowledgment ("okay", "fine", "theek hai") — no RAG
+            ack_response = self._detect_ack_intent(query, lang)
+            if ack_response:
+                logger.info(f"ACK INTENT (stream, lang={lang}): '{query[:60]}'")
+                for word in ack_response.split():
+                    yield word + " "
+                    await asyncio.sleep(0.02)
+                return
+
+            # 2.46 Conversation policy — thanks ("shukriya", "dhanyawad")
+            thanks_response = self._detect_thanks_intent(query, lang)
+            if thanks_response:
+                logger.info(f"THANKS INTENT (stream, lang={lang}): '{query[:60]}'")
+                for word in thanks_response.split():
+                    yield word + " "
+                    await asyncio.sleep(0.02)
+                return
+
+            # Open-ended intents — ask first, never assume a topic or caller data.
+            open_clarify = self._detect_open_intent(query, lang)
+            if open_clarify:
+                logger.info(
+                    f"OPEN-INTENT CLARIFICATION (stream, lang={lang}): '{query[:60]}'"
+                )
+                telemetry.log_turn_input(
+                    session_id,
+                    turn_number=turn_number,
+                    raw_transcript=query,
+                    detected_language=lang,
+                    detected_intent="clarification",
+                )
+                for word in open_clarify.split():
+                    yield word + " "
+                    await asyncio.sleep(0.02)
+                return
+
+            # Vague "I have a back/backlog" statement — ask which subject/semester.
+            backlog_open = self._detect_backlog_open_statement(query, lang)
+            if backlog_open:
+                logger.info(
+                    f"BACKLOG-OPEN CLARIFICATION (stream, lang={lang}): '{query[:60]}'"
+                )
+                telemetry.log_turn_input(
+                    session_id,
+                    turn_number=turn_number,
+                    raw_transcript=query,
+                    detected_language=lang,
+                    detected_intent="clarification",
+                )
+                for word in backlog_open.split():
+                    yield word + " "
+                    await asyncio.sleep(0.02)
+                return
+
             # Repeat intent — return last assistant response without RAG
             if self._detect_repeat_intent(query):
                 last_response = self._get_last_assistant_response(history)
@@ -5104,6 +6619,44 @@ USER QUESTION: {query}
                     return
                 logger.info("REPEAT HIT (stream) but no history — falling through")
 
+            # Shadow routing — silent signal detection (emotion+grievance ≥0.8)
+            record_shadow(query, session_id=session_id, turn_number=turn_number)
+
+            # 2.88 Grounding — record topic, retrieve verified context, refuse no-data domains
+            self._record_topic(query, session_id)
+            retrieval_context, retrieval_conf = self._retrieve_context(query)
+            grounding_meta = self._collect_retrieval_telemetry()
+            grounding_meta["confidence_tier"] = self._confidence_tier(retrieval_conf)
+            logger.info(
+                f"[{session_id}] GROUNDING stream conf={grounding_meta.get('retrieval_score')} "
+                f"tier={grounding_meta.get('confidence_tier')} "
+                f"docs={grounding_meta.get('documents_used')} sources={grounding_meta.get('source_file')}"
+            )
+            refusal = self._grounded_refusal_guard(query, lang)
+            existence_known = False
+            if not refusal:
+                existence_known = self._existence_entity_is_known(query)
+                refusal = self._existence_refusal_guard(query, lang)
+            if not refusal and not existence_known:
+                refusal = self._low_confidence_guard(
+                    query, lang, retrieval_conf, retrieval_context
+                )
+            if refusal:
+                logger.info(
+                    f"GROUNDED REFUSAL (stream, lang={lang}, conf={retrieval_conf}): '{query[:80]}'"
+                )
+                telemetry.log_turn_input(
+                    session_id,
+                    turn_number=turn_number,
+                    raw_transcript=query,
+                    detected_language=lang,
+                    detected_intent="grounded_refusal",
+                )
+                for word in refusal.split():
+                    yield word + " "
+                    await asyncio.sleep(0.02)
+                return
+
             # LLM (stream path) — single path for ALL queries
             # Structured lookup removed. LLM gets full context.
             # Build messages: system prompt + history + current query
@@ -5122,6 +6675,16 @@ USER QUESTION: {query}
             kb_context = self._format_kb_context()
             if kb_context:
                 messages.append({"role": "system", "content": kb_context})
+            if retrieval_context:
+                messages.append(
+                    {
+                        "role": "system",
+                        "content": (
+                            "VERIFIED RETRIEVED DOCUMENTS (highest-confidence source matches; "
+                            "use them when relevant, never contradict them):\n" + retrieval_context
+                        ),
+                    }
+                )
             profile_context = self._format_profile_context(session_id)
             if profile_context:
                 messages.append({"role": "system", "content": profile_context})
@@ -5131,6 +6694,20 @@ USER QUESTION: {query}
                     content = turn.get("content", "")
                     if role in ("user", "assistant") and content:
                         messages.append({"role": role, "content": content})
+            messages.append(
+                {
+                    "role": "system",
+                    "content": (
+                        "GROUNDING RULE: Only state facts that appear in the COLLEGE DATA or "
+                        "VERIFIED RETRIEVED DOCUMENTS blocks above. Never invent fees, scholarships, "
+                        "menus, shop locations, placement packages, or policies. If the exact detail "
+                        "is not present in that verified data, say you don't have that verified "
+                        "information and suggest asking the college reception or help desk."
+                    ),
+                }
+            )
+            if grounding_meta.get("confidence_tier") in ("medium", "low"):
+                messages.append({"role": "system", "content": LOW_CONF_HEDGE})
             messages.append({"role": "user", "content": query + lang_hint})
 
             # Resolve tool calls (non-streaming, up to 4 turns), then stream final answer

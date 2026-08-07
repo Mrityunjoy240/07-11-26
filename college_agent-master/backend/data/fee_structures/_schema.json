@@ -1,0 +1,110 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "Fee Structure Schema for FeeEngine v2.0.0",
+  "definitions": {
+    "component": {
+      "type": "object",
+      "required": ["id", "label", "type", "category", "amount"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z_]+$" },
+        "label": { "type": "string" },
+        "type": { "type": "string", "enum": ["one_time", "per_semester", "per_month"] },
+        "category": { "type": "string", "enum": ["compulsory", "refundable", "optional", "special"] },
+        "amount": { "type": "integer", "minimum": 0 },
+        "applicable_semesters": {
+          "type": "array",
+          "items": { "type": "integer", "minimum": 1 }
+        },
+        "charged_in_semester": { "type": "integer", "minimum": 1 },
+        "refundable_at": { "type": "string" },
+        "optional": { "type": "boolean" },
+        "effective_from_batch": { "type": "string", "pattern": "^\\d{4}-\\d{2}$" },
+        "discontinued_from_batch": { "type": "string", "pattern": "^\\d{4}-\\d{2}$" },
+        "notes": { "type": "string" },
+        "months_per_year": { "type": "integer", "minimum": 1 },
+        "availability": { "type": "string" }
+      }
+    },
+    "group": {
+      "type": "object",
+      "required": ["components", "computed"],
+      "properties": {
+        "components": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/component" }
+        },
+        "semester_overrides": {
+          "type": "object",
+          "patternProperties": {
+            "^\\d+$": { "type": "object" }
+          }
+        },
+        "computed": {
+          "type": "object",
+          "required": ["total_course_fee"],
+          "properties": {
+            "total_course_fee": { "type": "integer", "minimum": 0 },
+            "first_semester_payable": { "type": "integer", "minimum": 0 },
+            "regular_semester_fee": { "type": "integer", "minimum": 0 }
+          }
+        }
+      }
+    },
+    "structure": {
+      "type": "object",
+      "required": ["version_id", "status", "admission_batches", "effective_date", "groups"],
+      "properties": {
+        "version_id": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "superseded", "archived", "draft"] },
+        "label": { "type": "string" },
+        "admission_batches": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^\\d{4}-\\d{2}$" }
+        },
+        "effective_date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+        "published_date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+        "source": { "type": "string" },
+        "supersedes": { "type": "string" },
+        "superseded_by": { "type": "string" },
+        "groups": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/definitions/group" }
+        }
+      }
+    }
+  },
+  "type": "object",
+  "required": ["_file_meta", "groups", "structures"],
+  "properties": {
+    "_file_meta": {
+      "type": "object",
+      "required": ["program", "duration_semesters", "last_updated", "schema_version"],
+      "properties": {
+        "program": { "type": "string" },
+        "display_name": { "type": "string" },
+        "duration_semesters": { "type": "integer", "minimum": 1 },
+        "last_updated": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+        "updated_by": { "type": "string" },
+        "structure_count": { "type": "integer", "minimum": 0 },
+        "schema_version": { "type": "string" }
+      }
+    },
+    "groups": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["branches"],
+        "properties": {
+          "branches": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    },
+    "structures": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/structure" }
+    }
+  }
+}

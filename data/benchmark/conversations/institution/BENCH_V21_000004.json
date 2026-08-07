@@ -1,0 +1,101 @@
+{
+  "id": "BENCH_V21_000004",
+  "domain": "admission",
+  "difficulty": 1,
+  "primary_language": "hi",
+  "languages": [
+    "hi"
+  ],
+  "speaker_profile": "student",
+  "features": [],
+  "ground_truth": {
+    "rank": null,
+    "pcm_percentage": null,
+    "category": "",
+    "interest": "",
+    "board": "",
+    "exam": "",
+    "budget": null,
+    "location": ""
+  },
+  "turns": [
+    {
+      "student": "college ka contact number kya hai?",
+      "expected": {
+        "understanding": {
+          "intent": "institution",
+          "facts": {},
+          "inference": {},
+          "confidence": "high",
+          "missing": [
+            "rank",
+            "pcm_percentage",
+            "category",
+            "interest",
+            "board"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.0,
+          "confidence": "high",
+          "current_problem": "general_inquiry",
+          "problems": [
+            "general_inquiry"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_program_info",
+          "priority": "normal",
+          "confidence": "high",
+          "why": [
+            "Direct factual query about college contact",
+            "Can answer from knowledge base in Hindi"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "contact",
+                "number",
+                "phone"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_program_info",
+            "Direct_factual_query"
+          ]
+        }
+      },
+      "must_not": [
+        "recommend_branch",
+        "hallucinate_phone_number"
+      ],
+      "ideal_counselor_notes": "Student asking for contact number in Hindi. Provide the phone number from the knowledge base and respond in Hindi."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "Hindi speaker asking for college contact number. Direct factual answer in Hindi.",
+  "author_note": {
+    "primary_capability": "institution information retrieval (Hindi)",
+    "expected_failure_mode": "multilingual — system might respond in English instead of Hindi, or fail to find contact in KB",
+    "why_this_conversation": "Tests Hindi factual retrieval about institution. Same intent as V21_003 but in Hindi to verify language handling."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

@@ -1,0 +1,187 @@
+{
+  "id": "BENCH_V21_000009",
+  "domain": "fees",
+  "difficulty": 2,
+  "primary_language": "hi",
+  "languages": [
+    "hi"
+  ],
+  "speaker_profile": "student",
+  "features": [],
+  "ground_truth": {
+    "rank": null,
+    "pcm_percentage": null,
+    "category": "",
+    "interest": "CSE",
+    "board": "",
+    "exam": "",
+    "budget": 500000,
+    "location": ""
+  },
+  "turns": [
+    {
+      "student": "Bhaiya CSE ka fees kitna hai? Budget limited hai, 5 lakh se kam hona chahiye.",
+      "expected": {
+        "understanding": {
+          "intent": "fee",
+          "facts": {
+            "interest": "CSE",
+            "budget": 500000
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": [
+            "rank",
+            "pcm_percentage",
+            "category"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.14,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": [
+            "needs_fee_information"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_fee_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Direct fee query with budget constraint",
+            "Can provide fee range for CSE"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "fees",
+                "CSE",
+                "range"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "rank",
+                "category"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_fee_info",
+            "Budget_constrained"
+          ]
+        }
+      },
+      "must_not": [
+        "recommend_branch",
+        "guarantee_fees_under_budget"
+      ],
+      "ideal_counselor_notes": "Student asks about CSE fees with budget constraint in Hindi. Provide fee range and continue profile collection."
+    },
+    {
+      "student": "General category hai. Rank abhi nahi aaya, 12th result aa gaya hai bas.",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {
+            "category": "general"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": [
+            "rank"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.29,
+          "confidence": "high",
+          "current_problem": "needs_profile_completion",
+          "problems": [
+            "needs_profile_completion",
+            "needs_fee_information"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "collect_profile",
+          "priority": "normal",
+          "confidence": "high",
+          "why": [
+            "Category provided but rank not yet available",
+            "Rank is essential for admission guidance",
+            "Acknowledge and wait for exam result"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "category",
+                "general"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "rank",
+                "exam",
+                "important"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "WBJEE",
+                "registration",
+                "date"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=collect_profile",
+            "Missing=rank"
+          ]
+        }
+      },
+      "must_not": [
+        "recommend_branch",
+        "hallucinate_cutoff"
+      ],
+      "ideal_counselor_notes": "Student has 12th results but no exam rank yet. Explain importance of rank and ask about exam timeline."
+    }
+  ],
+  "expected_end_state": "incomplete",
+  "ideal_counselor_notes": "Hindi fee conversation with budget constraint. Student doesn't have rank yet. Guide about exam importance.",
+  "author_note": {
+    "primary_capability": "fee query (Hindi) with budget extraction",
+    "expected_failure_mode": "retrieval — might not connect budget=500000 to fee comparison, or might respond in English",
+    "why_this_conversation": "Hindi fee query with explicit budget. Tests budget fact extraction from Hindi ('5 lakh') and response in Hindi."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

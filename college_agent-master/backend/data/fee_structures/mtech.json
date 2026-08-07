@@ -1,0 +1,74 @@
+{
+  "_file_meta": {
+    "program": "M.Tech",
+    "display_name": "Master of Technology",
+    "duration_semesters": 4,
+    "last_updated": "2026-07-10",
+    "updated_by": "System (initial load from combined_kb.json)",
+    "structure_count": 1,
+    "schema_version": "2.0.0"
+  },
+  "groups": {
+    "mtech": { "branches": ["MTECH"] },
+    "cse_special": { "branches": [] },
+    "other_special": { "branches": [] }
+  },
+  "structures": [
+    {
+      "version_id": "v2026",
+      "status": "active",
+      "label": "2026-2028 M.Tech Fee Structure",
+      "admission_batches": ["2026-27", "2027-28"],
+      "effective_date": "2026-07-01",
+      "published_date": "2026-06-15",
+      "source": "BCREC M.Tech Fee Structure (range varies by specialization)",
+      "groups": {
+        "mtech": {
+          "components": [
+            {
+              "id": "total_range_low",
+              "label": "Total Fee (Lower Range)",
+              "type": "one_time",
+              "category": "compulsory",
+              "amount": 128000,
+              "charged_in_semester": 1,
+              "notes": "Minimum total fee for M.Tech (varies by specialization)"
+            },
+            {
+              "id": "total_range_high",
+              "label": "Total Fee (Upper Range)",
+              "type": "one_time",
+              "category": "compulsory",
+              "amount": 227000,
+              "charged_in_semester": 1,
+              "notes": "Maximum total fee for M.Tech (varies by specialization)"
+            },
+            {
+              "id": "admission_fee_cse",
+              "label": "Admission Fee (CSE)",
+              "type": "one_time",
+              "category": "compulsory",
+              "amount": 41200,
+              "charged_in_semester": 1,
+              "notes": "Admission fee for M.Tech CSE specialization"
+            },
+            {
+              "id": "admission_fee_other",
+              "label": "Admission Fee (ECE/ME/PS/CE)",
+              "type": "one_time",
+              "category": "compulsory",
+              "amount": 66200,
+              "charged_in_semester": 1,
+              "notes": "Admission fee for ECE, ME, Power Systems, CE specializations"
+            }
+          ],
+          "computed": {
+            "total_course_fee": 128000,
+            "first_semester_payable": 41200
+          },
+          "notes": "M.Tech fees vary by specialization. Contact accounts office for exact figures."
+        }
+      }
+    }
+  ]
+}

@@ -385,7 +385,7 @@ class IntentClassifier:
             vs = VectorStoreService()
             if hasattr(vs, "embeddings") and vs.embeddings is not None:
                 self._embedder = vs.embeddings
-                logger.info("IntentClassifier: using BGE-M3 embeddings from VectorStoreService")
+                logger.info("IntentClassifier: using shared embedding model from VectorStoreService")
             else:
                 self._fallback_only = True
                 logger.warning("IntentClassifier: vector store embeddings unavailable, using keyword fallback")

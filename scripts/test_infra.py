@@ -1,12 +1,14 @@
 """Verify Redis and PostgreSQL connectivity."""
 
 import asyncio
+import os
 
 import redis.asyncio as aioredis
 
 
 async def test_redis():
-    r = await aioredis.from_url("redis://localhost:6379/0", decode_responses=True)
+    redis_url = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
+    r = await aioredis.from_url(redis_url, decode_responses=True)
     await r.set("test:hello", "world", ex=10)
     val = await r.get("test:hello")
     assert val == "world", f"Expected 'world', got {val}"
@@ -19,7 +21,11 @@ async def test_postgres():
     try:
         import asyncpg
         conn = await asyncpg.connect(
-            user="bcrec", password="bcrec_dev", host="localhost", port=5432, database="bcrec"
+            user=os.environ.get("POSTGRES_USER", "bcrec"),
+            password=os.environ.get("POSTGRES_PASSWORD", "bcrec_dev"),
+            host=os.environ.get("POSTGRES_HOST", "localhost"),
+            port=int(os.environ.get("POSTGRES_PORT", "5432")),
+            database=os.environ.get("POSTGRES_DB", "bcrec"),
         )
         version = await conn.fetchval("SELECT version()")
         print(f"PostgreSQL OK — {version}")

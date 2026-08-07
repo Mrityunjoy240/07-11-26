@@ -1,0 +1,226 @@
+{
+  "id": "BENCH_V21_000035",
+  "domain": "scholarship",
+  "difficulty": 3,
+  "primary_language": "en",
+  "languages": ["en"],
+  "speaker_profile": "student",
+  "features": [],
+  "ground_truth": {
+    "rank": 12000,
+    "pcm_percentage": 82,
+    "category": "sc",
+    "interest": "CSE",
+    "board": "cbse",
+    "exam": "wbjee",
+    "budget": null,
+    "location": "kolkata"
+  },
+  "turns": [
+    {
+      "student": "I want to know about scholarships available for college students. What are the options?",
+      "expected": {
+        "understanding": {
+          "intent": "scholarship",
+          "facts": {},
+          "inference": {},
+          "confidence": "high",
+          "missing": ["rank", "pcm_percentage", "category", "interest", "board"]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.0,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": ["needs_fee_information"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_scholarship_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student directly asking about scholarship options",
+            "Need to collect profile details for specific scholarship eligibility"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": ["scholarship", "types", "eligibility"]
+            },
+            {
+              "action": "ask",
+              "content_contains": ["category", "rank", "income"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_scholarship_info", "Student_asks_scholarship"]
+        }
+      },
+      "must_not": [
+        "hallucinate_scholarship_amount",
+        "recommend_branch"
+      ],
+      "ideal_counselor_notes": "Open-ended scholarship query. Provide general scholarship types and ask for category and academic details for specific eligibility."
+    },
+    {
+      "student": "I am SC category, rank 12000 in WBJEE, 82% in PCM. I want CSE.",
+      "expected": {
+        "understanding": {
+          "intent": "scholarship",
+          "facts": {
+            "rank": 12000,
+            "pcm_percentage": 82,
+            "category": "sc",
+            "interest": "CSE",
+            "board": "cbse",
+            "exam": "wbjee"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": ["needs_fee_information"]
+        },
+        "brain": {
+          "eligible_branches": ["CSE", "AIML", "IT", "ECE", "EE", "ME", "CE"],
+          "applicable": true,
+          "why": [
+            {
+              "condition": "rank_provided",
+              "met": true,
+              "detail": "Rank=12000"
+            },
+            {
+              "condition": "category_known",
+              "met": true,
+              "detail": "SC"
+            },
+            {
+              "condition": "rank_within_margin",
+              "met": true,
+              "detail": "12000 < 15000*0.85=12750 for CSE/General, even better for SC"
+            }
+          ]
+        },
+        "decision": {
+          "action": "provide_scholarship_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Full profile provided — SC category with strong rank",
+            "SC students eligible for multiple government scholarships"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": ["SC", "12000", "CSE"]
+            },
+            {
+              "action": "recommend",
+              "content_contains": ["SC scholarship", "post-matric", "eligibility"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_scholarship_info", "SC_eligible", "Profile_complete"]
+        }
+      },
+      "must_not": [
+        "guarantee_scholarship",
+        "hallucinate_exact_amount"
+      ],
+      "ideal_counselor_notes": "SC student with rank 12000 and strong PCM. Eligible for multiple SC scholarships. Provide specific scholarship schemes and eligibility."
+    },
+    {
+      "student": "What is the scholarship amount? And when is the deadline to apply?",
+      "expected": {
+        "understanding": {
+          "intent": "scholarship",
+          "facts": {},
+          "inference": {},
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": ["needs_fee_information"]
+        },
+        "brain": {
+          "eligible_branches": ["CSE", "AIML", "IT", "ECE", "EE", "ME", "CE"],
+          "applicable": true,
+          "why": [
+            {
+              "condition": "rank_provided",
+              "met": true,
+              "detail": "Rank=12000"
+            },
+            {
+              "condition": "category_known",
+              "met": true,
+              "detail": "SC"
+            }
+          ]
+        },
+        "decision": {
+          "action": "provide_scholarship_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Specific follow-up about scholarship amount and deadline",
+            "Natural extension of scholarship conversation"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": ["amount", "range", "fee waiver"]
+            },
+            {
+              "action": "clarify",
+              "content_contains": ["deadline", "application", "documents"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_scholarship_info", "Amount_deadline_query"]
+        }
+      },
+      "must_not": [
+        "guarantee_scholarship_amount",
+        "hallucinate_deadline"
+      ],
+      "ideal_counselor_notes": "Student asks about scholarship amount and deadline. Provide general amount range and application timeline. Conversation ends with scholarship info covered."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "Scholarship query from SC student with rank 12000. Profile completeness goes from 0 to 86%. Tests eligibility check and scholarship info provision.",
+  "author_note": {
+    "primary_capability": "scholarship eligibility check with profile collection",
+    "expected_failure_mode": "retrieval — might give incorrect scholarship amounts or miss SC-specific schemes",
+    "why_this_conversation": "Tests scholarship info retrieval and eligibility check. SC student with good rank is eligible for multiple scholarships."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

@@ -1,0 +1,196 @@
+{
+  "id": "BENCH_V21_000024",
+  "domain": "fees",
+  "difficulty": 2,
+  "primary_language": "en",
+  "languages": ["en"],
+  "speaker_profile": "student",
+  "features": [],
+  "ground_truth": {
+    "rank": null,
+    "pcm_percentage": 85,
+    "category": "sc",
+    "interest": "CSE",
+    "board": "cbse",
+    "exam": "",
+    "budget": null,
+    "location": "kolkata"
+  },
+  "turns": [
+    {
+      "student": "I have 85% in PCM and I belong to SC category. What is the fee for CSE?",
+      "expected": {
+        "understanding": {
+          "intent": "fee",
+          "facts": {
+            "pcm_percentage": 85,
+            "category": "sc",
+            "interest": "CSE"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": ["rank", "budget"]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.43,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": ["needs_fee_information"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_fee_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Direct fee query with PCM and category provided",
+            "SC category may have fee concessions, important to mention"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": ["fee", "CSE", "SC", "concession"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_fee_info", "Student_asks_fees"]
+        }
+      },
+      "must_not": [
+        "recommend_branch",
+        "hallucinate_exact_fees"
+      ],
+      "ideal_counselor_notes": "Student provides PCM percentage and SC category while asking about CSE fees. Mention SC concession possibilities."
+    },
+    {
+      "student": "Also, does the fee include hostel or is it separate? I am from Kolkata and might need hostel.",
+      "expected": {
+        "understanding": {
+          "intent": "fee",
+          "facts": {
+            "location": "kolkata",
+            "topic": "hostel_fee"
+          },
+          "inference": {
+            "needs_hostel": true
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.57,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": ["needs_fee_information"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_fee_info",
+          "priority": "normal",
+          "confidence": "high",
+          "why": [
+            "Follow-up about hostel fees with location context",
+            "Memory of previous fee response needed"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "recommend",
+              "content_contains": ["hostel", "fee", "separate", "Kolkata"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_fee_info", "Hostel_query"]
+        }
+      },
+      "must_not": [
+        "hallucinate_hostel_amount",
+        "ignore_location"
+      ],
+      "ideal_counselor_notes": "Student asks about hostel fees and mentions being from Kolkata. Provide hostel fee info and note that being from Kolkata means hostel is needed."
+    },
+    {
+      "student": "I am SC category, budget 100000.",
+      "expected": {
+        "understanding": {
+          "intent": "fee",
+          "facts": {
+            "category": "sc",
+            "budget": 100000
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "decision",
+          "profile_completeness": 0.57,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": []
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_fee_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "SC category with 100000 budget — SC concession could bring CSE fees within range",
+            "Can now provide specific fee feasibility assessment"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": ["SC", "budget", "100000"]
+            },
+            {
+              "action": "inform",
+              "content_contains": ["SC concession", "fee range", "scholarship eligibility"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_fee_info", "Budget_and_category_known"]
+        }
+      },
+      "must_not": [
+        "recommend_branch",
+        "hallucinate_exact_fees"
+      ],
+      "ideal_counselor_notes": "Student confirms SC category and budget of 100000. Provide CSE fee range with SC concession applied and mention scholarship eligibility for SC category students."
+    }
+  ],
+  "expected_end_state": "incomplete",
+  "ideal_counselor_notes": "3-turn fee conversation. Student provides good profile info (PCM, SC category, CSE interest). Turn 2 adds hostel fee query with location context. Turn 3 provides budget enabling specific fee feasibility assessment with SC concession.",
+  "author_note": {
+    "primary_capability": "fee explanation with SC concession and budget assessment",
+    "expected_failure_mode": "memory_use — might forget SC category when discussing budget, or not apply SC concession in fee calculation",
+    "why_this_conversation": "Tests fee explanation with memory use. Student provides multiple facts upfront, asks about hostel, then reveals budget enabling specific fee feasibility with SC concession."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

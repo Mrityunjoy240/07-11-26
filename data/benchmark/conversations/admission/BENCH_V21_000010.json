@@ -1,0 +1,205 @@
+{
+  "id": "BENCH_V21_000010",
+  "domain": "admission",
+  "difficulty": 2,
+  "primary_language": "en",
+  "languages": [
+    "en"
+  ],
+  "speaker_profile": "student",
+  "features": [],
+  "ground_truth": {
+    "rank": 45000,
+    "pcm_percentage": 78,
+    "category": "general",
+    "interest": "ECE",
+    "board": "cbse",
+    "exam": "wbjee",
+    "budget": null,
+    "location": ""
+  },
+  "turns": [
+    {
+      "student": "How many seats does ECE have?",
+      "expected": {
+        "understanding": {
+          "intent": "seats",
+          "facts": {
+            "interest": "ECE"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": [
+            "rank",
+            "pcm_percentage",
+            "category",
+            "board"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.14,
+          "confidence": "high",
+          "current_problem": "needs_profile_completion",
+          "problems": [
+            "needs_profile_completion"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_program_info",
+          "priority": "normal",
+          "confidence": "high",
+          "why": [
+            "Direct question about ECE seat count",
+            "Can provide intake info without full profile"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "ECE",
+                "seats",
+                "intake"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "rank",
+                "category"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_program_info",
+            "Direct_factual_query"
+          ]
+        }
+      },
+      "must_not": [
+        "hallucinate_seat_count"
+      ],
+      "ideal_counselor_notes": "Student asks about ECE seats. Provide intake information and continue profile collection."
+    },
+    {
+      "student": "My rank is 45000, general category, 78% PCM from CBSE board.",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {
+            "rank": 45000,
+            "pcm_percentage": 78,
+            "category": "general",
+            "board": "cbse",
+            "exam": "wbjee"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance",
+          "problems": [
+            "needs_admission_guidance"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [
+            "CSE",
+            "AIML",
+            "IT",
+            "ECE",
+            "EE",
+            "ME",
+            "CE"
+          ],
+          "applicable": true,
+          "why": [
+            {
+              "condition": "rank_provided",
+              "met": true,
+              "detail": "Rank=45000"
+            },
+            {
+              "condition": "category_known",
+              "met": true,
+              "detail": "General category cutoffs apply"
+            },
+            {
+              "condition": "rank_within_margin",
+              "met": true,
+              "detail": "45000 within eligible range for multiple branches under general"
+            }
+          ]
+        },
+        "decision": {
+          "action": "recommend_branches",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Complete profile available",
+            "Brain evaluation shows eligible branches",
+            "Student originally interested in ECE"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "rank",
+                "PCM",
+                "category"
+              ]
+            },
+            {
+              "action": "recommend",
+              "content_contains": [
+                "ECE",
+                "eligible",
+                "general"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=recommend_branches",
+            "Brain=ECE_eligible",
+            "Complete_profile"
+          ]
+        }
+      },
+      "must_not": [
+        "hallucinate_cutoff",
+        "guarantee_admission"
+      ],
+      "ideal_counselor_notes": "Full profile provided in one turn. ECE was original interest and is likely eligible at rank 45000 general. Confirm eligibility and recommend."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "Seat query followed by full profile. System should provide ECE intake info then confirm eligibility with complete profile.",
+  "author_note": {
+    "primary_capability": "seat information + profile collection completion",
+    "expected_failure_mode": "retrieval — might not find exact seat count, or might not transition to recommendation after profile completion",
+    "why_this_conversation": "Tests that seat queries are handled as factual info (not admission guidance), and that the system transitions smoothly to recommendation once profile is complete."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

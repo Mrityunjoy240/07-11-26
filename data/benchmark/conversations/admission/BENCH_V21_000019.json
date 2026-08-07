@@ -1,0 +1,214 @@
+{
+  "id": "BENCH_V21_000019",
+  "domain": "admission",
+  "difficulty": 3,
+  "primary_language": "en",
+  "languages": [
+    "en"
+  ],
+  "speaker_profile": "student",
+  "features": [
+    "emotion"
+  ],
+  "ground_truth": {
+    "rank": 45000,
+    "pcm_percentage": 68,
+    "category": "sc",
+    "interest": "CSE",
+    "board": "cbse",
+    "exam": "wbjee",
+    "budget": null,
+    "location": "patna"
+  },
+  "turns": [
+    {
+      "student": "I am from Patna. I scored 45000 rank in WBJEE. I feel like my chances are gone. Is there any hope for CSE?",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {
+            "rank": 45000,
+            "location": "patna"
+          },
+          "inference": {
+            "emotional": true,
+            "out_of_state": true
+          },
+          "confidence": "high",
+          "missing": [
+            "pcm_percentage",
+            "category",
+            "interest"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.14,
+          "confidence": "high",
+          "current_problem": "needs_profile_completion",
+          "problems": [
+            "needs_profile_completion",
+            "emotional_support_needed"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "encourage_and_collect_profile",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student demotivated",
+            "Need encouragement and more info (category especially)"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "45000",
+                "Patna",
+                "hope"
+              ]
+            },
+            {
+              "action": "reassure",
+              "content_contains": [
+                "don't lose hope",
+                "depends on category"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "category",
+                "PCM"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=encourage_and_collect_profile",
+            "Emotional_support"
+          ]
+        }
+      },
+      "must_not": [
+        "dismiss_concern",
+        "guarantee_CSE"
+      ],
+      "ideal_counselor_notes": "Out-of-state student, demotivated. Reassure and collect category (SC could open options)."
+    },
+    {
+      "student": "I am SC category. My PCM is 68%. Please help me, I really want CSE.",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {
+            "category": "sc",
+            "pcm_percentage": 68,
+            "interest": "CSE"
+          },
+          "inference": {
+            "emotional": true
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "comparing_options",
+          "problems": []
+        },
+        "brain": {
+          "eligible_branches": [
+            "CSE",
+            "IT",
+            "ECE"
+          ],
+          "applicable": true,
+          "why": [
+            {
+              "condition": "Rank 45000 SC — CSE cutoff ~55000 SC",
+              "met": true,
+              "detail": "Rank 45000 SC — CSE cutoff ~55000 SC"
+            },
+            {
+              "condition": "ECE cutoff ~70000 SC",
+              "met": true,
+              "detail": "ECE cutoff ~70000 SC"
+            }
+          ]
+        },
+        "decision": {
+          "action": "recommend_branches",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "SC category opens CSE at 45000",
+            "Multiple branches eligible"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "SC",
+                "68%",
+                "CSE"
+              ]
+            },
+            {
+              "action": "reassure",
+              "content_contains": [
+                "good news",
+                "SC category",
+                "eligible"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "CSE branch",
+                "IT",
+                "ECE",
+                "the eligible"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=recommend_branches",
+            "Profile_complete"
+          ]
+        }
+      },
+      "must_not": [
+        "guarantee_admission"
+      ],
+      "ideal_counselor_notes": "SC category makes CSE feasible at 45000. Reassure and provide specific branch recommendations."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "2-turn emotional admission query from out-of-state SC student. Tests encouragement + profile collection + recommendation.",
+  "author_note": {
+    "primary_capability": "emotional support + encourage_and_collect_profile + SC eligibility",
+    "expected_failure_mode": "action_selection — might not use encourage action or miss SC category significance",
+    "why_this_conversation": "Tests emotion + out-of-state student. SC category changes the eligibility picture dramatically — good test of category-aware reasoning."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

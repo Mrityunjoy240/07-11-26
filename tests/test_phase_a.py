@@ -79,7 +79,7 @@ def test_pipeline_result_has_versions():
     assert result.versions["brain"] == "v1"
     assert result.versions["decision"] == "v2"
     assert result.versions["planner"] == "v2"
-    assert result.versions["composer"] == "v1"
+    assert result.versions["composer"] == "v2"
 
 
 def test_understanding_engine_has_version():
@@ -109,7 +109,7 @@ def test_planner_engine_has_version():
 
 def test_composer_has_version():
     from src.composer.engine import ResponseComposer
-    assert ResponseComposer.VERSION == "v1"
+    assert ResponseComposer.VERSION == "v2"
 
 
 # ---------------------------------------------------------------------------

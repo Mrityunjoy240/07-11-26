@@ -119,9 +119,13 @@ class TestProblemIdentification:
         assert result.current_problem == "needs_profile_initial"
 
     def test_needs_fee_information(self, engine: ReasoningEngine):
+        p = StudentProfile()
+        p.personal.category = "general"
+        p.academic.rank = 25000
         understanding = UnderstandingResult(
             text="what are the fees",
             intent=UnderstandingIntent(primary="fee", confidence=0.8),
+            profile=p,
         )
         result = engine.reason(understanding)
         assert result.current_problem == "needs_fee_information"
@@ -157,3 +161,71 @@ class TestConfidence:
     def test_nonzero_with_data(self, engine: ReasoningEngine, rank_understanding: UnderstandingResult):
         result = engine.reason(rank_understanding)
         assert result.confidence > 0
+
+
+class TestShouldRevertToGuidance:
+    """_should_revert_to_guidance uses dict .get() on a StudentProfile
+    dataclass, causing AttributeError at runtime.
+    
+    Fix: Use attribute access instead, mapping the dict-style field names
+    to the correct dataclass attributes:
+      academic.rank      → profile.academic.rank
+      academic.pcm       → profile.academic.pcm_percentage
+      personal.category  → profile.personal.category
+      preferences.interest → profile.career.interest
+    """
+
+    def _make_state(self, previous_problem: str = "needs_personalized_guidance") -> ConversationState:
+        return ConversationState(
+            session_id="test",
+            metadata={"previous_problem": previous_problem},
+        )
+
+    def test_returns_false_when_prev_not_personalized(self, engine: ReasoningEngine):
+        """Gate: only revert when coming from personalized guidance."""
+        r = UnderstandingResult(text="test")
+        state = self._make_state(previous_problem="needs_profile_completion")
+        assert engine._should_revert_to_guidance(r, state) is False
+
+    def test_returns_false_when_profile_empty(self, engine: ReasoningEngine):
+        """No critical fields set → stay on personalized guidance."""
+        r = UnderstandingResult(text="test")
+        state = self._make_state()
+        assert engine._should_revert_to_guidance(r, state) is False
+
+    def test_returns_true_with_rank(self, engine: ReasoningEngine):
+        p = StudentProfile()
+        p.academic.rank = 25000
+        r = UnderstandingResult(text="test", profile=p)
+        state = self._make_state()
+        assert engine._should_revert_to_guidance(r, state) is True
+
+    def test_returns_true_with_pcm(self, engine: ReasoningEngine):
+        p = StudentProfile()
+        p.academic.pcm_percentage = 85.0
+        r = UnderstandingResult(text="test", profile=p)
+        state = self._make_state()
+        assert engine._should_revert_to_guidance(r, state) is True
+
+    def test_returns_true_with_category(self, engine: ReasoningEngine):
+        p = StudentProfile()
+        p.personal.category = "sc"
+        r = UnderstandingResult(text="test", profile=p)
+        state = self._make_state()
+        assert engine._should_revert_to_guidance(r, state) is True
+
+    def test_returns_true_with_interest(self, engine: ReasoningEngine):
+        p = StudentProfile()
+        p.career.interest = "engineering"
+        r = UnderstandingResult(text="test", profile=p)
+        state = self._make_state()
+        assert engine._should_revert_to_guidance(r, state) is True
+
+    def test_returns_true_with_multiple_fields(self, engine: ReasoningEngine):
+        p = StudentProfile()
+        p.academic.rank = 12000
+        p.personal.category = "obc"
+        p.career.interest = "medical"
+        r = UnderstandingResult(text="test", profile=p)
+        state = self._make_state()
+        assert engine._should_revert_to_guidance(r, state) is True

@@ -21,6 +21,7 @@ import {
 import { useVoice } from '../../hooks/useVoice';
 import { useVoiceWS } from '../../hooks/useVoiceWS';
 import { useNoiseCancellation } from '../../hooks/useNoiseCancellation';
+import { authHeaders } from '../../apiAuth';
 
 interface Message {
     role: 'user' | 'assistant';
@@ -111,6 +112,7 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    ...authHeaders(),
                 },
                 body: JSON.stringify({
                     text: text,
@@ -194,6 +196,7 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    ...authHeaders(),
                 },
                 body: JSON.stringify({ 
                     message: textToSend,
@@ -275,7 +278,7 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
     useEffect(() => {
         const loadHealth = async () => {
             try {
-                const res = await fetch(`${API_BASE}/qa/health`);
+                const res = await fetch(`${API_BASE}/qa/health`, { headers: authHeaders() });
                 if (res.ok) {
                     const data = await res.json();
                     setHealth(data);
@@ -289,7 +292,7 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
 
     const loadConversationMessages = async (convId: string) => {
         try {
-            const res = await fetch(`${API_BASE}/api/conversations/${convId}`);
+            const res = await fetch(`${API_BASE}/api/conversations/${convId}`, { headers: authHeaders() });
             if (res.ok) {
                 const data = await res.json();
                 const loadedMessages: Message[] = data.messages.map((m: { role: string; content: string }) => ({

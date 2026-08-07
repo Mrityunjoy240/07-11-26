@@ -1,0 +1,199 @@
+{
+  "id": "BENCH_V21_000045",
+  "domain": "admission",
+  "difficulty": 3,
+  "primary_language": "en",
+  "languages": ["en"],
+  "speaker_profile": "student",
+  "features": [],
+  "ground_truth": {
+    "rank": 35000,
+    "pcm_percentage": 72,
+    "category": "obc",
+    "interest": "CSE",
+    "board": "wbchse",
+    "exam": "wbjee",
+    "budget": 100000,
+    "location": "kolkata"
+  },
+  "turns": [
+    {
+      "student": "I want to know about education loan options for engineering. I got 35000 rank in WBJEE and I am from OBC category. Is loan available?",
+      "expected": {
+        "understanding": {
+          "intent": "loan",
+          "facts": {"rank": 35000, "category": "obc", "exam": "wbjee"},
+          "inference": {},
+          "confidence": "high",
+          "missing": ["pcm_percentage", "interest", "board", "budget", "location"]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.29,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": ["needs_fee_information"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_program_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student asking about education loan for engineering",
+            "Has rank and category but need more details for specific guidance"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": ["education loan", "WBJEE rank", "OBC"]
+            },
+            {
+              "action": "inform",
+              "content_contains": ["loan options", "eligibility", "bank tie-ups"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_program_info", "Loan_query"]
+        }
+      },
+      "must_not": ["guarantee_loan_approval", "ignore_academic_profile"],
+      "ideal_counselor_notes": "Student asking about education loan with WBJEE rank 35000 and OBC category. Explain loan options and ask for more academic details."
+    },
+    {
+      "student": "My PCM is 72% from WBCHSE board. I want CSE branch. My family can contribute about 1 lakh per year. How much loan can I get?",
+      "expected": {
+        "understanding": {
+          "intent": "loan",
+          "facts": {
+            "pcm_percentage": 72,
+            "board": "wbchse",
+            "interest": "CSE",
+            "budget": 100000,
+            "location": "kolkata"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": ["needs_fee_information"]
+        },
+        "brain": {
+          "eligible_branches": ["CSE", "AIML", "IT", "ECE", "EE", "ME", "CE"],
+          "applicable": true,
+          "why": [
+            {"condition": "rank_provided", "met": true, "detail": "Rank=35000 WBJEE"},
+            {"condition": "category_known", "met": true, "detail": "OBC"},
+            {"condition": "rank_within_margin", "met": true, "detail": "35000 < 40000 cutoff for CSE/OBC — within margin"}
+          ]
+        },
+        "decision": {
+          "action": "provide_program_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Complete profile available — can assess both admission chances and loan needs",
+            "CSE is achievable at rank 35000 for OBC",
+            "Need to explain loan amounts based on fee structure"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": ["loan amount", "CSE fee structure", "interest rate"]
+            },
+            {
+              "action": "recommend",
+              "content_contains": ["government loan schemes", "OBC scholarship", "repayment"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_program_info", "Profile_complete", "CSE_eligible"]
+        }
+      },
+      "must_not": ["promise_exact_amount", "ignore_scholarship_options"],
+      "ideal_counselor_notes": "Student provided complete profile. CSE is achievable at rank 35000 for OBC. Explain loan options, government schemes, and OBC scholarship possibilities."
+    },
+    {
+      "student": "What about the scholarship for OBC students? Can I get both loan and scholarship together?",
+      "expected": {
+        "understanding": {
+          "intent": "loan",
+          "facts": {},
+          "inference": {},
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": ["needs_fee_information"]
+        },
+        "brain": {
+          "eligible_branches": ["CSE", "AIML", "IT", "ECE", "EE", "ME", "CE"],
+          "applicable": true,
+          "why": [
+            {"condition": "rank_provided", "met": true, "detail": "Rank=35000"},
+            {"condition": "category_known", "met": true, "detail": "OBC"},
+            {"condition": "rank_within_margin", "met": true, "detail": "35000 < 40000 for CSE/OBC"}
+          ]
+        },
+        "decision": {
+          "action": "provide_program_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student asking about combining loan and scholarship",
+            "OBC students are eligible for specific government scholarships",
+            "Can explain how loan and scholarship complement each other"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "clarify",
+              "content_contains": ["loan plus scholarship", "OBC benefits", "eligibility"]
+            },
+            {
+              "action": "summarize",
+              "content_contains": ["financial planning", "combined funding", "next steps"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_program_info", "OBC_scholarship_query"]
+        }
+      },
+      "must_not": ["guarantee_scholarship", "overpromise_funding"],
+      "ideal_counselor_notes": "Student wants to combine loan and OBC scholarship. Explain how both can work together and provide a summary of financial planning options."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "Student seeking education loan guidance for engineering. Profile builds across turns with increasing detail. Key challenge: explaining loan and scholarship options while also noting that CSE is achievable at their rank.",
+  "author_note": {
+    "primary_capability": "education loan guidance with OBC scholarship inquiry",
+    "expected_failure_mode": "fee_info — might focus only on admission and forget to address loan-specific questions",
+    "why_this_conversation": "Tests loan guidance combined with admission assessment. The OBC category adds scholarship dimension. Turn 3 tests the system's ability to handle follow-up about combining funding sources."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

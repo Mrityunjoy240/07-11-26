@@ -1,0 +1,104 @@
+{
+  "_file_meta": {
+    "program": "Hostel",
+    "display_name": "Hostel Accommodation",
+    "duration_semesters": 8,
+    "last_updated": "2026-07-10",
+    "updated_by": "System (initial load from combined_kb.json)",
+    "structure_count": 1,
+    "schema_version": "2.0.0"
+  },
+  "groups": {
+    "hostel": { "branches": [] }
+  },
+  "structures": [
+    {
+      "version_id": "v2026",
+      "status": "active",
+      "label": "2026-2030 Hostel Fee Structure",
+      "admission_batches": ["2026-27", "2027-28", "2028-29", "2029-30", "2030-31"],
+      "effective_date": "2026-07-01",
+      "published_date": "2026-06-15",
+      "source": "BCREC Combined KB (hostel section)",
+      "groups": {
+        "hostel": {
+          "components": [
+            {
+              "id": "single_bed_rent",
+              "label": "Single Bed Seat Rent",
+              "type": "per_semester",
+              "category": "optional",
+              "amount": 30000,
+              "applicable_semesters": [1, 2, 3, 4, 5, 6, 7, 8],
+              "availability": "Limited (need-based)",
+              "notes": "Single occupancy room. Limited availability."
+            },
+            {
+              "id": "shared_bed_rent",
+              "label": "Double/Triple Bed Seat Rent",
+              "type": "per_semester",
+              "category": "optional",
+              "amount": 10000,
+              "applicable_semesters": [1, 2, 3, 4, 5, 6, 7, 8],
+              "availability": "Standard",
+              "notes": "Standard shared accommodation"
+            },
+            {
+              "id": "four_bed_rent",
+              "label": "4-Bed Seat Rent",
+              "type": "per_semester",
+              "category": "optional",
+              "amount": 10000,
+              "applicable_semesters": [1, 2, 3, 4, 5, 6, 7, 8],
+              "availability": "Maximum",
+              "notes": "Maximum availability room type"
+            },
+            {
+              "id": "hostel_caution_money",
+              "label": "Hostel Caution Deposit",
+              "type": "one_time",
+              "category": "refundable",
+              "amount": 2000,
+              "charged_in_semester": 1,
+              "refundable_at": "hostel_checkout",
+              "notes": "Refundable at hostel checkout subject to no dues"
+            },
+            {
+              "id": "admission_caution_with_hostel",
+              "label": "Admission Caution Deposit (With Hostel)",
+              "type": "one_time",
+              "category": "refundable",
+              "amount": 12000,
+              "charged_in_semester": 1,
+              "refundable_at": "course_completion",
+              "notes": "Admission caution deposit for students opting for hostel"
+            },
+            {
+              "id": "admission_caution_without_hostel",
+              "label": "Admission Caution Deposit (Without Hostel)",
+              "type": "one_time",
+              "category": "refundable",
+              "amount": 10000,
+              "charged_in_semester": 1,
+              "refundable_at": "course_completion",
+              "notes": "Admission caution deposit for students NOT opting for hostel"
+            },
+            {
+              "id": "mess_charges",
+              "label": "Mess Charges",
+              "type": "per_month",
+              "category": "optional",
+              "amount": 5500,
+              "months_per_year": 11,
+              "notes": "Monthly mess fee. Includes vegetarian meals daily, non-veg 3-4 days/week."
+            }
+          ],
+          "computed": {
+            "total_course_fee": 0,
+            "first_semester_payable": 0
+          }
+        }
+      }
+    }
+  ]
+}

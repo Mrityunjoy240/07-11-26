@@ -1,0 +1,1430 @@
+{
+  "version": "v2.1",
+  "status": "frozen",
+  "ontology": "ontology_v2.1.json",
+  "created": "2026-07-19",
+  "description": "v2.1 coverage matrix. Every intent, action, behavior, and operator covered. Traffic-realistic frequency documented separately.",
+  "design_notes": {
+    "coverage_vs_traffic": "This matrix targets full ontology coverage. A separate traffic_profile.json documents real-world frequency. Coverage conversations for rare intents (greeting, repeat, lateral_entry) are short and simple to minimize skew.",
+    "golden": "Slots marked golden are the most stable. They should almost never change after freezing. Other slots may evolve.",
+    "failure_modes": "Each slot lists expected_failure_modes drawn from ontology failure taxonomy. One conversation often stresses multiple weaknesses.",
+    "long_conversations": "5 conversations have 6+ turns to stress-test multi-turn routing and correction chains."
+  },
+  "traffic_profile": {
+    "description": "Approximate real-world frequency. Use this to weight regression scoring, not to decide which conversations to write.",
+    "distribution": {
+      "admission": 0.35,
+      "fees": 0.15,
+      "placement": 0.1,
+      "hostel": 0.08,
+      "scholarship": 0.08,
+      "institution": 0.06,
+      "transfer": 0.03,
+      "distance": 0.03,
+      "management": 0.03,
+      "career": 0.02,
+      "counseling": 0.02,
+      "other": 0.05
+    }
+  },
+  "targets": {
+    "conversations": 50,
+    "turns_min": 150,
+    "turns_max": 210,
+    "turns_avg": "~3.2",
+    "behaviors_min_coverage": "every behavior >= 2 conversations",
+    "operators_min_coverage": "every operator >= 3 conversations",
+    "golden_min": 8,
+    "long_conversation_min": 5,
+    "multi_constraint_pct": ">=30%",
+    "correction_pct": ">=20%",
+    "memory_use_pct": ">=40%"
+  },
+  "conversations": [
+    {
+      "id": "V21_001",
+      "domain": "admission",
+      "intent": "greeting",
+      "action": "collect_profile",
+      "behaviors": [
+        "greeting",
+        "information_retrieval"
+      ],
+      "operators": [],
+      "expected_failure_modes": [
+        "intent_classification"
+      ],
+      "difficulty": 1,
+      "turns": 1,
+      "languages": [
+        "en"
+      ],
+      "features": [],
+      "golden": true,
+      "status": "authored"
+    },
+    {
+      "id": "V21_002",
+      "domain": "admission",
+      "intent": "unknown",
+      "action": "clarify",
+      "behaviors": [
+        "out_of_scope_handling",
+        "ambiguous_query_resolution"
+      ],
+      "operators": [],
+      "expected_failure_modes": [
+        "intent_classification"
+      ],
+      "difficulty": 1,
+      "turns": 1,
+      "languages": [
+        "en"
+      ],
+      "features": [],
+      "golden": true,
+      "status": "authored"
+    },
+    {
+      "id": "V21_003",
+      "domain": "institution",
+      "intent": "institution",
+      "action": "provide_program_info",
+      "behaviors": [
+        "information_retrieval"
+      ],
+      "operators": [
+        "retrieval"
+      ],
+      "expected_failure_modes": [
+        "retrieval"
+      ],
+      "difficulty": 1,
+      "turns": 1,
+      "languages": [
+        "en"
+      ],
+      "features": [],
+      "golden": true,
+      "status": "authored"
+    },
+    {
+      "id": "V21_004",
+      "domain": "institution",
+      "intent": "institution",
+      "action": "provide_program_info",
+      "behaviors": [
+        "information_retrieval"
+      ],
+      "operators": [
+        "retrieval"
+      ],
+      "expected_failure_modes": [
+        "retrieval",
+        "multilingual"
+      ],
+      "difficulty": 1,
+      "turns": 1,
+      "languages": [
+        "hi"
+      ],
+      "features": [],
+      "golden": false,
+      "status": "authored"
+    },
+    {
+      "id": "V21_005",
+      "domain": "admission",
+      "intent": "repeat",
+      "action": "clarify",
+      "behaviors": [
+        "ambiguous_query_resolution"
+      ],
+      "operators": [],
+      "expected_failure_modes": [
+        "intent_classification"
+      ],
+      "difficulty": 1,
+      "turns": 1,
+      "languages": [
+        "en"
+      ],
+      "features": [],
+      "golden": false,
+      "status": "authored"
+    },
+    {
+      "id": "V21_006",
+      "domain": "admission",
+      "intent": "admission",
+      "action": "recommend_branches",
+      "behaviors": [
+        "information_retrieval",
+        "multi_constraint_reasoning"
+      ],
+      "operators": [
+        "retrieval",
+        "multi_constraint"
+      ],
+      "expected_failure_modes": [
+        "reasoning",
+        "retrieval"
+      ],
+      "difficulty": 2,
+      "turns": 3,
+      "languages": [
+        "en"
+      ],
+      "features": [],
+      "golden": true,
+      "status": "authored"
+    },
+    {
+      "id": "V21_007",
+      "domain": "admission",
+      "intent": "admission",
+      "action": "collect_profile",
+      "behaviors": [
+        "information_retrieval"
+      ],
+      "operators": [
+        "retrieval"
+      ],
+      "expected_failure_modes": [
+        "multilingual",
+        "retrieval"
+      ],
+      "difficulty": 2,
+      "turns": 2,
+      "languages": [
+        "hi"
+      ],
+      "features": [],
+      "golden": false,
+      "status": "authored"
+    },
+    {
+      "id": "V21_008",
+      "domain": "fees",
+      "intent": "fee",
+      "action": "provide_fee_info",
+      "behaviors": [
+        "fee_explanation",
+        "eligibility_check"
+      ],
+      "operators": [
+        "retrieval",
+        "eligibility",
+        "comparison",
+        "recommendation"
+      ],
+      "expected_failure_modes": [
+        "reasoning",
+        "routing"
+      ],
+      "difficulty": 2,
+      "turns": 3,
+      "languages": [
+        "en"
+      ],
+      "features": [
+        "missing_info"
+      ],
+      "golden": true,
+      "status": "planned"
+    },
+    {
+      "id": "V21_009",
+      "domain": "admission",
+      "intent": "admission",
+      "action": "recommend_branches",
+      "behaviors": [
+        "multi_constraint_reasoning",
+        "branch_recommendation"
+      ],
+      "operators": [
+        "retrieval",
+        "eligibility",
+        "comparison",
+        "recommendation",
+        "multi_constraint"
+      ],
+      "expected_failure_modes": [
+        "reasoning",
+        "routing"
+      ],
+      "difficulty": 4,
+      "turns": 3,
+      "languages": [
+        "en"
+      ],
+      "features": [
+        "emotion"
+      ],
+      "golden": true,
+      "status": "planned"
+    },
+    {
+      "id": "V21_010",
+      "domain": "admission",
+      "intent": "admission",
+      "action": "recommend_branches",
+      "behaviors": [
+        "multi_constraint_reasoning",
+        "branch_recommendation",
+        "correction_handling"
+      ],
+      "operators": [
+        "retrieval",
+        "eligibility",
+        "comparison",
+        "recommendation",
+        "multi_constraint",
+        "correction"
+      ],
+      "expected_failure_modes": [
+        "reasoning",
+        "routing"
+      ],
+      "difficulty": 4,
+      "turns": 3,
+      "languages": [
+        "en"
+      ],
+      "features": [
+        "parent_mode",
+        "correction"
+      ],
+      "golden": false,
+      "status": "planned"
+    },
+    {
+      "id": "V21_011",
+      "domain": "admission",
+      "intent": "admission",
+      "action": "recommend_branches",
+      "behaviors": [
+        "correction_handling",
+        "branch_recommendation",
+        "topic_switch"
+      ],
+      "operators": [
+        "correction",
+        "memory_use",
+        "eligibility",
+        "comparison"
+      ],
+      "expected_failure_modes": [
+        "correction",
+        "memory"
+      ],
+      "difficulty": 4,
+      "turns": 6,
+      "languages": [
+        "en"
+      ],
+      "features": [
+        "correction",
+        "topic_switch"
+      ],
+      "golden": false,
+      "status": "planned"
+    },
+    {
+      "id": "V21_012",
+      "domain": "admission",
+      "intent": "admission",
+      "action": "recommend_branches",
+      "behaviors": [
+        "conflict_resolution",
+        "branch_recommendation",
+        "multi_constraint_reasoning",
+        "topic_switch"
+      ],
+      "operators": [
+        "retrieval",
+        "eligibility",
+        "comparison",
+        "recommendation",
+        "multi_constraint",
+        "conflict_resolution"
+      ],
+      "expected_failure_modes": [
+        "reasoning",
+        "routing",
+        "ambiguity"
+      ],
+      "difficulty": 5,
+      "turns": 7,
+      "languages": [
+        "en"
+      ],
+      "features": [
+        "correction",
+        "parent_mode",
+        "emotion"
+      ],
+      "golden": false,
+      "status": "planned"
+    },
+    {
+      "id": "V21_013",
+      "domain": "admission",
+      "intent": "cutoff",
+      "action": "provide_cutoff_info",
+      "behaviors": [
+        "information_retrieval",
+        "eligibility_check",
+        "multi_constraint_reasoning"
+      ],
+      "operators": [
+        "retrieval",
+        "eligibility",
+        "multi_constraint"
+      ],
+      "expected_failure_modes": [
+        "retrieval",
+        "reasoning"
+      ],
+      "difficulty": 3,
+      "turns": 3,
+      "languages": [
+        "en"
+      ],
+      "features": [],
+      "golden": true,
+      "status": "planned"
+    },
+    {
+      "id": "V21_014",
+      "domain": "admission",
+      "intent": "cutoff",
+      "action": "provide_cutoff_info",
+      "behaviors": [
+        "information_retrieval"
+      ],
+      "operators": [
+        "retrieval"
+      ],
+      "expected_failure_modes": [
+        "retrieval",
+        "multilingual"
+      ],
+      "difficulty": 3,
+      "turns": 3,
+      "languages": [
+        "bn",
+        "en"
+      ],
+      "features": [
+        "language_switch"
+      ],
+      "golden": true,
+      "status": "planned"
+    },
+    {
+      "id": "V21_015",
+      "domain": "admission",
+      "intent": "seats",
+      "action": "provide_program_info",
+      "behaviors": [
+        "information_retrieval",
+        "multi_constraint_reasoning"
+      ],
+      "operators": [
+        "retrieval",
+        "multi_constraint"
+      ],
+      "expected_failure_modes": [
+        "reasoning"
+      ],
+      "difficulty": 2,
+      "turns": 2,
+      "languages": [
+        "en"
+      ],
+      "features": [],
+      "golden": false,
+      "status": "planned"
+    },
+    {
+      "id": "V21_016",
+      "domain": "admission",
+      "intent": "department",
+      "action": "provide_program_info",
+      "behaviors": [
+        "information_retrieval",
+        "follow_up_reference"
+      ],
+      "operators": [
+        "retrieval",
+        "memory_use"
+      ],
+      "expected_failure_modes": [
+        "retrieval"
+      ],
+      "difficulty": 2,
+      "turns": 3,
+      "languages": [
+        "en"
+      ],
+      "features": [],
+      "golden": false,
+      "status": "planned"
+    },
+    {
+      "id": "V21_017",
+      "domain": "admission",
+      "intent": "document",
+      "action": "provide_program_info",
+      "behaviors": [
+        "information_retrieval",
+        "follow_up_reference"
+      ],
+      "operators": [
+        "retrieval",
+        "memory_use"
+      ],
+      "expected_failure_modes": [
+        "retrieval"
+      ],
+      "difficulty": 2,
+      "turns": 3,
+      "languages": [
+        "en"
+      ],
+      "features": [],
+      "golden": false,
+      "status": "planned"
+    },
+    {
+      "id": "V21_018",
+      "domain": "admission",
+      "intent": "admission",
+      "action": "provide_admission_guidance",
+      "behaviors": [
+        "emotional_support",
+        "eligibility_check"
+      ],
+      "operators": [
+        "memory_use"
+      ],
+      "expected_failure_modes": [
+        "action_selection"
+      ],
+      "difficulty": 2,
+      "turns": 3,
+      "languages": [
+        "en"
+      ],
+      "features": [
+        "emotion"
+      ],
+      "golden": false,
+      "status": "planned"
+    },
+    {
+      "id": "V21_019",
+      "domain": "admission",
+      "intent": "admission",
+      "action": "encourage_and_collect_profile",
+      "behaviors": [
+        "emotional_support",
+        "follow_up_reference"
+      ],
+      "operators": [
+        "memory_use"
+      ],
+      "expected_failure_modes": [
+        "action_selection"
+      ],
+      "difficulty": 3,
+      "turns": 2,
+      "languages": [
+        "en"
+      ],
+      "features": [
+        "emotion"
+      ],
+      "golden": false,
+      "status": "planned"
+    },
+    {
+      "id": "V21_020",
+      "domain": "admission",
+      "intent": "admission",
+      "action": "provide_admission_guidance",
+      "behaviors": [
+        "branch_recommendation",
+        "follow_up_reference"
+      ],
+      "operators": [
+        "retrieval",
+        "comparison",
+        "recommendation",
+        "memory_use",
+        "follow_up_reference"
+      ],
+      "expected_failure_modes": [
+        "reasoning"
+      ],
+      "difficulty": 3,
+      "turns": 2,
+      "languages": [
+        "en"
+      ],
+      "features": [],
+      "golden": false,
+      "status": "planned"
+    },
+    {
+      "id": "V21_021",
+      "domain": "fees",
+      "intent": "fee",
+      "action": "provide_fee_info",
+      "behaviors": [
+        "fee_explanation",
+        "follow_up_reference"
+      ],
+      "operators": [
+        "retrieval",
+        "memory_use"
+      ],
+      "expected_failure_modes": [
+        "retrieval"
+      ],
+      "difficulty": 2,
+      "turns": 3,
+      "languages": [
+        "en"
+      ],
+      "features": [],
+      "golden": true,
+      "status": "planned"
+    },
+    {
+      "id": "V21_022",
+      "domain": "fees",
+      "intent": "fee",
+      "action": "provide_fee_info",
+      "behaviors": [
+        "fee_explanation"
+      ],
+      "operators": [
+        "retrieval"
+      ],
+      "expected_failure_modes": [
+        "retrieval",
+        "multilingual"
+      ],
+      "difficulty": 2,
+      "turns": 3,
+      "languages": [
+        "hi"
+      ],
+      "features": [],
+      "golden": false,
+      "status": "planned"
+    },
+    {
+      "id": "V21_023",
+      "domain": "fees",
+      "intent": "fee",
+      "action": "provide_fee_info",
+      "behaviors": [
+        "fee_explanation",
+        "multi_constraint_reasoning"
+      ],
+      "operators": [
+        "retrieval",
+        "multi_constraint"
+      ],
+      "expected_failure_modes": [
+        "retrieval",
+        "reasoning"
+      ],
+      "difficulty": 4,
+      "turns": 6,
+      "languages": [
+        "hi",
+        "en"
+      ],
+      "features": [
+        "parent_mode",
+        "correction"
+      ],
+      "golden": false,
+      "status": "planned"
+    },
+    {
+      "id": "V21_024",
+      "domain": "fees",
+      "intent": "fee",
+      "action": "provide_fee_info",
+      "behaviors": [
+        "fee_explanation"
+      ],
+      "operators": [
+        "retrieval",
+        "memory_use"
+      ],
+      "expected_failure_modes": [
+        "retrieval"
+      ],
+      "difficulty": 2,
+      "turns": 3,
+      "languages": [
+        "en"
+      ],
+      "features": [],
+      "golden": false,
+      "status": "planned"
+    },
+    {
+      "id": "V21_025",
+      "domain": "fees",
+      "intent": "fee",
+      "action": "provide_fee_info",
+      "behaviors": [
+        "fee_explanation",
+        "eligibility_check",
+        "multi_constraint_reasoning",
+        "correction_handling"
+      ],
+      "operators": [
+        "retrieval",
+        "eligibility",
+        "multi_constraint",
+        "memory_use",
+        "correction"
+      ],
+      "expected_failure_modes": [
+        "retrieval"
+      ],
+      "difficulty": 3,
+      "turns": 3,
+      "languages": [
+        "en"
+      ],
+      "features": [
+        "missing_info",
+        "correction"
+      ],
+      "golden": false,
+      "status": "planned"
+    },
+    {
+      "id": "V21_026",
+      "domain": "fees",
+      "intent": "scholarship",
+      "action": "provide_scholarship_info",
+      "behaviors": [
+        "scholarship_guidance",
+        "eligibility_check"
+      ],
+      "operators": [
+        "retrieval",
+        "eligibility",
+        "memory_use"
+      ],
+      "expected_failure_modes": [
+        "retrieval",
+        "reasoning"
+      ],
+      "difficulty": 3,
+      "turns": 3,
+      "languages": [
+        "en"
+      ],
+      "features": [],
+      "golden": true,
+      "status": "planned"
+    },
+    {
+      "id": "V21_027",
+      "domain": "placement",
+      "intent": "placement",
+      "action": "provide_placement_info",
+      "behaviors": [
+        "information_retrieval"
+      ],
+      "operators": [
+        "retrieval"
+      ],
+      "expected_failure_modes": [
+        "retrieval"
+      ],
+      "difficulty": 2,
+      "turns": 3,
+      "languages": [
+        "en"
+      ],
+      "features": [],
+      "golden": true,
+      "status": "planned"
+    },
+    {
+      "id": "V21_028",
+      "domain": "placement",
+      "intent": "placement",
+      "action": "provide_placement_info",
+      "behaviors": [
+        "information_retrieval",
+        "eligibility_check",
+        "multi_constraint_reasoning"
+      ],
+      "operators": [
+        "retrieval",
+        "eligibility",
+        "multi_constraint"
+      ],
+      "expected_failure_modes": [
+        "retrieval",
+        "reasoning"
+      ],
+      "difficulty": 3,
+      "turns": 3,
+      "languages": [
+        "en"
+      ],
+      "features": [
+        "follow_up"
+      ],
+      "golden": false,
+      "status": "planned"
+    },
+    {
+      "id": "V21_029",
+      "domain": "placement",
+      "intent": "placement",
+      "action": "provide_placement_info",
+      "behaviors": [
+        "information_retrieval",
+        "follow_up_reference"
+      ],
+      "operators": [
+        "retrieval",
+        "memory_use",
+        "follow_up_reference"
+      ],
+      "expected_failure_modes": [
+        "memory",
+        "retrieval"
+      ],
+      "difficulty": 4,
+      "turns": 3,
+      "languages": [
+        "en"
+      ],
+      "features": [
+        "follow_up"
+      ],
+      "golden": false,
+      "status": "planned"
+    },
+    {
+      "id": "V21_030",
+      "domain": "placement",
+      "intent": "placement",
+      "action": "provide_placement_info",
+      "behaviors": [
+        "information_retrieval",
+        "multi_constraint_reasoning",
+        "correction_handling"
+      ],
+      "operators": [
+        "retrieval",
+        "eligibility",
+        "multi_constraint",
+        "memory_use",
+        "correction"
+      ],
+      "expected_failure_modes": [
+        "reasoning",
+        "retrieval"
+      ],
+      "difficulty": 4,
+      "turns": 3,
+      "languages": [
+        "en"
+      ],
+      "features": [
+        "adversarial",
+        "correction"
+      ],
+      "golden": false,
+      "status": "planned"
+    },
+    {
+      "id": "V21_031",
+      "domain": "hostel",
+      "intent": "hostel",
+      "action": "provide_hostel_info",
+      "behaviors": [
+        "information_retrieval"
+      ],
+      "operators": [
+        "retrieval"
+      ],
+      "expected_failure_modes": [
+        "retrieval"
+      ],
+      "difficulty": 2,
+      "turns": 4,
+      "languages": [
+        "en"
+      ],
+      "features": [],
+      "golden": true,
+      "status": "planned"
+    },
+    {
+      "id": "V21_032",
+      "domain": "hostel",
+      "intent": "hostel",
+      "action": "provide_hostel_info",
+      "behaviors": [
+        "information_retrieval",
+        "emotional_support"
+      ],
+      "operators": [
+        "retrieval"
+      ],
+      "expected_failure_modes": [
+        "retrieval",
+        "action_selection"
+      ],
+      "difficulty": 3,
+      "turns": 3,
+      "languages": [
+        "en"
+      ],
+      "features": [
+        "parent_mode",
+        "emotion"
+      ],
+      "golden": false,
+      "status": "planned"
+    },
+    {
+      "id": "V21_033",
+      "domain": "hostel",
+      "intent": "hostel",
+      "action": "provide_hostel_info",
+      "behaviors": [
+        "information_retrieval",
+        "follow_up_reference"
+      ],
+      "operators": [
+        "retrieval",
+        "memory_use",
+        "follow_up_reference"
+      ],
+      "expected_failure_modes": [
+        "memory",
+        "retrieval"
+      ],
+      "difficulty": 4,
+      "turns": 3,
+      "languages": [
+        "bn",
+        "en"
+      ],
+      "features": [
+        "language_switch",
+        "follow_up"
+      ],
+      "golden": false,
+      "status": "planned"
+    },
+    {
+      "id": "V21_034",
+      "domain": "hostel",
+      "intent": "hostel",
+      "action": "provide_hostel_info",
+      "behaviors": [
+        "information_retrieval",
+        "multi_constraint_reasoning"
+      ],
+      "operators": [
+        "retrieval",
+        "multi_constraint"
+      ],
+      "expected_failure_modes": [
+        "retrieval",
+        "reasoning"
+      ],
+      "difficulty": 3,
+      "turns": 3,
+      "languages": [
+        "en"
+      ],
+      "features": [
+        "missing_info"
+      ],
+      "golden": false,
+      "status": "planned"
+    },
+    {
+      "id": "V21_035",
+      "domain": "scholarship",
+      "intent": "scholarship",
+      "action": "provide_scholarship_info",
+      "behaviors": [
+        "scholarship_guidance",
+        "eligibility_check",
+        "multi_constraint_reasoning"
+      ],
+      "operators": [
+        "retrieval",
+        "eligibility",
+        "multi_constraint"
+      ],
+      "expected_failure_modes": [
+        "retrieval",
+        "reasoning"
+      ],
+      "difficulty": 3,
+      "turns": 3,
+      "languages": [
+        "en"
+      ],
+      "features": [],
+      "golden": false,
+      "status": "planned"
+    },
+    {
+      "id": "V21_036",
+      "domain": "scholarship",
+      "intent": "scholarship",
+      "action": "provide_scholarship_info",
+      "behaviors": [
+        "scholarship_guidance",
+        "correction_handling"
+      ],
+      "operators": [
+        "correction",
+        "memory_use",
+        "eligibility"
+      ],
+      "expected_failure_modes": [
+        "correction",
+        "memory"
+      ],
+      "difficulty": 4,
+      "turns": 3,
+      "languages": [
+        "en"
+      ],
+      "features": [
+        "correction",
+        "parent_mode"
+      ],
+      "golden": true,
+      "status": "planned"
+    },
+    {
+      "id": "V21_037",
+      "domain": "scholarship",
+      "intent": "scholarship",
+      "action": "provide_scholarship_info",
+      "behaviors": [
+        "scholarship_guidance",
+        "policy_explanation",
+        "multi_constraint_reasoning"
+      ],
+      "operators": [
+        "retrieval",
+        "policy_application",
+        "multi_constraint"
+      ],
+      "expected_failure_modes": [
+        "policy",
+        "retrieval"
+      ],
+      "difficulty": 3,
+      "turns": 3,
+      "languages": [
+        "en"
+      ],
+      "features": [
+        "follow_up"
+      ],
+      "golden": false,
+      "status": "planned"
+    },
+    {
+      "id": "V21_038",
+      "domain": "institution",
+      "intent": "institution",
+      "action": "provide_program_info",
+      "behaviors": [
+        "information_retrieval"
+      ],
+      "operators": [
+        "retrieval"
+      ],
+      "expected_failure_modes": [
+        "retrieval"
+      ],
+      "difficulty": 1,
+      "turns": 2,
+      "languages": [
+        "en"
+      ],
+      "features": [],
+      "golden": false,
+      "status": "authored"
+    },
+    {
+      "id": "V21_039",
+      "domain": "admission",
+      "intent": "counseling_info",
+      "action": "provide_guidance",
+      "behaviors": [
+        "information_retrieval"
+      ],
+      "operators": [
+        "retrieval",
+        "memory_use"
+      ],
+      "expected_failure_modes": [
+        "retrieval"
+      ],
+      "difficulty": 2,
+      "turns": 2,
+      "languages": [
+        "hi",
+        "en"
+      ],
+      "features": [
+        "language_switch"
+      ],
+      "golden": false,
+      "status": "planned"
+    },
+    {
+      "id": "V21_040",
+      "domain": "transfer",
+      "intent": "transfer",
+      "action": "explain_policy",
+      "behaviors": [
+        "policy_explanation",
+        "eligibility_check"
+      ],
+      "operators": [
+        "retrieval",
+        "eligibility",
+        "policy_application"
+      ],
+      "expected_failure_modes": [
+        "policy",
+        "reasoning"
+      ],
+      "difficulty": 4,
+      "turns": 3,
+      "languages": [
+        "en"
+      ],
+      "features": [
+        "correction"
+      ],
+      "golden": false,
+      "status": "planned"
+    },
+    {
+      "id": "V21_041",
+      "domain": "distance",
+      "intent": "distance_education",
+      "action": "provide_program_info",
+      "behaviors": [
+        "information_retrieval",
+        "policy_explanation"
+      ],
+      "operators": [
+        "retrieval",
+        "policy_application"
+      ],
+      "expected_failure_modes": [
+        "retrieval",
+        "policy"
+      ],
+      "difficulty": 3,
+      "turns": 2,
+      "languages": [
+        "hi"
+      ],
+      "features": [],
+      "golden": false,
+      "status": "planned"
+    },
+    {
+      "id": "V21_042",
+      "domain": "distance",
+      "intent": "distance_education",
+      "action": "provide_program_info",
+      "behaviors": [
+        "information_retrieval",
+        "follow_up_reference"
+      ],
+      "operators": [
+        "retrieval",
+        "memory_use",
+        "follow_up_reference"
+      ],
+      "expected_failure_modes": [
+        "memory",
+        "retrieval"
+      ],
+      "difficulty": 4,
+      "turns": 3,
+      "languages": [
+        "en"
+      ],
+      "features": [
+        "follow_up"
+      ],
+      "golden": false,
+      "status": "planned"
+    },
+    {
+      "id": "V21_043",
+      "domain": "management",
+      "intent": "management_quota",
+      "action": "explain_policy",
+      "behaviors": [
+        "policy_explanation",
+        "multi_constraint_reasoning"
+      ],
+      "operators": [
+        "retrieval",
+        "policy_application",
+        "multi_constraint",
+        "memory_use"
+      ],
+      "expected_failure_modes": [
+        "policy",
+        "reasoning"
+      ],
+      "difficulty": 4,
+      "turns": 3,
+      "languages": [
+        "en"
+      ],
+      "features": [
+        "parent_mode",
+        "missing_info",
+        "correction"
+      ],
+      "golden": false,
+      "status": "planned"
+    },
+    {
+      "id": "V21_044",
+      "domain": "nri",
+      "intent": "nri_admission",
+      "action": "explain_policy",
+      "behaviors": [
+        "policy_explanation",
+        "follow_up_reference"
+      ],
+      "operators": [
+        "retrieval",
+        "policy_application",
+        "memory_use"
+      ],
+      "expected_failure_modes": [
+        "policy",
+        "memory"
+      ],
+      "difficulty": 4,
+      "turns": 3,
+      "languages": [
+        "en"
+      ],
+      "features": [
+        "follow_up"
+      ],
+      "golden": false,
+      "status": "planned"
+    },
+    {
+      "id": "V21_045",
+      "domain": "admission",
+      "intent": "loan",
+      "action": "provide_program_info",
+      "behaviors": [
+        "information_retrieval",
+        "policy_explanation"
+      ],
+      "operators": [
+        "retrieval",
+        "policy_application"
+      ],
+      "expected_failure_modes": [
+        "retrieval"
+      ],
+      "difficulty": 3,
+      "turns": 3,
+      "languages": [
+        "en"
+      ],
+      "features": [],
+      "golden": false,
+      "status": "planned"
+    },
+    {
+      "id": "V21_046",
+      "domain": "admission",
+      "intent": "safety",
+      "action": "provide_program_info",
+      "behaviors": [
+        "information_retrieval"
+      ],
+      "operators": [
+        "retrieval"
+      ],
+      "expected_failure_modes": [
+        "retrieval",
+        "multilingual"
+      ],
+      "difficulty": 3,
+      "turns": 3,
+      "languages": [
+        "hi",
+        "en"
+      ],
+      "features": [
+        "language_switch"
+      ],
+      "golden": false,
+      "status": "planned"
+    },
+    {
+      "id": "V21_047",
+      "domain": "admission",
+      "intent": "lateral_entry",
+      "action": "provide_program_info",
+      "behaviors": [
+        "information_retrieval",
+        "eligibility_check",
+        "follow_up_reference"
+      ],
+      "operators": [
+        "retrieval",
+        "eligibility",
+        "memory_use",
+        "follow_up_reference"
+      ],
+      "expected_failure_modes": [
+        "retrieval",
+        "memory"
+      ],
+      "difficulty": 4,
+      "turns": 3,
+      "languages": [
+        "en"
+      ],
+      "features": [
+        "follow_up"
+      ],
+      "golden": false,
+      "status": "planned"
+    },
+    {
+      "id": "V21_048",
+      "domain": "career",
+      "intent": "career_confusion",
+      "action": "provide_career_guidance",
+      "behaviors": [
+        "career_counseling",
+        "emotional_support",
+        "follow_up_reference"
+      ],
+      "operators": [
+        "comparison",
+        "recommendation",
+        "memory_use",
+        "follow_up_reference"
+      ],
+      "expected_failure_modes": [
+        "reasoning",
+        "action_selection"
+      ],
+      "difficulty": 4,
+      "turns": 6,
+      "languages": [
+        "hi",
+        "en"
+      ],
+      "features": [
+        "parent_mode",
+        "emotion"
+      ],
+      "golden": false,
+      "status": "planned"
+    },
+    {
+      "id": "V21_049",
+      "domain": "grievance",
+      "intent": "grievance",
+      "action": "provide_program_info",
+      "behaviors": [
+        "policy_explanation",
+        "emotional_support"
+      ],
+      "operators": [
+        "retrieval",
+        "policy_application"
+      ],
+      "expected_failure_modes": [
+        "policy",
+        "reasoning"
+      ],
+      "difficulty": 5,
+      "turns": 3,
+      "languages": [
+        "en"
+      ],
+      "features": [
+        "adversarial",
+        "emotion"
+      ],
+      "golden": false,
+      "status": "planned"
+    },
+    {
+      "id": "V21_050",
+      "domain": "sports",
+      "intent": "sports_quota",
+      "action": "provide_program_info",
+      "behaviors": [
+        "correction_handling",
+        "eligibility_check",
+        "multi_constraint_reasoning"
+      ],
+      "operators": [
+        "correction",
+        "memory_use",
+        "eligibility",
+        "multi_constraint"
+      ],
+      "expected_failure_modes": [
+        "correction",
+        "memory",
+        "reasoning"
+      ],
+      "difficulty": 5,
+      "turns": 8,
+      "languages": [
+        "en"
+      ],
+      "features": [
+        "correction",
+        "emotion"
+      ],
+      "golden": false,
+      "status": "planned"
+    }
+  ]
+}

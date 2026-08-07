@@ -1,6 +1,6 @@
 # Inter-Rater Annotation Guidelines — Golden Conversation Benchmark
 
-**Version**: 1.0  
+**Version**: 2.0  
 **Date**: 2026-07-19
 
 ---
@@ -17,7 +17,7 @@ Each conversation turn has an `expected` object with fields across 5 stages. Ann
 
 | Field | Annotation task | Decision rule |
 |---|---|---|
-| `intent.primary` | Classify the student's primary intent | Choose ONE from: `admission`, `fee`, `placement`, `hostel`, `scholarship`, `grievance`, `counseling`, `unknown` |
+| `intent.primary` | Classify the student's primary intent | Choose ONE from the intent vocabulary defined in `data/benchmark/coverage/ontology_v2.1.json` (24 intents). For v2.0 backward compatibility, the schema also accepts `counseling` and `general`. |
 | `facts` | Extract factual claims from student text | Only include values explicitly stated or clearly inferable. Use `null` for unknown numeric values. |
 | `missing` | List fields still needed | Include any ground_truth field not yet stated by the student AND not clearly inferable from context. |
 
@@ -108,19 +108,7 @@ Controlled vocabulary for `reasoning.current_problem`:
 
 ## 5. Decision Action Vocabulary
 
-| Value | Description |
-|---|---|
-| `collect_profile` | Ask for missing profile information |
-| `encourage_and_collect_profile` | Encourage anxious student + collect profile |
-| `recommend_branches` | Provide branch/college recommendation |
-| `provide_admission_info` | Share admission-related information |
-| `provide_fee_info` | Share fee-related information |
-| `provide_placement_info` | Share placement-related information |
-| `provide_hostel_info` | Share hostel-related information |
-| `provide_scholarship_info` | Share scholarship-related information |
-| `provide_career_guidance` | Provide career guidance (non-engineering) |
-| `provide_counseling_schedule` | Share counseling dates/timeline |
-| `escalate_to_human` | Escalate to human counselor |
+Choose ONE from the action vocabulary defined in `data/benchmark/coverage/ontology_v2.1.json` (15 actions). For v2.0 backward compatibility, the schema also accepts deprecated actions listed in the ontology's `mappings.deprecated_actions`.
 
 ## 6. When to Disagree with Another Rater
 

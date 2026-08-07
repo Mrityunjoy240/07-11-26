@@ -15,6 +15,19 @@ logs/
 uploads/
 temp_audio/
 
+# Telemetry / request logs
+college_agent-master/backend/data/telemetry/
+**/telemetry/*.jsonl
+
+# Benchmark generated run outputs (canonical baseline stays tracked)
+data/benchmark/evaluation/v*/
+
+# Analysis / script output artifacts
+scripts/output/
+
+# Generated KB export dumps
+*_kb_full.txt
+
 # IDE
 .mimocode/
 .vscode/

@@ -1,0 +1,84 @@
+{
+  "_file_meta": {
+    "program": "MBA",
+    "display_name": "Master of Business Administration",
+    "duration_semesters": 4,
+    "last_updated": "2026-07-10",
+    "updated_by": "System (initial load from verified FEE_GROUP_MAP)",
+    "structure_count": 1,
+    "schema_version": "2.0.0"
+  },
+  "groups": {
+    "mba": { "branches": ["MBA"] },
+    "mba_hm": { "branches": ["MBA-HM"] }
+  },
+  "structures": [
+    {
+      "version_id": "v2026",
+      "status": "active",
+      "label": "2026-2028 MBA Fee Structure",
+      "admission_batches": ["2026-27", "2027-28"],
+      "effective_date": "2026-07-01",
+      "published_date": "2026-06-15",
+      "source": "BCREC MBA Fee Structure PDF 2026-28",
+      "groups": {
+        "mba": {
+          "components": [
+            {
+              "id": "first_semester_payable",
+              "label": "First Semester Payable (includes all one-time and semester 1 charges)",
+              "type": "one_time",
+              "category": "compulsory",
+              "amount": 121400,
+              "charged_in_semester": 1,
+              "notes": "Includes admission fee, tuition, and other charges for first semester. Contact accounts for itemized breakdown."
+            },
+            {
+              "id": "remaining_tuition",
+              "label": "Remaining Course Fee (Semesters 2-4)",
+              "type": "one_time",
+              "category": "compulsory",
+              "amount": 297800,
+              "notes": "Aggregate fee for semesters 2-4. Per-semester breakdown not available from source PDF."
+            },
+            {
+              "id": "scholarship_note",
+              "label": "Tuition Fee Scholarship (Eligible)",
+              "type": "one_time",
+              "category": "optional",
+              "amount": 0,
+              "notes": "10% tuition fee scholarship for eligible candidates. Contact accounts for details."
+            }
+          ],
+          "computed": {
+            "total_course_fee": 419200,
+            "first_semester_payable": 121400
+          }
+        },
+        "mba_hm": {
+          "components": [
+            {
+              "id": "first_semester_payable",
+              "label": "First Semester Payable (includes all one-time and semester 1 charges)",
+              "type": "one_time",
+              "category": "compulsory",
+              "amount": 121400,
+              "charged_in_semester": 1
+            },
+            {
+              "id": "remaining_tuition",
+              "label": "Remaining Course Fee (Semesters 2-4)",
+              "type": "one_time",
+              "category": "compulsory",
+              "amount": 297800
+            }
+          ],
+          "computed": {
+            "total_course_fee": 419200,
+            "first_semester_payable": 121400
+          }
+        }
+      }
+    }
+  ]
+}

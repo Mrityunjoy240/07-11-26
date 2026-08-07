@@ -5,7 +5,7 @@ POST /qa/tts - Generate speech from text
 GET /qa/tts/voices - List available voices
 GET /qa/tts/languages - List supported languages
 """
-from fastapi import APIRouter, HTTPException, Request, Response
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from pydantic import BaseModel
 from typing import Optional
 import logging
@@ -13,12 +13,14 @@ import os
 import time
 import uuid
 
+from app.api.qa import require_tool_auth
+
 from app.config import settings
 from app.services.sarvam_service import get_sarvam_service, init_sarvam_service
 from app.services import tts_cache  # Phase 3 Lite: in-memory + disk audio cache
 
 logger = logging.getLogger(__name__)
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(require_tool_auth)])
 
 
 class TTSRequest(BaseModel):
@@ -84,7 +86,7 @@ async def text_to_speech_direct(request_data: TTSRequest, request: Request):
 
     try:
         # Phase 3 Lite: check audio cache first (skips Sarvam API entirely on hit)
-        cached = tts_cache.get_cached_audio(request_data.text, language, speaker)
+        cached = tts_cache.get_cached_audio(request_data.text, language, speaker, request_data.pace or 1.0)
         if cached is not None:
             logger.info(f"[{session_id}] TTS direct CACHE HIT ({len(cached)} bytes)")
             return Response(content=cached, media_type="audio/wav", headers={"X-TTS-Cache": "hit"})
@@ -104,7 +106,7 @@ async def text_to_speech_direct(request_data: TTSRequest, request: Request):
 
         # Phase 3 Lite: warm the cache for future requests
         try:
-            tts_cache.store_audio(request_data.text, language, speaker, audio_bytes)
+            tts_cache.store_audio(request_data.text, language, speaker, audio_bytes, request_data.pace or 1.0)
         except Exception as e:
             logger.debug(f"TTS cache store failed: {e}")
 

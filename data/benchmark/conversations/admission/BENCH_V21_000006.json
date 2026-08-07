@@ -1,0 +1,276 @@
+{
+  "id": "BENCH_V21_000006",
+  "domain": "admission",
+  "difficulty": 2,
+  "primary_language": "en",
+  "languages": [
+    "en"
+  ],
+  "speaker_profile": "student",
+  "features": [],
+  "ground_truth": {
+    "rank": null,
+    "pcm_percentage": 75,
+    "category": "",
+    "interest": "CSE",
+    "board": "cbse",
+    "exam": "wbjee",
+    "budget": null,
+    "location": "kolkata"
+  },
+  "turns": [
+    {
+      "student": "Hello, I want to know about admission in your college.",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {},
+          "inference": {},
+          "confidence": "medium",
+          "missing": [
+            "rank",
+            "pcm_percentage",
+            "category",
+            "interest",
+            "board"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.0,
+          "confidence": "high",
+          "current_problem": "needs_profile_completion",
+          "problems": [
+            "needs_profile_completion"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "collect_profile",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student wants admission info",
+            "No profile available yet",
+            "Need rank, PCM, category to proceed"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "reassure",
+              "content_contains": [
+                "welcome",
+                "admission"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "rank",
+                "PCM",
+                "category",
+                "exam"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=collect_profile",
+            "Missing=all_profile_fields"
+          ]
+        }
+      },
+      "must_not": [
+        "recommend_branch",
+        "hallucinate_cutoff"
+      ],
+      "ideal_counselor_notes": "Open-ended admission query. Need to collect rank, PCM, category, interest, and board before providing guidance."
+    },
+    {
+      "student": "I gave WBJEE, got 85000 rank. My PCM is 75% from CBSE board. I want CSE.",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {
+            "rank": 85000,
+            "pcm_percentage": 75,
+            "board": "cbse",
+            "exam": "wbjee",
+            "interest": "CSE"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": [
+            "category"
+          ]
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.71,
+          "confidence": "high",
+          "current_problem": "needs_profile_completion",
+          "problems": [
+            "needs_profile_completion"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "collect_profile",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Have most profile info but missing category",
+            "Need category for accurate cutoff lookup"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "rank",
+                "PCM",
+                "CSE"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "category",
+                "general",
+                "OBC",
+                "SC"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=collect_profile",
+            "Missing=category"
+          ]
+        }
+      },
+      "must_not": [
+        "recommend_branch",
+        "assume_category"
+      ],
+      "ideal_counselor_notes": "Good profile progress. Rank 85000 with CSE interest. Need category to determine cutoff eligibility."
+    },
+    {
+      "student": "I am general category.",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {
+            "category": "general"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "decision",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance",
+          "problems": []
+        },
+        "brain": {
+          "eligible_branches": [
+            "IT",
+            "ECE",
+            "EE",
+            "ME",
+            "CE"
+          ],
+          "applicable": true,
+          "why": [
+            {
+              "condition": "Rank 85000 General — CSE cutoff ~12000",
+              "met": false,
+              "detail": "Rank 85000 exceeds CSE cutoff for general category"
+            },
+            {
+              "condition": "IT cutoff ~35000 for general",
+              "met": false,
+              "detail": "Rank 85000 also exceeds IT cutoff for general category"
+            },
+            {
+              "condition": "ECE cutoff ~60000 for general",
+              "met": false,
+              "detail": "Rank 85000 exceeds ECE cutoff for general category"
+            },
+            {
+              "condition": "EE/ME/CE have higher cutoffs",
+              "met": true,
+              "detail": "Branches like EE, ME, CE may be within reach at rank 85000"
+            }
+          ]
+        },
+        "decision": {
+          "action": "recommend_branches",
+          "priority": "high",
+          "confidence": "medium",
+          "why": [
+            "Full profile now available",
+            "CSE unlikely at rank 85000 general",
+            "Should recommend branches with realistic cutoffs"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "category",
+                "general"
+              ]
+            },
+            {
+              "action": "recommend",
+              "content_contains": [
+                "eligibility",
+                "branches",
+                "cutoff"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=recommend_branches",
+            "Profile_complete"
+          ]
+        }
+      },
+      "must_not": [
+        "guarantee_CSE_admission",
+        "hallucinate_exact_cutoff"
+      ],
+      "ideal_counselor_notes": "Profile complete with general category. CSE cutoff ~12000 general is far from 85000. Recommend realistic branches like EE, ME, CE and mention that IT and ECE may also be difficult."
+    }
+  ],
+  "expected_end_state": "incomplete",
+  "ideal_counselor_notes": "Three-turn admission query. Profile builds from zero to 86% across turns. Category collected in turn 3 enables branch recommendation with realistic cutoff guidance.",
+  "author_note": {
+    "primary_capability": "profile collection followed by branch recommendation",
+    "expected_failure_mode": "reasoning — might recommend CSE despite cutoff gap",
+    "why_this_conversation": "Tests basic 3-turn profile collection then recommendation. The greeting behavior on turn 1 tests that the system can simultaneously welcome and ask for info. Turn 2 tests fact extraction with multi-field input. Turn 3 tests branch recommendation after profile completion."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

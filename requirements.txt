@@ -1,0 +1,21 @@
+# Root requirements — CI baseline for the `src/` rewrite, tests, and benchmark
+# validation. The legacy backend has its own requirements.txt under
+# college_agent-master/backend/requirements.txt and is out of scope here.
+#
+# Phase A pinning: pinned to the versions installed and verified green
+# (1345 pytest, benchmark validation) on Python 3.12/3.13. Bump deliberately,
+# never casually — the benchmark is the release gate.
+
+groq>=1.2.0,<2
+pydantic>=2.9,<3
+pydantic-settings>=2.4
+sqlalchemy>=2.0,<3
+asyncpg>=0.29
+redis>=5
+jsonschema>=4.21
+opentelemetry-api>=1.26
+opentelemetry-sdk>=1.26
+opentelemetry-exporter-otlp-proto-http>=1.26
+
+# Test tooling
+pytest>=8.3

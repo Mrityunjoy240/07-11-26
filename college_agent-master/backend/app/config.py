@@ -34,10 +34,18 @@ class Settings(BaseSettings):
     livekit_api_key: str = ""
     livekit_api_secret: str = ""
 
-    # Sarvam Agents SDK (Samvaad bridge) — org/workspace/app targeting
+    # Sarvam Agents SDK (Samvaad bridge) — org/workspace/app targeting.
+    # DEV/TEST CHANNEL ONLY. Production uses Sarvam Inbound Deployment + HTTP
+    # tool -> /qa/query. Set SARVAM_SDK_ENABLED=true to expose the /sdk router.
     sarvam_org_id: str = ""
     sarvam_workspace_id: str = ""
     sarvam_app_id: str = ""
+    sarvam_sdk_enabled: bool = False
+
+    # Optional shared secret for the Sarvam HTTPS tool calling /qa/query.
+    # When set, requests to /qa/query must present it (Authorization: Bearer
+    # <token> or X-API-Key: <token>). Empty => no auth enforced.
+    sarvam_tool_api_token: str = ""
 
     # Twilio Settings
     twilio_account_sid: str = ""

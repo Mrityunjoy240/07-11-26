@@ -1,0 +1,283 @@
+{
+  "id": "BENCH_V21_000018",
+  "domain": "admission",
+  "difficulty": 2,
+  "primary_language": "en",
+  "languages": [
+    "en"
+  ],
+  "speaker_profile": "student",
+  "features": [
+    "emotion"
+  ],
+  "ground_truth": {
+    "rank": 90000,
+    "pcm_percentage": 55,
+    "category": "general",
+    "interest": "CSE",
+    "board": "wbchse",
+    "exam": "wbjee",
+    "budget": null,
+    "location": "kolkata"
+  },
+  "turns": [
+    {
+      "student": "I got 90000 rank in WBJEE. I am very worried. Can I get any branch?",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {
+            "rank": 90000,
+            "exam": "wbjee"
+          },
+          "inference": {
+            "emotional": true
+          },
+          "confidence": "high",
+          "missing": [
+            "pcm_percentage",
+            "category",
+            "interest"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.14,
+          "confidence": "high",
+          "current_problem": "needs_reassurance",
+          "problems": [
+            "needs_reassurance",
+            "emotional_support_needed"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "reassure",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student is worried about high rank",
+            "Need to reassure while collecting profile"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "90000",
+                "worried"
+              ]
+            },
+            {
+              "action": "reassure",
+              "content_contains": [
+                "don't worry",
+                "options",
+                "still possible"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "category",
+                "interest"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=reassure",
+            "Emotional_support",
+            "Collect_profile"
+          ]
+        }
+      },
+      "must_not": [
+        "dismiss_concern",
+        "guarantee_admission"
+      ],
+      "ideal_counselor_notes": "Student anxious about high rank. Reassure and collect more info before assessing options."
+    },
+    {
+      "student": "I am general category. I got 55% in PCM. I want CSE but I know it's difficult.",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {
+            "category": "general",
+            "pcm_percentage": 55,
+            "interest": "CSE"
+          },
+          "inference": {
+            "low_confidence": true
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance",
+          "problems": []
+        },
+        "brain": {
+          "eligible_branches": ["ME", "CE", "EE"],
+          "applicable": true,
+          "why": [
+            {
+              "condition": "Rank 90000 General — CSE cutoff ~12000",
+              "met": false,
+              "detail": "Rank 90000 exceeds CSE cutoff for general category"
+            },
+            {
+              "condition": "ME/CE/EE cutoff ~100000 for general",
+              "met": true,
+              "met": true,
+              "detail": "Very unlikely for CSE"
+            }
+          ]
+        },
+        "decision": {
+          "action": "recommend_branches",
+          "priority": "high",
+          "confidence": "medium",
+          "why": [
+            "Profile complete but CSE unrealistic",
+            "Should suggest lower-cutoff branches"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "general",
+                "55%",
+                "CSE"
+              ]
+            },
+            {
+              "action": "reassure",
+              "content_contains": [
+                "honest",
+                "options"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "alternative branches",
+                "lower cutoff"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=recommend_branches",
+            "Alternative_suggestion"
+          ]
+        }
+      },
+      "must_not": [
+        "guarantee_CSE",
+        "crush_hope"
+      ],
+      "ideal_counselor_notes": "Realistic but supportive. Acknowledge CSE difficulty, suggest alternatives like civil, mechanical, or diploma pathways."
+    },
+    {
+      "student": "What about diploma pathway?",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {},
+          "inference": {},
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance",
+          "problems": []
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": true,
+          "why": [
+            {
+              "condition": "Rank 90000 General — CSE cutoff ~12000",
+              "met": false,
+              "detail": "CSE through main counselling unlikely at rank 90000"
+            },
+            {
+              "condition": "Diploma pathway viable alternative",
+              "met": true,
+              "detail": "Diploma then lateral entry is a recognized pathway for students with lower ranks"
+            }
+          ]
+        },
+        "decision": {
+          "action": "provide_admission_guidance",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student exploring alternative pathways after branch alternatives",
+            "Diploma pathway is viable option at this rank",
+            "Can provide lateral entry information"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "clarify",
+              "content_contains": [
+                "diploma",
+                "pathway"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "lateral entry",
+                "polytechnic",
+                "eligibility"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_admission_guidance",
+            "Diploma_query"
+          ]
+        }
+      },
+      "must_not": [
+        "dismiss_diploma",
+        "guarantee_lateral_entry"
+      ],
+      "ideal_counselor_notes": "Student asks about diploma pathway. Explain diploma to lateral entry route as a viable alternative. Mention polytechnic options and how lateral entry works after diploma."
+    }
+  ],
+  "expected_end_state": "incomplete",
+  "ideal_counselor_notes": "3-turn emotional admission query. Student worried about high rank. Tests emotional support, realistic assessment, and alternative pathway guidance through diploma route.",
+  "author_note": {
+    "primary_capability": "emotional support + realistic counseling + alternative pathways",
+    "expected_failure_mode": "action_selection — might give cold factual response without emotional reassurance or might dismiss diploma pathway",
+    "why_this_conversation": "Tests emotion feature. Student anxious about 90000 rank. Turn 1: emotional support. Turn 2: realistic alternative suggestion. Turn 3: diploma pathway guidance."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

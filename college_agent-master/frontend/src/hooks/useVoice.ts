@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { authHeaders } from '../apiAuth';
 
 interface UseVoiceOptions {
   language?: string;
@@ -157,6 +158,7 @@ export const useVoice = (options: UseVoiceOptions = {}): UseVoiceReturn => {
 
       const response = await fetch(`${API_BASE}/qa/stt`, {
         method: 'POST',
+        headers: authHeaders(),
         body: formData,
       });
 

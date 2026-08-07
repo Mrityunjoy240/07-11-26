@@ -1,0 +1,225 @@
+{
+  "id": "BENCH_V21_000037",
+  "domain": "scholarship",
+  "difficulty": 3,
+  "primary_language": "en",
+  "languages": ["en"],
+  "speaker_profile": "student",
+  "features": [],
+  "ground_truth": {
+    "rank": 20000,
+    "pcm_percentage": 80,
+    "category": "obc",
+    "interest": "ECE",
+    "board": "cbse",
+    "exam": "jee",
+    "budget": null,
+    "location": "delhi"
+  },
+  "turns": [
+    {
+      "student": "What is the scholarship policy for OBC students? Are there any conditions or minimum requirements?",
+      "expected": {
+        "understanding": {
+          "intent": "scholarship",
+          "facts": {},
+          "inference": {},
+          "confidence": "high",
+          "missing": ["rank", "pcm_percentage", "interest", "board"]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.0,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": ["needs_fee_information"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_scholarship_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student asking about OBC scholarship policy",
+            "Need to explain policy rules and collect profile details"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": ["OBC", "scholarship", "policy"]
+            },
+            {
+              "action": "clarify",
+              "content_contains": ["conditions", "requirements", "minimum"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_scholarship_info", "Policy_query"]
+        }
+      },
+      "must_not": [
+        "hallucinate_policy_details",
+        "guarantee_scholarship"
+      ],
+      "ideal_counselor_notes": "Student asking about OBC scholarship policy and conditions. Provide general policy info and ask for academic details."
+    },
+    {
+      "student": "I have 20000 rank in JEE, 80% PCM, OBC category, want ECE. Can I get a scholarship based on this?",
+      "expected": {
+        "understanding": {
+          "intent": "scholarship",
+          "facts": {
+            "rank": 20000,
+            "pcm_percentage": 80,
+            "category": "obc",
+            "interest": "ECE",
+            "exam": "jee"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": ["board"]
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.71,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": ["needs_fee_information"]
+        },
+        "brain": {
+          "eligible_branches": ["ECE", "EE", "ME", "CE"],
+          "applicable": true,
+          "why": [
+            {
+              "condition": "rank_provided",
+              "met": true,
+              "detail": "Rank=20000"
+            },
+            {
+              "condition": "category_known",
+              "met": true,
+              "detail": "OBC"
+            },
+            {
+              "condition": "rank_within_margin",
+              "met": true,
+              "detail": "20000 < 28000*0.85=23800 for ECE/OBC"
+            }
+          ]
+        },
+        "decision": {
+          "action": "provide_scholarship_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Full profile provided with OBC category",
+            "OBC category qualifies for multiple scholarship schemes"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "ask",
+              "content_contains": ["board", "CBSE", "state"]
+            },
+            {
+              "action": "listen",
+              "content_contains": ["OBC", "20000", "ECE"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_scholarship_info", "OBC_eligible", "Profile_near_complete"]
+        }
+      },
+      "must_not": [
+        "guarantee_scholarship",
+        "hallucinate_exact_amount"
+      ],
+      "ideal_counselor_notes": "Student provides academic details. OBC category with good rank. Can provide specific scholarship eligibility information."
+    },
+    {
+      "student": "You mentioned minimum attendance requirement for scholarship renewal. What if someone has medical issues and misses classes for a few weeks?",
+      "expected": {
+        "understanding": {
+          "intent": "scholarship",
+          "facts": {},
+          "inference": {},
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.71,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": ["needs_fee_information"]
+        },
+        "brain": {
+          "eligible_branches": ["ECE", "EE", "ME", "CE"],
+          "applicable": true,
+          "why": [
+            {
+              "condition": "rank_provided",
+              "met": true,
+              "detail": "Rank=20000"
+            },
+            {
+              "condition": "category_known",
+              "met": true,
+              "detail": "OBC"
+            }
+          ]
+        },
+        "decision": {
+          "action": "provide_scholarship_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Follow-up about attendance policy exception",
+            "Specific edge case about medical leave and scholarship renewal"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "recommend",
+              "content_contains": ["medical", "leave", "exception"]
+            },
+            {
+              "action": "inform",
+              "content_contains": ["attendance", "policy", "medical certificate"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_scholarship_info", "Attendance_policy_query", "Medical_exception"]
+        }
+      },
+      "must_not": [
+        "guarantee_exception_approval",
+        "hallucinate_medical_policy"
+      ],
+      "ideal_counselor_notes": "Student asks about medical exception for attendance requirement. Provide general info about medical leave policy and documentation needed."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "Scholarship policy query from OBC student. Covers policy explanation, eligibility check, and medical exception edge case. Tests policy application and multi-constraint reasoning.",
+  "author_note": {
+    "primary_capability": "scholarship policy explanation with follow-up on edge cases",
+    "expected_failure_mode": "policy — might not handle medical exception question correctly, or might give incorrect policy details",
+    "why_this_conversation": "Tests policy explanation and multi-constraint reasoning in scholarship context. Student asks about policy rules and a specific edge case about medical leave."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

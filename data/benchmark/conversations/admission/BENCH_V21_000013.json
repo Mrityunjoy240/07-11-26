@@ -1,0 +1,253 @@
+{
+  "id": "BENCH_V21_000013",
+  "domain": "admission",
+  "difficulty": 3,
+  "primary_language": "en",
+  "languages": [
+    "en"
+  ],
+  "speaker_profile": "student",
+  "features": [],
+  "ground_truth": {
+    "rank": 15000,
+    "pcm_percentage": 82,
+    "category": "obc",
+    "interest": "CSE",
+    "board": "cbse",
+    "exam": "wbjee",
+    "budget": null,
+    "location": "kolkata"
+  },
+  "turns": [
+    {
+      "student": "What is the cutoff for CSE in WBJEE?",
+      "expected": {
+        "understanding": {
+          "intent": "cutoff",
+          "facts": {
+            "interest": "CSE",
+            "exam": "wbjee"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": [
+            "rank",
+            "category"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.14,
+          "confidence": "high",
+          "current_problem": "needs_profile_completion",
+          "problems": [
+            "needs_profile_completion"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "collect_profile",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Cutoff query but need rank and category for personalized cutoff"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "cutoff",
+                "CSE"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "rank",
+                "category"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=collect_profile",
+            "Missing=rank,category"
+          ]
+        }
+      },
+      "must_not": [
+        "hallucinate_cutoff"
+      ],
+      "ideal_counselor_notes": "Cutoff query for CSE. Need rank and category for accurate cutoff info."
+    },
+    {
+      "student": "I got 15000 rank. I am OBC.",
+      "expected": {
+        "understanding": {
+          "intent": "cutoff",
+          "facts": {
+            "rank": 15000,
+            "category": "obc"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.43,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance",
+          "problems": []
+        },
+        "brain": {
+          "eligible_branches": [
+            "CSE"
+          ],
+          "applicable": true,
+          "why": [
+            {
+              "condition": "Rank 15000 OBC — CSE cutoff ~18000 OBC",
+              "met": true,
+              "detail": "Rank 15000 OBC — CSE cutoff ~18000 OBC"
+            }
+          ]
+        },
+        "decision": {
+          "action": "provide_cutoff_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Have rank and category",
+            "Can provide CSE OBC cutoff range"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "15000",
+                "OBC"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "cutoff",
+                "CSE",
+                "OBC category",
+                "the 15000"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_cutoff_info",
+            "Profile_sufficient"
+          ]
+        }
+      },
+      "must_not": [
+        "recommend_branch"
+      ],
+      "ideal_counselor_notes": "Have rank and category. Provide CSE OBC cutoff range and confirm eligibility."
+    },
+    {
+      "student": "So I can get CSE? What about IT?",
+      "expected": {
+        "understanding": {
+          "intent": "cutoff",
+          "facts": {
+            "interest": "IT"
+          },
+          "inference": {
+            "interest_expanded": true
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.43,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance",
+          "problems": []
+        },
+        "brain": {
+          "eligible_branches": [
+            "CSE",
+            "IT"
+          ],
+          "applicable": true,
+          "why": [
+            {
+              "condition": "Rank 15000 OBC — both CSE and IT eligible",
+              "met": true,
+              "detail": "Rank 15000 OBC — both CSE and IT eligible"
+            }
+          ]
+        },
+        "decision": {
+          "action": "provide_cutoff_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Both CSE and IT cutoff info requested",
+            "Can provide comparison"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "CSE",
+                "IT"
+              ]
+            },
+            {
+              "action": "recommend",
+              "content_contains": [
+                "CSE branch",
+                "IT branch",
+                "cutoff",
+                "eligible"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_cutoff_info",
+            "Multi_branch_query"
+          ]
+        }
+      },
+      "must_not": [
+        "guarantee_admission"
+      ],
+      "ideal_counselor_notes": "Student asks about both CSE and IT cutoffs. Provide comparison and confirm eligibility for both."
+    }
+  ],
+  "expected_end_state": "incomplete",
+  "ideal_counselor_notes": "3-turn cutoff query. Profile builds from interest only → rank + category → multi-branch comparison. Golden conversation for cutoff intent testing.",
+  "author_note": {
+    "primary_capability": "cutoff information retrieval + eligibility check",
+    "expected_failure_mode": "retrieval — might hallucinate exact cutoff numbers or not compare branches",
+    "why_this_conversation": "Golden conversation for cutoff testing. Tests progressive information collection (turn 1→2) and multi-branch comparison (turn 3)."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

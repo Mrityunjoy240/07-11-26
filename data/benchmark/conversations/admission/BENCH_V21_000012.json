@@ -1,0 +1,560 @@
+{
+  "id": "BENCH_V21_000012",
+  "domain": "admission",
+  "difficulty": 5,
+  "primary_language": "en",
+  "languages": [
+    "en"
+  ],
+  "speaker_profile": "parent",
+  "features": [
+    "correction",
+    "parent_mode",
+    "emotion"
+  ],
+  "ground_truth": {
+    "rank": 25000,
+    "pcm_percentage": 72,
+    "category": "general",
+    "interest": "CSE",
+    "board": "state",
+    "exam": "wbjee",
+    "budget": null,
+    "location": "howrah"
+  },
+  "turns": [
+    {
+      "student": "My son scored 25000 rank in WBJEE. He wants CSE. What are his chances?",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {
+            "rank": 25000,
+            "exam": "wbjee",
+            "interest": "CSE"
+          },
+          "inference": {
+            "speaker_is_parent": true
+          },
+          "confidence": "high",
+          "missing": [
+            "pcm_percentage",
+            "category",
+            "board"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.29,
+          "confidence": "high",
+          "current_problem": "needs_profile_completion",
+          "problems": [
+            "needs_profile_completion"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "collect_profile",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Parent asking for son",
+            "Need PCM, category, board for eligibility"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "25000",
+                "CSE"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "PCM",
+                "category",
+                "board"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=collect_profile",
+            "Missing=pcm,category,board"
+          ]
+        }
+      },
+      "must_not": [
+        "recommend_branch",
+        "assume_profile"
+      ],
+      "ideal_counselor_notes": "Parent speaking for son. Rank 25000 with CSE interest. Need to collect missing profile fields."
+    },
+    {
+      "student": "He got 72% in PCM, state board. General category.",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {
+            "pcm_percentage": 72,
+            "board": "state",
+            "category": "general"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "comparing_options",
+          "problems": []
+        },
+        "brain": {
+          "eligible_branches": [
+            "IT",
+            "ECE"
+          ],
+          "applicable": true,
+          "why": [
+            {
+              "condition": "Rank 25000 General — CSE cutoff ~12000, likely ineligible",
+              "met": true,
+              "detail": "Rank 25000 General — CSE cutoff ~12000, likely ineligible"
+            },
+            {
+              "condition": "IT cutoff ~30000, eligible",
+              "met": true,
+              "detail": "IT cutoff ~30000, eligible"
+            }
+          ]
+        },
+        "decision": {
+          "action": "recommend_branches",
+          "priority": "high",
+          "confidence": "medium",
+          "why": [
+            "CSE unlikely at 25000 General",
+            "Should suggest IT/ECE as alternatives"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "72%",
+                "state",
+                "general"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "IT",
+                "ECE",
+                "CSE",
+                "competitive"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=recommend_branches",
+            "Profile_complete"
+          ]
+        }
+      },
+      "must_not": [
+        "guarantee_CSE",
+        "guarantee_rejection"
+      ],
+      "ideal_counselor_notes": "Profile complete. CSE at 25000 General is borderline/unlikely. Need to communicate this diplomatically and suggest alternatives."
+    },
+    {
+      "student": "But he really wants CSE. Can't he get CSE anywhere? Even in round 3?",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {},
+          "inference": {
+            "emotional": true,
+            "persistent": true
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "comparing_options",
+          "problems": [
+            "counseling_needed"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [
+            "IT"
+          ],
+          "applicable": true,
+          "why": []
+        },
+        "decision": {
+          "action": "reassure",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Parent emotional about son's preference",
+            "CSE at 25000 General is difficult",
+            "Need to be honest but supportive"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "CSE",
+                "round 3"
+              ]
+            },
+            {
+              "action": "reassure",
+              "content_contains": [
+                "understand",
+                "competitive"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "IT",
+                "similar",
+                "placement"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=reassure",
+            "Emotional_support"
+          ]
+        }
+      },
+      "must_not": [
+        "guarantee_CSE",
+        "dismiss_concern"
+      ],
+      "ideal_counselor_notes": "Emotional parent. Need to acknowledge son's preference while providing realistic assessment. Suggest IT as strong alternative."
+    },
+    {
+      "student": "What about other branches that are similar to CSE?",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {},
+          "inference": {
+            "open_to_alternatives": true
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "comparing_options",
+          "problems": []
+        },
+        "brain": {
+          "eligible_branches": [
+            "IT",
+            "ECE"
+          ],
+          "applicable": true,
+          "why": [
+            {
+              "condition": "IT is closest to CSE",
+              "met": true,
+              "detail": "IT is closest to CSE"
+            },
+            {
+              "condition": "ECE has good placement overlap",
+              "met": true,
+              "detail": "ECE has good placement overlap"
+            }
+          ]
+        },
+        "decision": {
+          "action": "recommend_branches",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Parent open to alternatives",
+            "IT and ECE are strong options"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "similar",
+                "CSE"
+              ]
+            },
+            {
+              "action": "recommend",
+              "content_contains": [
+                "IT",
+                "ECE",
+                "curriculum",
+                "placement"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=recommend_branches",
+            "Alternative_exploration"
+          ]
+        }
+      },
+      "must_not": [
+        "guarantee_placement"
+      ],
+      "ideal_counselor_notes": "Parent open to alternatives. Compare IT and ECE with CSE, highlight curriculum overlap and placement similarity."
+    },
+    {
+      "student": "How is the placement for IT branch? Will he get a good job?",
+      "expected": {
+        "understanding": {
+          "intent": "placement",
+          "facts": {},
+          "inference": {},
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "needs_placement_data",
+          "problems": [
+            "needs_placement_information"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_placement_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Specific placement query for IT",
+            "Provide data-driven response"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "placement",
+                "IT"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "placements",
+                "IT branch",
+                "salary",
+                "companies"
+              ]
+            },
+            {
+              "action": "recommend",
+              "content_contains": [
+                "internship",
+                "training",
+                "career"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_placement_info",
+            "IT_query"
+          ]
+        }
+      },
+      "must_not": [
+        "guarantee_job",
+        "hallucinate_exact_placement_stats"
+      ],
+      "ideal_counselor_notes": "Placement query for IT. Provide general placement data without guaranteeing outcomes."
+    },
+    {
+      "student": "OK that sounds reasonable. What is the fee for IT?",
+      "expected": {
+        "understanding": {
+          "intent": "fee",
+          "facts": {},
+          "inference": {
+            "tentatively_decided": "IT"
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": [
+            "needs_fee_information"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_fee_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Fee query for IT",
+            "Provide general fee range"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "fee",
+                "IT"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "fees",
+                "IT branch",
+                "range"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "budget",
+                "scholarship"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_fee_info",
+            "Fee_query"
+          ]
+        }
+      },
+      "must_not": [
+        "hallucinate_exact_fees"
+      ],
+      "ideal_counselor_notes": "Fee query for IT. Provide general fee range and scholarship options."
+    },
+    {
+      "student": "Thank you for all the information. We will think about IT.",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {},
+          "inference": {
+            "conversation_ending": true
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "general_inquiry",
+          "problems": []
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "reassure",
+          "priority": "normal",
+          "confidence": "high",
+          "why": [
+            "Conversation ending",
+            "Close with encouragement"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "thank"
+              ]
+            },
+            {
+              "action": "reassure",
+              "content_contains": [
+                "good luck",
+                "IT",
+                "encourage"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=reassure",
+            "Conversation_close"
+          ]
+        }
+      },
+      "must_not": [
+        "pressure_decision"
+      ],
+      "ideal_counselor_notes": "Conversation closing. Acknowledge their decision process and offer future help."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "7-turn parent conversation with emotion (CSE preference), correction of expectations (25000 General → CSE unlikely), and decision process (exploring IT). Tests emotional support, realistic counseling, and alternative recommendation.",
+  "author_note": {
+    "primary_capability": "parent_mode + emotional support + alternative recommendation + expectation management",
+    "expected_failure_mode": "reasoning — might overpromise on CSE chances or fail to redirect to alternatives",
+    "why_this_conversation": "Tests parent-mode communication (turns 1,2), emotional support when child's preference is unrealistic (turn 3), alternative recommendation (turn 4), placement info (turn 5), fee info (turn 6), and conversation closure (turn 7)."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

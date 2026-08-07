@@ -1,0 +1,249 @@
+{
+  "id": "BENCH_V21_000016",
+  "domain": "admission",
+  "difficulty": 2,
+  "primary_language": "en",
+  "languages": [
+    "en"
+  ],
+  "speaker_profile": "student",
+  "features": [],
+  "ground_truth": {
+    "rank": null,
+    "pcm_percentage": 85,
+    "category": "",
+    "interest": "ECE",
+    "board": "cbse",
+    "exam": "wbjee",
+    "budget": null,
+    "location": ""
+  },
+  "turns": [
+    {
+      "student": "What departments does the college offer? I am interested in electronics.",
+      "expected": {
+        "understanding": {
+          "intent": "department",
+          "facts": {
+            "interest": "ECE"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": [
+            "rank",
+            "category"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.14,
+          "confidence": "high",
+          "current_problem": "needs_profile_completion",
+          "problems": [
+            "needs_profile_completion"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_program_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student asking about departments with electronics interest"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "departments",
+                "electronics"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "the departments",
+                "ECE",
+                "EEE",
+                "the electronics"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_program_info",
+            "Department_query"
+          ]
+        }
+      },
+      "must_not": [
+        "recommend_branch"
+      ],
+      "ideal_counselor_notes": "Department query with electronics interest. List relevant departments and collect more profile info."
+    },
+    {
+      "student": "I have 85% in PCM from CBSE. What about ECE specifically?",
+      "expected": {
+        "understanding": {
+          "intent": "department",
+          "facts": {
+            "pcm_percentage": 85,
+            "board": "cbse",
+            "interest": "ECE"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": [
+            "rank",
+            "category"
+          ]
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.43,
+          "confidence": "high",
+          "current_problem": "needs_profile_completion",
+          "problems": [
+            "needs_profile_completion"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_program_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student asking specifically about ECE department"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "85%",
+                "ECE"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "electronics",
+                "curriculum",
+                "labs"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "rank",
+                "category"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_program_info",
+            "ECE_specific"
+          ]
+        }
+      },
+      "must_not": [
+        "recommend_branch"
+      ],
+      "ideal_counselor_notes": "Profile partially filled. Provide ECE-specific info and ask for remaining fields."
+    },
+    {
+      "student": "I did not give WBJEE yet. I will appear next year.",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {},
+          "inference": {
+            "future_student": true
+          },
+          "confidence": "high",
+          "missing": [
+            "rank"
+          ]
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.43,
+          "confidence": "medium",
+          "current_problem": "needs_admission_guidance",
+          "problems": [
+            "future_planning"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_admission_guidance",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Future student — no rank yet",
+            "Provide general guidance for next year"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "next year"
+              ]
+            },
+            {
+              "action": "recommend",
+              "content_contains": [
+                "preparation",
+                "WBJEE",
+                "ECE",
+                "the next year"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_admission_guidance",
+            "Future_student"
+          ]
+        }
+      },
+      "must_not": [
+        "hallucinate_cutoff"
+      ],
+      "ideal_counselor_notes": "Future student, no exam yet. Provide general guidance and preparation tips for next year."
+    }
+  ],
+  "expected_end_state": "incomplete",
+  "ideal_counselor_notes": "3-turn department query. Tests program info retrieval and handling future student scenario.",
+  "author_note": {
+    "primary_capability": "department information retrieval + future student handling",
+    "expected_failure_mode": "retrieval — might try to check eligibility without rank",
+    "why_this_conversation": "Tests department intent (new to v2.1). Turn 1: general department query. Turn 2: ECE specific. Turn 3: future student scenario."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

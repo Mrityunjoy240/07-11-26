@@ -1,0 +1,201 @@
+{
+  "id": "BENCH_V21_000049",
+  "domain": "grievance",
+  "difficulty": 5,
+  "primary_language": "en",
+  "languages": ["en"],
+  "speaker_profile": "student",
+  "features": ["adversarial", "emotion"],
+  "ground_truth": {
+    "rank": 15000,
+    "pcm_percentage": 78,
+    "category": "general",
+    "interest": "CSE",
+    "board": "cbse",
+    "exam": "wbjee",
+    "budget": null,
+    "location": "kolkata"
+  },
+  "turns": [
+    {
+      "student": "This is absolutely unacceptable! I submitted my admission form two weeks ago and nobody has responded. The whole process is a mess. I want to speak to someone in charge right now!",
+      "expected": {
+        "understanding": {
+          "intent": "grievance",
+          "facts": {},
+          "inference": {"anxiety": true},
+          "confidence": "high",
+          "missing": ["rank", "pcm_percentage", "category", "interest", "board"]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.0,
+          "confidence": "high",
+          "current_problem": "has_grievance",
+          "problems": ["has_grievance", "expressing_anxiety"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "reassure",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student is angry about delayed admission response",
+            "Must de-escalate before providing any guidance",
+            "Acknowledge the frustration and provide process information"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": ["frustration", "delay", "form submission"]
+            },
+            {
+              "action": "reassure",
+              "content_contains": ["apologize", "assist", "resolve"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=reassure", "Student_angry", "Grievance_first"]
+        }
+      },
+      "must_not": ["be_defensive", "match_hostility", "dismiss_concern"],
+      "ideal_counselor_notes": "Angry student complaining about delayed admission response. De-escalate first — acknowledge frustration, apologize for inconvenience, then try to gather details."
+    },
+    {
+      "student": "I had WBJEE rank 15000, 78% PCM, CBSE board, general category. I want CSE. I applied two weeks ago and got no reply. What is going on? Is my application lost?",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {
+            "rank": 15000,
+            "pcm_percentage": 78,
+            "board": "cbse",
+            "category": "general",
+            "interest": "CSE",
+            "exam": "wbjee"
+          },
+          "inference": {"anxiety": true},
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "has_grievance",
+          "problems": ["has_grievance"]
+        },
+        "brain": {
+          "eligible_branches": ["CSE", "AIML", "IT", "ECE", "EE", "ME", "CE"],
+          "applicable": true,
+          "why": [
+            {"condition": "rank_provided", "met": true, "detail": "Rank=15000 WBJEE"},
+            {"condition": "category_known", "met": true, "detail": "General"},
+            {"condition": "rank_within_margin", "met": true, "detail": "15000 < 18000 cutoff for CSE/General — within margin"}
+          ]
+        },
+        "decision": {
+          "action": "provide_admission_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student provided complete profile while venting frustration",
+            "CSE is achievable at rank 15000 general — can provide positive news",
+            "Use the admission info to redirect from grievance to guidance"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": ["application status", "admission process", "timeline"]
+            },
+            {
+              "action": "recommend",
+              "content_contains": ["CSE chances", "rank 15000", "strong profile"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_admission_info", "Profile_complete", "CSE_eligible"]
+        }
+      },
+      "must_not": ["guarantee_admission", "ignore_grievance_root_cause"],
+      "ideal_counselor_notes": "Student provided full profile while venting. CSE is achievable at rank 15000 general. Address the application delay while providing positive admission guidance."
+    },
+    {
+      "student": "Fine, but I still want to know why nobody responded for two weeks. And can you confirm I will definitely get CSE? I do not want any more surprises.",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {},
+          "inference": {"anxiety": true},
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "decision",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "has_grievance",
+          "problems": ["has_grievance"]
+        },
+        "brain": {
+          "eligible_branches": ["CSE", "AIML", "IT", "ECE", "EE", "ME", "CE"],
+          "applicable": true,
+          "why": [
+            {"condition": "rank_provided", "met": true, "detail": "Rank=15000"},
+            {"condition": "category_known", "met": true, "detail": "General"},
+            {"condition": "rank_within_margin", "met": true, "detail": "15000 < 18000 for CSE/General — within margin"}
+          ]
+        },
+        "decision": {
+          "action": "provide_admission_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student still wants grievance addressed — must acknowledge delay cause",
+            "Cannot guarantee CSE — must be honest about chances",
+            "Provide clear next steps to rebuild trust"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "clarify",
+              "content_contains": ["delay reason", "process improvement", "follow-up"]
+            },
+            {
+              "action": "summarize",
+              "content_contains": ["CSE outlook", "next steps", "counseling advice"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_admission_info", "Grievance_resolution", "Decision_stage"]
+        }
+      },
+      "must_not": ["guarantee_CSE", "make_excuses", "be_vague_about_timeline"],
+      "ideal_counselor_notes": "Student wants both grievance resolution and admission confirmation. Be honest about the delay, explain the process, provide realistic CSE outlook without guaranteeing, and give clear next steps."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "Angry student complaining about delayed admission process with adversarial tone. Key challenge: de-escalating hostility while providing honest admission guidance. Must address grievance root cause AND provide positive news about CSE eligibility without overpromising.",
+  "author_note": {
+    "primary_capability": "grievance handling with emotional de-escalation and admission guidance",
+    "expected_failure_mode": "adversarial — might become defensive, might overpromise CSE admission to pacify student, or might ignore the root grievance",
+    "why_this_conversation": "Tests adversarial conversation handling. Student provides profile information while venting anger. The system must simultaneously address the grievance AND provide admission guidance, using the positive CSE outlook to rebuild trust."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import re
 from pathlib import Path
 from typing import Any
 
@@ -75,10 +76,13 @@ class KnowledgeBase:
             "ds": "DS", "data science": "DS",
             "cy": "CY", "cyber": "CY",
         }
-        # Check longest matches first
+        _ambig = frozenset({'it', 'me'})
         for alias in sorted(dept_map, key=len, reverse=True):
-            if alias in q:
-                return dept_map[alias]
+            if not re.search(rf"(?<!\w){re.escape(alias)}(?!\w)", q):
+                continue
+            if alias in _ambig and alias.upper() not in query:
+                continue
+            return dept_map[alias]
         return None
 
     def reload(self):

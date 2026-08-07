@@ -1,0 +1,251 @@
+{
+  "id": "BENCH_V21_000026",
+  "domain": "fees",
+  "difficulty": 3,
+  "primary_language": "en",
+  "languages": [
+    "en"
+  ],
+  "speaker_profile": "student",
+  "features": [],
+  "ground_truth": {
+    "rank": 12000,
+    "pcm_percentage": 88,
+    "category": "general",
+    "interest": "CSE",
+    "board": "cbse",
+    "exam": "jee",
+    "budget": null,
+    "location": ""
+  },
+  "turns": [
+    {
+      "student": "I want to know about scholarships. My JEE rank is 12000 and I have 88% in PCM.",
+      "expected": {
+        "understanding": {
+          "intent": "scholarship",
+          "facts": {
+            "rank": 12000,
+            "pcm_percentage": 88,
+            "exam": "jee"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": [
+            "category",
+            "interest"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.29,
+          "confidence": "high",
+          "current_problem": "general_inquiry",
+          "problems": [
+            "needs_scholarship_info",
+            "needs_profile_completion"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_scholarship_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Direct scholarship query with good rank",
+            "Can provide merit-based scholarship info"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "scholarship",
+                "merit",
+                "eligibility"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "category",
+                "interest"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_scholarship_info",
+            "Student_asks_scholarship"
+          ]
+        }
+      },
+      "must_not": [
+        "guarantee_scholarship",
+        "hallucinate_scholarship_amount"
+      ],
+      "ideal_counselor_notes": "Student asks about scholarships with good rank and PCM. Provide merit-based scholarship eligibility and ask for category."
+    },
+    {
+      "student": "I am general category. Interested in CSE. Are there any scholarships specifically for CSE students?",
+      "expected": {
+        "understanding": {
+          "intent": "scholarship",
+          "facts": {
+            "category": "general",
+            "interest": "CSE"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.71,
+          "confidence": "high",
+          "current_problem": "general_inquiry",
+          "problems": [
+            "needs_scholarship_info"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_scholarship_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student wants CSE-specific scholarship info",
+            "General category with good rank, merit scholarships applicable"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "category",
+                "general",
+                "CSE"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "scholarship",
+                "CSE branch",
+                "merit",
+                "criteria"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_scholarship_info",
+            "CSE_scholarship"
+          ]
+        }
+      },
+      "must_not": [
+        "guarantee_scholarship",
+        "hallucinate_specific_scholarship_names"
+      ],
+      "ideal_counselor_notes": "Student specifies general category and CSE interest. Provide scholarship eligibility criteria for merit-based scholarships."
+    },
+    {
+      "student": "What about if my family income is below 6 lakh? Is there any income-based scholarship too?",
+      "expected": {
+        "understanding": {
+          "intent": "scholarship",
+          "facts": {
+            "family_income": "below_6_lakh"
+          },
+          "inference": {
+            "eligibility_check": true,
+            "scholarship_type": "income_based"
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "decision",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "general_inquiry",
+          "problems": [
+            "needs_scholarship_info"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_scholarship_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student asking about income-based scholarship with income detail",
+            "Must check eligibility for income-based scholarships"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "income",
+                "6 lakh",
+                "income_based"
+              ]
+            },
+            {
+              "action": "recommend",
+              "content_contains": [
+                "scholarship",
+                "family income",
+                "eligibility",
+                "criteria"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_scholarship_info",
+            "Income_based"
+          ]
+        }
+      },
+      "must_not": [
+        "guarantee_income_scholarship",
+        "hallucinate_scholarship_amount",
+        "ask_for_income_proof"
+      ],
+      "ideal_counselor_notes": "Student asks about income-based scholarship with family income below 6 lakh. Explain eligibility for income-based scholarships and link to merit scholarships."
+    }
+  ],
+  "expected_end_state": "incomplete",
+  "ideal_counselor_notes": "Golden scholarship conversation. Student provides rank, PCM, category, interest, and income. Tests scholarship guidance with merit and income-based eligibility check. Clean flow, easy to verify.",
+  "author_note": {
+    "primary_capability": "scholarship guidance with eligibility check",
+    "expected_failure_mode": "eligibility — might not connect income threshold to specific scholarship schemes, or might overpromise on amounts",
+    "why_this_conversation": "Golden conversation for scholarship guidance. Tests merit-based and income-based scholarship eligibility with progressively revealed profile info."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

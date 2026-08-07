@@ -23,6 +23,7 @@ except ImportError:
 from src.planner.engine import MinimalPlanner
 from src.planner.models import Plan
 from src.reasoning.engine import ReasoningEngine
+from src.reasoning.observation import Observer
 from src.registry import CapabilityRegistry
 from src.understanding.engine import UnderstandingEngine
 
@@ -90,6 +91,7 @@ class PipelineOrchestrator:
         text: str,
         state: ConversationState | None = None,
         debug: bool = False,
+        observer: Observer | None = None,
     ) -> PipelineResult:
         errors: list[str] = []
         latencies: dict[str, int] = {}
@@ -115,7 +117,8 @@ class PipelineOrchestrator:
         try:
             t = time.perf_counter()
             reasoning = self.reasoning.process(
-                ReasoningInput(understanding=understanding, state=state, college_brain=self.brain, debug=debug)
+                ReasoningInput(understanding=understanding, state=state, college_brain=self.brain, debug=debug),
+                observer=observer,
             )
             latencies["reasoning"] = _elapsed_ms(t)
         except Exception as e:

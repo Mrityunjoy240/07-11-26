@@ -1,0 +1,198 @@
+{
+  "id": "BENCH_V21_000020",
+  "domain": "admission",
+  "difficulty": 3,
+  "primary_language": "en",
+  "languages": [
+    "en"
+  ],
+  "speaker_profile": "student",
+  "features": [],
+  "ground_truth": {
+    "rank": 30000,
+    "pcm_percentage": 75,
+    "category": "obc",
+    "interest": "IT",
+    "board": "cbse",
+    "exam": "wbjee",
+    "budget": null,
+    "location": "kolkata"
+  },
+  "turns": [
+    {
+      "student": "I want to study IT. I have 30000 rank in WBJEE. What branches can I get?",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {
+            "rank": 30000,
+            "interest": "IT"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": [
+            "category",
+            "pcm_percentage"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.29,
+          "confidence": "high",
+          "current_problem": "needs_profile_completion",
+          "problems": [
+            "needs_profile_completion"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "collect_profile",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Rank and interest known",
+            "Need category for accurate recommendation"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "30000",
+                "IT"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "category",
+                "PCM"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=collect_profile",
+            "Missing=category"
+          ]
+        }
+      },
+      "must_not": [
+        "recommend_branch"
+      ],
+      "ideal_counselor_notes": "IT interest with rank 30000. Need category before providing recommendation."
+    },
+    {
+      "student": "I am OBC category. My PCM is 75%. Can I get IT?",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {
+            "category": "obc",
+            "pcm_percentage": 75
+          },
+          "inference": {
+            "confirmation_request": true
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "comparing_options",
+          "problems": []
+        },
+        "brain": {
+          "eligible_branches": [
+            "IT",
+            "ECE"
+          ],
+          "applicable": true,
+          "why": [
+            {
+              "condition": "Rank 30000 OBC — IT cutoff ~35000 OBC",
+              "met": true,
+              "detail": "Rank 30000 OBC — IT cutoff ~35000 OBC"
+            },
+            {
+              "condition": "ECE cutoff ~40000 OBC",
+              "met": true,
+              "detail": "ECE cutoff ~40000 OBC"
+            }
+          ]
+        },
+        "decision": {
+          "action": "provide_admission_guidance",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Complete profile",
+            "IT at 30000 OBC is feasible",
+            "Also mention ECE as backup"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "OBC",
+                "75%",
+                "IT"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "IT branch",
+                "eligible",
+                "30000",
+                "OBC category"
+              ]
+            },
+            {
+              "action": "recommend",
+              "content_contains": [
+                "ECE",
+                "backup",
+                "additional option"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_admission_guidance",
+            "Profile_complete"
+          ]
+        }
+      },
+      "must_not": [
+        "guarantee_admission",
+        "hallucinate_exact_cutoff"
+      ],
+      "ideal_counselor_notes": "Profile complete. IT at 30000 OBC is feasible. Provide admission guidance with ECE as backup suggestion."
+    }
+  ],
+  "expected_end_state": "incomplete",
+  "ideal_counselor_notes": "2-turn admission guidance. Profile collection → IT recommendation with backup. Tests admission_guidance action (new to v2.1).",
+  "author_note": {
+    "primary_capability": "admission guidance + profile collection",
+    "expected_failure_mode": "reasoning — might not suggest ECE as backup option",
+    "why_this_conversation": "Tests provide_admission_guidance action (new to v2.1). Simple 2-turn flow: collect profile → provide guidance with backup."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

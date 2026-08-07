@@ -24,9 +24,9 @@ _MAX_MEMORY_ENTRIES = 128
 _MEMORY_CACHE: dict = {}
 
 
-def _make_key(text: str, language: str, speaker: str) -> str:
-    """Stable hash key for a (text, language, speaker) triple."""
-    raw = f"{text.strip().lower()}|{language}|{speaker}"
+def _make_key(text: str, language: str, speaker: str, pace: float = 1.0) -> str:
+    """Stable hash key for a (text, language, speaker, pace) tuple."""
+    raw = f"{text.strip().lower()}|{language}|{speaker}|{pace}"
     return hashlib.md5(raw.encode("utf-8")).hexdigest()
 
 
@@ -38,9 +38,9 @@ def _disk_path(key: str) -> str:
 # Public API
 # ---------------------------------------------------------------------------
 
-def get_cached_audio(text: str, language: str, speaker: str) -> Optional[bytes]:
+def get_cached_audio(text: str, language: str, speaker: str, pace: float = 1.0) -> Optional[bytes]:
     """Return cached WAV bytes or None if not cached."""
-    key = _make_key(text, language, speaker)
+    key = _make_key(text, language, speaker, pace)
 
     # 1. Memory hit
     if key in _MEMORY_CACHE:
@@ -64,9 +64,9 @@ def get_cached_audio(text: str, language: str, speaker: str) -> Optional[bytes]:
     return None
 
 
-def store_audio(text: str, language: str, speaker: str, audio_bytes: bytes) -> None:
+def store_audio(text: str, language: str, speaker: str, audio_bytes: bytes, pace: float = 1.0) -> None:
     """Store WAV bytes in memory and disk cache."""
-    key = _make_key(text, language, speaker)
+    key = _make_key(text, language, speaker, pace)
 
     # Memory
     if len(_MEMORY_CACHE) < _MAX_MEMORY_ENTRIES:

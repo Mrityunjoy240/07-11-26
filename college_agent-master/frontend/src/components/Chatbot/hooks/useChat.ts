@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Message, ChatState } from '../types';
 import { API_CONFIG } from '../config';
+import { authHeaders } from '../../../apiAuth';
 
 const INITIAL_MESSAGE: Message = {
     id: 'init',
@@ -82,6 +83,7 @@ export function useChat() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    ...authHeaders(),
                 },
                 body: JSON.stringify({ message: text }),
             });

@@ -8,10 +8,17 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_core.documents import Document
 logger = logging.getLogger(__name__)
 
+# Single source of truth for the embedding model.
+# Query AND ingest/reindex paths must share this exact model so the persisted
+# collection dimension always matches the query-time dimension. Switching this
+# constant without clearing + rebuilding the collection raises a loud error in
+# add_documents() instead of silently corrupting retrieval.
+EMBEDDING_MODEL_NAME = "all-MiniLM-L6-v2"
+
 
 class VectorStoreService:
     """
-    Professional Vector Store Service using ChromaDB and BGE-M3 embeddings.
+    Professional Vector Store Service using ChromaDB.
     Handles semantic search for the RAG pipeline.
     """
 
@@ -36,7 +43,7 @@ class VectorStoreService:
 
         # Using all-MiniLM-L6-v2 for fast startup (~2s vs 45s for BGE-M3).
         # Sufficient for intent classification and multilingual RAG at demo scale.
-        self.embedding_model_name = "all-MiniLM-L6-v2"
+        self.embedding_model_name = EMBEDDING_MODEL_NAME
 
         logger.info(f"Initializing VectorStoreService with model: {self.embedding_model_name}")
 
@@ -54,17 +61,46 @@ class VectorStoreService:
                 collection_name=self._collection_name,
             )
 
+            stored_dim = self._collection_dimension()
+            model_dim = len(self.embeddings.embed_query("dimension probe"))
+            if stored_dim and stored_dim != model_dim:
+                logger.warning(
+                    f"Collection dimension mismatch detected: stored={stored_dim}, "
+                    f"model={model_dim} ({self.embedding_model_name}). "
+                    "Rebuild the collection via /admin/kb/reindex to realign."
+                )
+            else:
+                logger.info(
+                    f"Embedding dimensions consistent: stored={stored_dim or 'empty'}, "
+                    f"model={model_dim} ({self.embedding_model_name})."
+                )
+
             self.initialized = True
             logger.info("VectorStoreService initialized successfully")
         except Exception as e:
             logger.error(f"Failed to initialize VectorStoreService: {e}")
             self.vector_store = None
 
+    def _collection_dimension(self) -> int:
+        """Return the persisted collection's embedding dimension, or 0 if empty."""
+        try:
+            collection = self.vector_store._collection
+            if collection.count() == 0:
+                return 0
+            embeddings = collection.get(limit=1, include=["embeddings"]).get("embeddings")
+            if embeddings is None:
+                return 0
+            if len(embeddings) > 0 and embeddings[0] is not None:
+                return len(embeddings[0])
+            return 0
+        except Exception as e:
+            logger.error(f"Error reading collection dimension: {e}")
+            return 0
+
     def search(self, query: str, k: int = 8) -> List[Document]:
         """
-        Pure semantic search using ChromaDB + BGE-M3.
+        Pure semantic search using ChromaDB.
         Single retriever — no keyword boosting, no hardcoded intent maps.
-        BGE-M3 handles multilingual queries natively.
         """
         docs, _ = self.search_with_scores(query, k=k)
         return docs
@@ -100,12 +136,23 @@ class VectorStoreService:
     def add_documents(self, documents: List[Document]):
         """
         Add documents to the vector store.
+        Refuses to add if the stored collection dimension differs from the
+        current embedding model dimension (prevents silent mixed-dim corruption).
         """
         if not self.vector_store:
             logger.error("Vector store not initialized.")
             return
 
         try:
+            stored_dim = self._collection_dimension()
+            model_dim = len(self.embeddings.embed_query("dimension probe"))
+            if stored_dim and stored_dim != model_dim:
+                logger.error(
+                    f"Refusing to add documents: collection dimension {stored_dim} "
+                    f"!= model dimension {model_dim} ({self.embedding_model_name}). "
+                    "Rebuild the collection via /admin/kb/reindex with the matching model."
+                )
+                return
             self.vector_store.add_documents(documents)
             logger.info(f"Added {len(documents)} documents to vector store.")
         except Exception as e:

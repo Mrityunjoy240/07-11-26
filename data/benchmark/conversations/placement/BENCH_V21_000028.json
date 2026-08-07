@@ -1,0 +1,259 @@
+{
+  "id": "BENCH_V21_000028",
+  "domain": "placement",
+  "difficulty": 3,
+  "primary_language": "en",
+  "languages": [
+    "en"
+  ],
+  "speaker_profile": "student",
+  "features": [
+    "topic_switch"
+  ],
+  "ground_truth": {
+    "rank": 55000,
+    "pcm_percentage": 68,
+    "category": "obc",
+    "interest": "IT",
+    "board": "wbchse",
+    "exam": "wbjee",
+    "budget": null,
+    "location": "siliguri"
+  },
+  "turns": [
+    {
+      "student": "I want to know about placement opportunities for IT branch. My WBJEE rank is 55000 and I have 68% in PCM.",
+      "expected": {
+        "understanding": {
+          "intent": "placement",
+          "facts": {
+            "rank": 55000,
+            "pcm_percentage": 68,
+            "interest": "IT",
+            "exam": "wbjee"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": [
+            "category",
+            "location"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.43,
+          "confidence": "high",
+          "current_problem": "needs_placement_data",
+          "problems": [
+            "needs_placement_data",
+            "needs_profile_completion"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_placement_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Direct placement query for IT branch",
+            "Can provide general placement data for IT"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "placement",
+                "IT",
+                "general"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "category",
+                "location"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_placement_info",
+            "Student_asks_placement"
+          ]
+        }
+      },
+      "must_not": [
+        "guarantee_placement",
+        "hallucinate_exact_salary"
+      ],
+      "ideal_counselor_notes": "Student asks about IT placement with WBJEE rank and PCM. Provide general IT placement info and ask for category and location."
+    },
+    {
+      "student": "I am OBC category and from Siliguri. Can I get placement in good companies with this rank? Or should I change to CSE for better placement?",
+      "expected": {
+        "understanding": {
+          "intent": "placement",
+          "facts": {
+            "category": "obc",
+            "location": "siliguri"
+          },
+          "inference": {
+            "eligibility_check": true,
+            "multi_constraint": true,
+            "constraints": [
+              "rank",
+              "category",
+              "branch",
+              "location"
+            ]
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "needs_placement_data",
+          "problems": [
+            "needs_placement_data"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_placement_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Multi-constraint query: rank + category + branch + location",
+            "Student comparing IT vs CSE placement"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "OBC",
+                "Siliguri",
+                "CSE",
+                "IT"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "placement",
+                "IT branch",
+                "CSE branch",
+                "comparison"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_placement_info",
+            "Multi_constraint",
+            "Branch_comparison"
+          ]
+        }
+      },
+      "must_not": [
+        "guarantee_placement",
+        "disparage_IT_branch",
+        "ignore_location_constraint"
+      ],
+      "ideal_counselor_notes": "Student provides OBC category and Siliguri location. Asks about IT vs CSE placement comparison. Address multi-constraint query with rank, category, branch, and location."
+    },
+    {
+      "student": "Follow up — if I stick with IT, what kind of salary range can I expect after 4 years? And do colleges in Siliguri have good placement cells?",
+      "expected": {
+        "understanding": {
+          "intent": "placement",
+          "facts": {},
+          "inference": {
+            "follow_up": true,
+            "topics": [
+              "salary_range",
+              "college_placement_cell"
+            ]
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "needs_placement_data",
+          "problems": [
+            "needs_placement_data"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_placement_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Follow-up on salary range and placement cell quality",
+            "Must reference prior context about IT branch and Siliguri"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "salary",
+                "range",
+                "IT",
+                "placement_cell"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_placement_info",
+            "Follow_up"
+          ]
+        }
+      },
+      "must_not": [
+        "guarantee_salary",
+        "disparage_Siliguri_colleges",
+        "hallucinate_exact_salary"
+      ],
+      "ideal_counselor_notes": "Follow-up about salary range and placement cell quality in Siliguri. Provide general salary range for IT and info about placement infrastructure."
+    }
+  ],
+  "expected_end_state": "incomplete",
+  "ideal_counselor_notes": "3-turn placement conversation with follow_up feature. Tests multi-constraint reasoning (rank + category + branch + location), eligibility check, and follow-up reference. Student considers switching from IT to CSE.",
+  "author_note": {
+    "primary_capability": "placement info with eligibility check and multi-constraint reasoning",
+    "expected_failure_mode": "multi_constraint — might not combine rank + OBC + Siliguri constraints, or might not compare IT vs CSE placement properly",
+    "why_this_conversation": "Difficulty 3 conversation testing placement info retrieval with eligibility check, multi-constraint reasoning, and follow_up feature. Student asks about branch comparison and location-specific placement."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

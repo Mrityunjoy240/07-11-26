@@ -1,0 +1,108 @@
+{
+  "id": "BENCH_V21_000001",
+  "domain": "mixed",
+  "difficulty": 1,
+  "primary_language": "en",
+  "languages": [
+    "en"
+  ],
+  "speaker_profile": "student",
+  "features": [],
+  "ground_truth": {
+    "rank": null,
+    "pcm_percentage": null,
+    "category": "",
+    "interest": "",
+    "board": "",
+    "exam": "",
+    "budget": null,
+    "location": ""
+  },
+  "turns": [
+    {
+      "student": "Hi there!",
+      "expected": {
+        "understanding": {
+          "intent": "greeting",
+          "facts": {},
+          "inference": {},
+          "confidence": "high",
+          "missing": [
+            "rank",
+            "pcm_percentage",
+            "category",
+            "interest",
+            "board"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.0,
+          "confidence": "high",
+          "current_problem": "needs_profile_completion",
+          "problems": [
+            "needs_profile_completion"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "collect_profile",
+          "priority": "normal",
+          "confidence": "high",
+          "why": [
+            "Greeting received, no profile info yet",
+            "Welcome and begin profile collection"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "reassure",
+              "content_contains": [
+                "welcome",
+                "admission"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "rank",
+                "exam",
+                "PCM"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=collect_profile",
+            "Missing=all_profile_fields"
+          ]
+        }
+      },
+      "must_not": [
+        "recommend_branch",
+        "hallucinate_cutoff"
+      ],
+      "ideal_counselor_notes": "Simple greeting. Welcome the student and ask about their exam and rank to begin."
+    }
+  ],
+  "expected_end_state": "incomplete",
+  "ideal_counselor_notes": "Student said hello. No information gathered yet. Need to start profile collection.",
+  "author_note": {
+    "primary_capability": "greeting handling",
+    "expected_failure_mode": "intent_classification — system might classify as unknown or admission instead of greeting",
+    "why_this_conversation": "Baseline test for the simplest possible interaction. Ensures the system can handle a greeting without jumping to recommendations."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

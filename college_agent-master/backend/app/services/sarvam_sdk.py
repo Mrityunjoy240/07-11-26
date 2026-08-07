@@ -1,9 +1,18 @@
 """
-Sarvam Agents SDK bridge — communication layer (Bridge mode / Architecture A).
+Sarvam Agents SDK bridge — OPTIONAL developer/testing channel.
 
-This backend hosts an ``AsyncSamvaadAgent`` that connects to Sarvam's
-app-runtime over WebSocket. The Sarvam platform agent handles the telephony /
-voice channel with the user; this service is the client side of that bridge:
+PRODUCTION PATH IS: Sarvam Inbound Deployment -> Agent Runtime -> HTTP tool
+-> FastAPI /qa/query. This module is NOT part of that path. It exists purely
+as a local bridge for exercising the QA/RAG stack against a Sarvam app without
+a phone line (create a session, inject messages, watch delivery).
+
+It is only mounted/active when ``SARVAM_SDK_ENABLED=true``; the /sdk router is
+skipped at startup otherwise, so production never depends on this module or on
+the ``sarvam-conv-ai-sdk`` package.
+
+The bridge hosts an ``AsyncSamvaadAgent`` that connects to Sarvam's app-runtime
+over WebSocket. The Sarvam platform agent handles the telephony / voice channel
+with the user; this service is the client side of that bridge:
 
     user speech  ->  Sarvam STT  ->  transcript_callback  ->  POST /qa/query
     answer       <-  /qa/query   <-  our intelligence      <-  Groq + RAG
@@ -18,6 +27,7 @@ Environment / Settings used:
     SARVAM_ORG_ID         (required)
     SARVAM_WORKSPACE_ID   (required)
     SARVAM_APP_ID         (required)
+    SARVAM_SDK_ENABLED    (optional, default false — must be true to mount /sdk)
     SARVAM_BASE_URL       (optional, default https://apps.sarvam.ai/api/app-runtime/)
     SARVAM_QA_ENDPOINT    (optional, default http://127.0.0.1:8000/qa/query)
     SARVAM_CONNECT_TIMEOUT(optional seconds, default 10.0)
@@ -122,7 +132,11 @@ class SarvamSDKCall:
     session_id: str
     user_identifier: str
     language: str = "English"
-    user_identifier_type: UserIdentifierType = UserIdentifierType.CUSTOM
+    user_identifier_type: Any = field(
+        default_factory=lambda: (
+            UserIdentifierType.CUSTOM if UserIdentifierType is not None else None
+        )
+    )
     agent: Optional[Any] = None
     interaction_id: Optional[str] = None
     status: str = "connecting"  # connecting|connected|disconnected|stopped|error
@@ -135,7 +149,11 @@ class SarvamSDKCall:
         return {
             "session_id": self.session_id,
             "user_identifier": self.user_identifier,
-            "user_identifier_type": self.user_identifier_type.value,
+            "user_identifier_type": (
+                self.user_identifier_type.value
+                if self.user_identifier_type is not None
+                else None
+            ),
             "language": self.language,
             "interaction_id": self.interaction_id,
             "status": self.status,
@@ -187,6 +205,9 @@ class SarvamSDKService:
     # Public API
     # ------------------------------------------------------------------ #
     def is_available(self) -> bool:
+        # Dev/test channel only — must be explicitly enabled.
+        if not settings.sarvam_sdk_enabled:
+            return False
         return SARVAM_SDK_AVAILABLE and self.config.is_configured()
 
     async def create_session(
@@ -389,6 +410,7 @@ class SarvamSDKService:
     def health(self) -> dict[str, Any]:
         return {
             "sdk_available": SARVAM_SDK_AVAILABLE,
+            "sdk_enabled": settings.sarvam_sdk_enabled,
             "configured": self.config.is_configured(),
             "app_id": self.config.app_id,
             "org_id": self.config.org_id,

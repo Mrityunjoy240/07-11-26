@@ -1,0 +1,1570 @@
+[
+  {
+    "query": "How many companies visited in 2025?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-26T09:09:31.385411Z",
+    "count": 1
+  },
+  {
+    "query": "Tell me about Dr. Chandan Chattoraj",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-26T09:17:03.015630Z",
+    "count": 1
+  },
+  {
+    "query": "??? ??? ????? ????",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-26T14:06:47.875311Z",
+    "count": 1
+  },
+  {
+    "query": "??????????? ???",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-26T15:31:11.724472Z",
+    "count": 1
+  },
+  {
+    "query": "vice principal name",
+    "lang": "en",
+    "reason": "hallucination_guard: entities not found in context: ['0343', '2501353', '03432501353']",
+    "timestamp": "2026-06-26T15:32:07.747540Z",
+    "count": 1
+  },
+  {
+    "query": "placement rate",
+    "lang": "en",
+    "reason": "hallucination_guard: entities not found in context: ['0343', '2501353', '03432501353']",
+    "timestamp": "2026-06-26T15:32:08.578681Z",
+    "count": 1
+  },
+  {
+    "query": "who is vice principal",
+    "lang": "en",
+    "reason": "hallucination_guard: entities not found in context: ['0343', '2501353', '03432501353']",
+    "timestamp": "2026-06-26T15:41:10.174674Z",
+    "count": 1
+  },
+  {
+    "query": "vice principal name",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-26T15:51:43.761318Z",
+    "count": 1
+  },
+  {
+    "query": "I have 90k WBJEE rank and 50% marks in PCM, can I get admission?",
+    "lang": "en",
+    "reason": "hallucination_guard: entities not found in context: ['90000']",
+    "timestamp": "2026-06-26T16:20:11.778129Z",
+    "count": 1
+  },
+  {
+    "query": "What is his phone number?",
+    "lang": "en",
+    "reason": "hallucination_guard: entities not found in context: ['03432501353']",
+    "timestamp": "2026-06-26T16:28:46.293225Z",
+    "count": 1
+  },
+  {
+    "query": "मुझे सीएसी एंड एआईएमएल डिपार्टमेंट का फैकल्टी बारे में बताइए कौन कौन है क्या क्या है",
+    "lang": "hi",
+    "reason": "out_of_kb_deflection_stream",
+    "timestamp": "2026-06-26T18:28:41.444184Z",
+    "count": 1
+  },
+  {
+    "query": "What's the placement rate?",
+    "lang": "en",
+    "reason": "hallucination_guard: entities not found in context: ['936']",
+    "timestamp": "2026-06-27T07:43:55.985812Z",
+    "count": 1
+  },
+  {
+    "query": "placement rate kya hai?",
+    "lang": "hi",
+    "reason": "hallucination_guard: entities not found in context: ['936']",
+    "timestamp": "2026-06-27T07:47:46.965698Z",
+    "count": 1
+  },
+  {
+    "query": "What's the placement rate?",
+    "lang": "en",
+    "reason": "hallucination_guard: entities not found in context: ['936']",
+    "timestamp": "2026-06-27T08:49:18.215917Z",
+    "count": 1
+  },
+  {
+    "query": "placement rate kya hai?",
+    "lang": "hi",
+    "reason": "hallucination_guard: entities not found in context: ['936']",
+    "timestamp": "2026-06-27T08:50:57.207266Z",
+    "count": 1
+  },
+  {
+    "query": "Ami admission nite pari?",
+    "lang": "bn",
+    "reason": "hallucination_guard: entities not found in context: ['03432501353']",
+    "timestamp": "2026-06-27T08:52:58.828619Z",
+    "count": 1
+  },
+  {
+    "query": "Hostel ache?",
+    "lang": "bn",
+    "reason": "hallucination_guard: entities not found in context: ['১৫০০', '২০০০']",
+    "timestamp": "2026-06-27T09:16:54.614202Z",
+    "count": 1
+  },
+  {
+    "query": "Hostel ache?",
+    "lang": "bn",
+    "reason": "hallucination_guard: entities not found in context: ['১৫০০', '২০০০']",
+    "timestamp": "2026-06-27T09:57:39.772287Z",
+    "count": 1
+  },
+  {
+    "query": "Who is the vice Principal of this college?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection_stream",
+    "timestamp": "2026-06-27T10:18:53.872178Z",
+    "count": 1
+  },
+  {
+    "query": "Can I pay fees in installments?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T13:32:00.283086Z",
+    "count": 1
+  },
+  {
+    "query": "Can I pay fees in installments?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T13:33:49.603167Z",
+    "count": 1
+  },
+  {
+    "query": "What are the charges for the library?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T13:34:07.547818Z",
+    "count": 1
+  },
+  {
+    "query": "Do engineering students have to pay lab fees separately?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T13:34:21.003014Z",
+    "count": 1
+  },
+  {
+    "query": "Can I transfer from another college?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T13:36:43.563199Z",
+    "count": 1
+  },
+  {
+    "query": "What's the acceptance rate for BCREC?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T13:36:55.771651Z",
+    "count": 1
+  },
+  {
+    "query": "Do you offer lateral entry for diploma holders?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T13:37:08.842387Z",
+    "count": 1
+  },
+  {
+    "query": "How many faculty members are in the ECE department?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T13:37:53.972330Z",
+    "count": 1
+  },
+  {
+    "query": "What are the qualifications of the CSE HOD?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T13:38:05.856153Z",
+    "count": 1
+  },
+  {
+    "query": "When does the placement season start?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T13:41:05.882893Z",
+    "count": 1
+  },
+  {
+    "query": "What sports facilities are available?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T13:42:19.922508Z",
+    "count": 1
+  },
+  {
+    "query": "Is there a library with good resources?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T13:42:31.953264Z",
+    "count": 1
+  },
+  {
+    "query": "What are the charges for the library?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T13:44:18.330968Z",
+    "count": 1
+  },
+  {
+    "query": "Do engineering students have to pay lab fees separately?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T13:44:31.603801Z",
+    "count": 1
+  },
+  {
+    "query": "Can I transfer from another college?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T13:46:39.847451Z",
+    "count": 1
+  },
+  {
+    "query": "What's the acceptance rate for BCREC?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T13:46:50.808821Z",
+    "count": 1
+  },
+  {
+    "query": "Do you offer lateral entry for diploma holders?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T13:47:05.040688Z",
+    "count": 1
+  },
+  {
+    "query": "How many faculty members are in the ECE department?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T13:47:50.000698Z",
+    "count": 1
+  },
+  {
+    "query": "Who handles student affairs?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T13:48:14.321929Z",
+    "count": 1
+  },
+  {
+    "query": "When does the placement season start?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T13:50:50.686110Z",
+    "count": 1
+  },
+  {
+    "query": "What sports facilities are available?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T13:52:17.236804Z",
+    "count": 1
+  },
+  {
+    "query": "Can I pay fees in installments?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:06:30.418255Z",
+    "count": 1
+  },
+  {
+    "query": "What are the charges for the library?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:07:10.177218Z",
+    "count": 1
+  },
+  {
+    "query": "Do engineering students have to pay lab fees separately?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:07:24.021615Z",
+    "count": 1
+  },
+  {
+    "query": "What's the fee structure for IT branch?",
+    "lang": "en",
+    "reason": "hallucination_guard: entities not found in context: ['98225']",
+    "timestamp": "2026-06-27T15:20:13.830929Z",
+    "count": 1
+  },
+  {
+    "query": "Can I pay fees in installments?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:20:31.285379Z",
+    "count": 1
+  },
+  {
+    "query": "What are the charges for the library?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:21:15.016616Z",
+    "count": 1
+  },
+  {
+    "query": "Do engineering students have to pay lab fees separately?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:21:21.292277Z",
+    "count": 1
+  },
+  {
+    "query": "Can I transfer from another college?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:24:13.859781Z",
+    "count": 1
+  },
+  {
+    "query": "What's the acceptance rate for BCREC?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:24:22.719958Z",
+    "count": 1
+  },
+  {
+    "query": "Do you offer lateral entry for diploma holders?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:24:40.824467Z",
+    "count": 1
+  },
+  {
+    "query": "How many faculty members are in the ECE department?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:25:33.701651Z",
+    "count": 1
+  },
+  {
+    "query": "What are the qualifications of the CSE HOD?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:25:48.036245Z",
+    "count": 1
+  },
+  {
+    "query": "Who is responsible for placements?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:26:20.416373Z",
+    "count": 1
+  },
+  {
+    "query": "What's the contact number of the Principal's office?",
+    "lang": "en",
+    "reason": "hallucination_guard: entities not found in context: ['03432501353']",
+    "timestamp": "2026-06-27T15:26:32.970509Z",
+    "count": 1
+  },
+  {
+    "query": "When does the placement season start?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:28:47.456248Z",
+    "count": 1
+  },
+  {
+    "query": "Can I pay fees in installments?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:30:39.390696Z",
+    "count": 1
+  },
+  {
+    "query": "What are the charges for the library?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:31:22.978014Z",
+    "count": 1
+  },
+  {
+    "query": "Do engineering students have to pay lab fees separately?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:31:40.214567Z",
+    "count": 1
+  },
+  {
+    "query": "Is GATE score required for admission?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:33:40.573937Z",
+    "count": 1
+  },
+  {
+    "query": "Can I transfer from another college?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:34:41.185687Z",
+    "count": 1
+  },
+  {
+    "query": "What's the acceptance rate for BCREC?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:34:55.490477Z",
+    "count": 1
+  },
+  {
+    "query": "Do you offer lateral entry for diploma holders?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:35:06.976481Z",
+    "count": 1
+  },
+  {
+    "query": "How many faculty members are in the ECE department?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:35:57.618746Z",
+    "count": 1
+  },
+  {
+    "query": "What are the qualifications of the CSE HOD?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:36:12.005874Z",
+    "count": 1
+  },
+  {
+    "query": "Who handles student affairs?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:36:28.574178Z",
+    "count": 1
+  },
+  {
+    "query": "Who is responsible for placements?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:36:48.220524Z",
+    "count": 1
+  },
+  {
+    "query": "Can I pay fees in installments?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:43:12.073659Z",
+    "count": 1
+  },
+  {
+    "query": "What are the charges for the library?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:43:58.153808Z",
+    "count": 1
+  },
+  {
+    "query": "Do engineering students have to pay lab fees separately?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:44:06.063346Z",
+    "count": 1
+  },
+  {
+    "query": "Can I transfer from another college?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:47:01.376889Z",
+    "count": 1
+  },
+  {
+    "query": "What's the acceptance rate for BCREC?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:47:15.251955Z",
+    "count": 1
+  },
+  {
+    "query": "Do you offer lateral entry for diploma holders?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:47:31.026248Z",
+    "count": 1
+  },
+  {
+    "query": "How many faculty members are in the ECE department?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:48:35.534046Z",
+    "count": 1
+  },
+  {
+    "query": "What are the qualifications of the CSE HOD?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:48:37.974732Z",
+    "count": 1
+  },
+  {
+    "query": "Who handles student affairs?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:49:04.861933Z",
+    "count": 1
+  },
+  {
+    "query": "Who is responsible for placements?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:49:24.380526Z",
+    "count": 1
+  },
+  {
+    "query": "When does the placement season start?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:52:09.653597Z",
+    "count": 1
+  },
+  {
+    "query": "What sports facilities are available?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:53:53.280674Z",
+    "count": 1
+  },
+  {
+    "query": "Is there a library with good resources?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:54:07.303304Z",
+    "count": 1
+  },
+  {
+    "query": "Do you have computer labs?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:54:21.541493Z",
+    "count": 1
+  },
+  {
+    "query": "What's the college address?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:54:51.080320Z",
+    "count": 1
+  },
+  {
+    "query": "What is the total cost of studying at BCREC?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:56:01.650935Z",
+    "count": 1
+  },
+  {
+    "query": "Can I pay fees in installments?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:56:04.840318Z",
+    "count": 1
+  },
+  {
+    "query": "What are the charges for the library?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:56:07.667417Z",
+    "count": 1
+  },
+  {
+    "query": "Do engineering students have to pay lab fees separately?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:56:08.883978Z",
+    "count": 1
+  },
+  {
+    "query": "What's the acceptance rate for BCREC?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:56:19.512172Z",
+    "count": 1
+  },
+  {
+    "query": "Do you offer lateral entry for diploma holders?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:56:20.609745Z",
+    "count": 1
+  },
+  {
+    "query": "How many faculty members are in the ECE department?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:56:24.637041Z",
+    "count": 1
+  },
+  {
+    "query": "What are the qualifications of the CSE HOD?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:56:25.591712Z",
+    "count": 1
+  },
+  {
+    "query": "Who handles student affairs?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:56:26.514930Z",
+    "count": 1
+  },
+  {
+    "query": "Can I meet the Vice Principal?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:56:27.620004Z",
+    "count": 1
+  },
+  {
+    "query": "What's the contact number of the Principal's office?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:56:29.694574Z",
+    "count": 1
+  },
+  {
+    "query": "When does the placement season start?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:56:52.245146Z",
+    "count": 1
+  },
+  {
+    "query": "How many companies visited for placements?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:56:57.048772Z",
+    "count": 1
+  },
+  {
+    "query": "Do final year students get guaranteed placements?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:57:00.454776Z",
+    "count": 1
+  },
+  {
+    "query": "What sports facilities are available?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:57:07.001713Z",
+    "count": 1
+  },
+  {
+    "query": "What's the college address?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:57:21.390067Z",
+    "count": 1
+  },
+  {
+    "query": "What are the college timings?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:57:27.833567Z",
+    "count": 1
+  },
+  {
+    "query": "Can I pay fees in installments?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T15:59:20.317046Z",
+    "count": 1
+  },
+  {
+    "query": "What are the charges for the library?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:00:01.886362Z",
+    "count": 1
+  },
+  {
+    "query": "Do engineering students have to pay lab fees separately?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:00:26.544905Z",
+    "count": 1
+  },
+  {
+    "query": "Can I transfer from another college?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:02:39.040319Z",
+    "count": 1
+  },
+  {
+    "query": "What's the acceptance rate for BCREC?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:02:51.380403Z",
+    "count": 1
+  },
+  {
+    "query": "Do you offer lateral entry for diploma holders?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:03:05.335413Z",
+    "count": 1
+  },
+  {
+    "query": "How many faculty members are in the ECE department?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:03:45.505149Z",
+    "count": 1
+  },
+  {
+    "query": "What are the qualifications of the CSE HOD?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:03:56.854319Z",
+    "count": 1
+  },
+  {
+    "query": "How many students got placed last year?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:06:02.199912Z",
+    "count": 1
+  },
+  {
+    "query": "When does the placement season start?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:06:44.931058Z",
+    "count": 1
+  },
+  {
+    "query": "What sports facilities are available?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:08:09.145786Z",
+    "count": 1
+  },
+  {
+    "query": "What are the charges for the library?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:10:17.162265Z",
+    "count": 1
+  },
+  {
+    "query": "Do engineering students have to pay lab fees separately?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:10:42.718842Z",
+    "count": 1
+  },
+  {
+    "query": "Can I transfer from another college?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:12:53.947226Z",
+    "count": 1
+  },
+  {
+    "query": "What's the acceptance rate for BCREC?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:13:06.757726Z",
+    "count": 1
+  },
+  {
+    "query": "Do you offer lateral entry for diploma holders?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:13:22.276895Z",
+    "count": 1
+  },
+  {
+    "query": "How many faculty members are in the ECE department?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:14:05.324228Z",
+    "count": 1
+  },
+  {
+    "query": "What are the qualifications of the CSE HOD?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:14:19.632478Z",
+    "count": 1
+  },
+  {
+    "query": "What sports facilities are available?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:18:33.491090Z",
+    "count": 1
+  },
+  {
+    "query": "Is there a library with good resources?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:18:47.181148Z",
+    "count": 1
+  },
+  {
+    "query": "What's the college address?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:19:23.533430Z",
+    "count": 1
+  },
+  {
+    "query": "What are the college timings?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:19:50.318215Z",
+    "count": 1
+  },
+  {
+    "query": "BCREC mein padhai ka total kharcha kitna hai?",
+    "lang": "hi",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:20:32.611658Z",
+    "count": 1
+  },
+  {
+    "query": "ECE saal mein kitne rupaye ka kharch hai?",
+    "lang": "hi",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:21:25.875956Z",
+    "count": 1
+  },
+  {
+    "query": "Library ke liye kitna charge hai?",
+    "lang": "hi",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:21:59.831888Z",
+    "count": 1
+  },
+  {
+    "query": "Agla pravesh chakra kab hai?",
+    "lang": "hi",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:24:03.568996Z",
+    "count": 1
+  },
+  {
+    "query": "CSE ke HOD ki yogyataen kya hain?",
+    "lang": "hi",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:25:49.214995Z",
+    "count": 1
+  },
+  {
+    "query": "Kya main Vice Principal se mil sakta hoon?",
+    "lang": "hi",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:26:13.251254Z",
+    "count": 1
+  },
+  {
+    "query": "Principal karyalaya ka phone number kya hai?",
+    "lang": "hi",
+    "reason": "hallucination_guard: entities not found in context: ['03432501353']",
+    "timestamp": "2026-06-27T16:26:46.625983Z",
+    "count": 1
+  },
+  {
+    "query": "Pichhle saal kitne chhatron ko jagah mili?",
+    "lang": "hi",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:27:55.146167Z",
+    "count": 1
+  },
+  {
+    "query": "Placement ke liye kitni companies aayin?",
+    "lang": "hi",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:29:16.700738Z",
+    "count": 1
+  },
+  {
+    "query": "Kya parivahan uplabdh hai?",
+    "lang": "hi",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:31:59.538039Z",
+    "count": 1
+  },
+  {
+    "query": "Engineering shiksharthider alada lab fee dite hoy ki?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:35:40.271263Z",
+    "count": 1
+  },
+  {
+    "query": "CSE ebong anyo vibhager modhye fee parthokko koto?",
+    "lang": "bn",
+    "reason": "hallucination_guard: entities not found in context: ['03432501353']",
+    "timestamp": "2026-06-27T16:35:41.378887Z",
+    "count": 1
+  },
+  {
+    "query": "Shara bochhor abedon grohito hoy ki?",
+    "lang": "hi",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:36:07.996488Z",
+    "count": 1
+  },
+  {
+    "query": "GATE score proyojon ache ki?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:36:24.235295Z",
+    "count": 1
+  },
+  {
+    "query": "Bhortir jonno ki ki dolil lage?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:36:43.601215Z",
+    "count": 1
+  },
+  {
+    "query": "Poroborti bhirti chokro kokhon?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:36:54.751659Z",
+    "count": 1
+  },
+  {
+    "query": "Shara bochhor abedon grohito hoy ki?",
+    "lang": "hi",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:40:40.603555Z",
+    "count": 1
+  },
+  {
+    "query": "GATE score proyojon ache ki?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:40:50.847495Z",
+    "count": 1
+  },
+  {
+    "query": "Poroborti bhirti chokro kokhon?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T16:41:11.724872Z",
+    "count": 1
+  },
+  {
+    "query": "Shara bochhor abedon grohito hoy ki?",
+    "lang": "hi",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T17:03:32.111098Z",
+    "count": 1
+  },
+  {
+    "query": "GATE score proyojon ache ki?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T17:03:47.237067Z",
+    "count": 1
+  },
+  {
+    "query": "Bhortir jonno ki ki dolil lage?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T17:04:11.163412Z",
+    "count": 1
+  },
+  {
+    "query": "Poroborti bhirti chokro kokhon?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T17:04:22.155774Z",
+    "count": 1
+  },
+  {
+    "query": "Shikkharthi bishoyok dayittwe ke ache?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T17:06:17.492923Z",
+    "count": 1
+  },
+  {
+    "query": "Placement season kokhon shuru hoy?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T17:09:01.317265Z",
+    "count": 1
+  },
+  {
+    "query": "Campus e hostel ache ki?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T17:10:10.810903Z",
+    "count": 1
+  },
+  {
+    "query": "Ki ki khelar subidha ache?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T17:10:22.170680Z",
+    "count": 1
+  },
+  {
+    "query": "Campus e WiFi ache ki?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T17:10:59.771082Z",
+    "count": 1
+  },
+  {
+    "query": "Poribohon upolobdh ache ki?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-27T17:12:16.581720Z",
+    "count": 1
+  },
+  {
+    "query": "How many hostels are there in BCREC?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-30T03:59:35.329996Z",
+    "count": 1
+  },
+  {
+    "query": "What is the weather like in Durgapur?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-30T04:07:43.582972Z",
+    "count": 1
+  },
+  {
+    "query": "Who won the 2024 T20 World Cup?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-30T04:08:46.089167Z",
+    "count": 1
+  },
+  {
+    "query": "What is the stock price of Apple?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-30T04:09:08.160395Z",
+    "count": 1
+  },
+  {
+    "query": "Does BCREC have a library?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-30T04:09:20.326313Z",
+    "count": 1
+  },
+  {
+    "query": "Does BCREC have online classes?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-30T04:16:56.533217Z",
+    "count": 1
+  },
+  {
+    "query": "Vorti process ta ki?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-30T04:59:47.228348Z",
+    "count": 1
+  },
+  {
+    "query": "How many hostels are there in BCREC?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-30T06:08:25.264501Z",
+    "count": 1
+  },
+  {
+    "query": "How many hostels are there in BCREC?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-30T06:14:21.709615Z",
+    "count": 1
+  },
+  {
+    "query": "Tell me about the CSE department",
+    "lang": "hi",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-30T06:17:16.756995Z",
+    "count": 1
+  },
+  {
+    "query": "How many hostels are there in BCREC?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-30T06:20:29.214582Z",
+    "count": 1
+  },
+  {
+    "query": "How many hostels are there in BCREC?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection_stream",
+    "timestamp": "2026-06-30T06:27:10.287468Z",
+    "count": 1
+  },
+  {
+    "query": "How many hostels are there in BCREC?",
+    "lang": "en",
+    "reason": "hallucination_guard: entities not found in context: ['03432501353', '03432502449']",
+    "timestamp": "2026-06-30T06:28:06.156462Z",
+    "count": 1
+  },
+  {
+    "query": "DC Royal का",
+    "lang": "hi",
+    "reason": "out_of_kb_deflection_stream",
+    "timestamp": "2026-06-30T07:46:15.395209Z",
+    "count": 1
+  },
+  {
+    "query": "What is the capital of France?",
+    "lang": "bn",
+    "reason": "low_confidence_retrieval_0.045",
+    "timestamp": "2026-06-30T19:27:17.438784Z",
+    "count": 1
+  },
+  {
+    "query": "How many seats in ECE department?",
+    "lang": "hi",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-30T19:27:43.361862Z",
+    "count": 1
+  },
+  {
+    "query": "What is the placement rate of IT and how many companies visited?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-30T19:43:02.505462Z",
+    "count": 1
+  },
+  {
+    "query": "What is the placement rate of IT and how many companies visited?",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-06-30T19:51:52.146845Z",
+    "count": 1
+  },
+  {
+    "query": "What is the cutoff for WBJEE?",
+    "lang": "en",
+    "reason": "hallucination_guard: entities not found in context: ['0343', '2501353', '03432501353']",
+    "timestamp": "2026-06-30T20:08:29.251758Z",
+    "count": 1
+  },
+  {
+    "query": "What is the fee for CSE?",
+    "lang": "en",
+    "reason": "hallucination_guard: entities not found in context: ['98225']",
+    "timestamp": "2026-06-30T20:25:28.834024Z",
+    "count": 1
+  },
+  {
+    "query": "Who is the principal of this college?",
+    "lang": "en",
+    "reason": "hallucination_guard: entities not found in context: ['03432501353']",
+    "timestamp": "2026-06-30T20:31:55.192726Z",
+    "count": 1
+  },
+  {
+    "query": "Principal ke baare mein batao",
+    "lang": "hi",
+    "reason": "hallucination_guard: entities not found in context: ['0343', '2501353', '03432501353']",
+    "timestamp": "2026-06-30T20:31:56.221664Z",
+    "count": 1
+  },
+  {
+    "query": "Is there any scholarship for SC students?",
+    "lang": "en",
+    "reason": "hallucination_guard: entities not found in context: ['03432501353']",
+    "timestamp": "2026-06-30T20:33:59.400967Z",
+    "count": 1
+  },
+  {
+    "query": "Bhai Mars mission kaise join karein?",
+    "lang": "hi",
+    "reason": "low_confidence_retrieval_0.093",
+    "timestamp": "2026-06-30T20:36:18.930072Z",
+    "count": 1
+  },
+  {
+    "query": "Principal ke baare mein batao",
+    "lang": "hi",
+    "reason": "hallucination_guard: entities not found in context: ['0343', '2501353', '03432501353']",
+    "timestamp": "2026-06-30T20:44:55.850895Z",
+    "count": 1
+  },
+  {
+    "query": "Bhai Mars mission kaise join karein?",
+    "lang": "hi",
+    "reason": "low_confidence_retrieval_0.093",
+    "timestamp": "2026-06-30T20:49:14.164116Z",
+    "count": 1
+  },
+  {
+    "query": "Principal ke baare mein batao",
+    "lang": "hi",
+    "reason": "hallucination_guard: entities not found in context: ['0343', '2501353', '03432501353']",
+    "timestamp": "2026-06-30T20:57:52.746439Z",
+    "count": 1
+  },
+  {
+    "query": "Who is the principal of this college?",
+    "lang": "en",
+    "reason": "hallucination_guard: entities not found in context: ['03432501353']",
+    "timestamp": "2026-06-30T20:58:11.008771Z",
+    "count": 1
+  },
+  {
+    "query": "Bhai Mars mission kaise join karein?",
+    "lang": "hi",
+    "reason": "low_confidence_retrieval_0.093",
+    "timestamp": "2026-06-30T21:01:39.581698Z",
+    "count": 1
+  },
+  {
+    "query": "college timings",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-07-03T15:46:29.105266Z",
+    "count": 1
+  },
+  {
+    "query": "the last date for admission is tomorrow and i haven't received my documents yet what should i do",
+    "lang": "en",
+    "reason": "hallucination_guard: entities not found in context: ['03432501353']",
+    "timestamp": "2026-07-03T16:08:32.978688Z",
+    "count": 1
+  },
+  {
+    "query": "how do i reach the college from durgapur station",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-07-03T16:10:06.484858Z",
+    "count": 1
+  },
+  {
+    "query": "ami kichu bujhini",
+    "lang": "en",
+    "reason": "low_confidence_retrieval_0.145",
+    "timestamp": "2026-07-04T10:18:22.189980Z",
+    "count": 1
+  },
+  {
+    "query": "is hostel available for girls",
+    "lang": "en",
+    "reason": "hallucination_guard_stream: entities not found in context: ['600']",
+    "timestamp": "2026-07-04T12:27:38.433338Z",
+    "count": 1
+  },
+  {
+    "query": "is hostel available for girls",
+    "lang": "en",
+    "reason": "hallucination_guard_stream: entities not found in context: ['750']",
+    "timestamp": "2026-07-04T12:42:10.943814Z",
+    "count": 1
+  },
+  {
+    "query": "is hostel available for girls",
+    "lang": "en",
+    "reason": "hallucination_guard_stream: entities not found in context: ['750']",
+    "timestamp": "2026-07-04T13:34:51.528969Z",
+    "count": 1
+  },
+  {
+    "query": "what लड़कियों के लिए अलग hostel है",
+    "lang": "hi",
+    "reason": "hallucination_guard_stream: entities not found in context: ['750', '375', '375']",
+    "timestamp": "2026-07-04T13:51:14.262552Z",
+    "count": 1
+  },
+  {
+    "query": "repeat",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-07-04T18:39:52.278465Z",
+    "count": 1
+  },
+  {
+    "query": "এবারে বাচ্চার সাথে কথা বলতে থাক না।",
+    "lang": "bn",
+    "reason": "low_confidence_retrieval_0.119",
+    "timestamp": "2026-07-06T06:56:58.911690Z",
+    "count": 1
+  },
+  {
+    "query": "broo i need healp",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-07-08T13:23:10.702811Z",
+    "count": 1
+  },
+  {
+    "query": "amar akta sem a back ache amar ki r scholership paoaholona",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-07-08T13:24:11.019966Z",
+    "count": 1
+  },
+  {
+    "query": "mera ak back lag geya he",
+    "lang": "hi",
+    "reason": "low_confidence_retrieval_0.141",
+    "timestamp": "2026-07-08T15:07:37.971495Z",
+    "count": 1
+  },
+  {
+    "query": "repeat",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-07-08T15:13:31.423211Z",
+    "count": 1
+  },
+  {
+    "query": "or kya acha he",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-07-08T18:41:20.951640Z",
+    "count": 1
+  },
+  {
+    "query": "mughe convinse koro ki me idhar q admission lu",
+    "lang": "hi",
+    "reason": "hallucination_guard: entities not found in context: ['2000', '201', '250']",
+    "timestamp": "2026-07-08T18:46:53.211206Z",
+    "count": 1
+  },
+  {
+    "query": "mughe convinse koro ki me idhar q admission lu",
+    "lang": "hi",
+    "reason": "hallucination_guard: entities not found in context: ['2000', '281', '80000']",
+    "timestamp": "2026-07-08T18:50:01.381049Z",
+    "count": 1
+  },
+  {
+    "query": "ai ka nam bohut sunne me a raha he",
+    "lang": "hi",
+    "reason": "post_llm_fact_guard: invented numbers",
+    "timestamp": "2026-07-08T19:34:36.544897Z",
+    "count": 1
+  },
+  {
+    "query": "BCREC complaints",
+    "lang": "en",
+    "reason": "post_llm_fact_guard: invented numbers",
+    "timestamp": "2026-07-08T19:34:50.472844Z",
+    "count": 1
+  },
+  {
+    "query": "college me kya facilities hai",
+    "lang": "hi",
+    "reason": "post_llm_fact_guard: invented numbers",
+    "timestamp": "2026-07-08T19:36:31.593932Z",
+    "count": 1
+  },
+  {
+    "query": "or kya acha he",
+    "lang": "hi",
+    "reason": "post_llm_fact_guard: invented numbers",
+    "timestamp": "2026-07-08T19:37:16.383853Z",
+    "count": 1
+  },
+  {
+    "query": "or kya acha he",
+    "lang": "hi",
+    "reason": "post_llm_fact_guard: invented numbers",
+    "timestamp": "2026-07-08T19:45:27.663329Z",
+    "count": 1
+  },
+  {
+    "query": "college me kya hai",
+    "lang": "hi",
+    "reason": "post_llm_fact_guard: invented numbers",
+    "timestamp": "2026-07-08T19:45:50.140471Z",
+    "count": 1
+  },
+  {
+    "query": "mene suna he is college ki faculty ache nahi he is IT true",
+    "lang": "hi",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-07-08T19:48:25.339204Z",
+    "count": 1
+  },
+  {
+    "query": "or kya acha he",
+    "lang": "hi",
+    "reason": "post_llm_fact_guard: invented numbers",
+    "timestamp": "2026-07-08T19:49:41.500117Z",
+    "count": 1
+  },
+  {
+    "query": "vice Dr. Sanjay S. Pawar name",
+    "lang": "en",
+    "reason": "post_llm_fact_guard: invented numbers",
+    "timestamp": "2026-07-09T02:32:46.338343Z",
+    "count": 1
+  },
+  {
+    "query": "vice Dr. Sanjay S. Pawar name",
+    "lang": "en",
+    "reason": "post_llm_fact_guard: invented numbers",
+    "timestamp": "2026-07-09T02:32:55.993633Z",
+    "count": 1
+  },
+  {
+    "query": "or kya acha he",
+    "lang": "hi",
+    "reason": "post_llm_fact_guard: invented numbers",
+    "timestamp": "2026-07-09T02:47:05.917583Z",
+    "count": 1
+  },
+  {
+    "query": "college me kya hai",
+    "lang": "hi",
+    "reason": "post_llm_fact_guard: invented numbers",
+    "timestamp": "2026-07-09T02:49:10.858820Z",
+    "count": 1
+  },
+  {
+    "query": "what his concact info number or mil",
+    "lang": "en",
+    "reason": "post_llm_fact_guard: invented numbers",
+    "timestamp": "2026-07-09T02:50:52.948538Z",
+    "count": 1
+  },
+  {
+    "query": "principal er name ki",
+    "lang": "en",
+    "reason": "hallucination_guard: entities not found in context: ['0343', '2501353', '03432501353']",
+    "timestamp": "2026-07-09T03:13:22.451875Z",
+    "count": 1
+  },
+  {
+    "query": "princepal r vice princepal ar nam ki",
+    "lang": "en",
+    "reason": "post_llm_fact_guard: invented numbers",
+    "timestamp": "2026-07-09T03:13:26.945398Z",
+    "count": 1
+  },
+  {
+    "query": "principal er name ki",
+    "lang": "en",
+    "reason": "hallucination_guard: entities not found in context: ['2024', '0343', '2501353', '03432501353']",
+    "timestamp": "2026-07-09T03:15:18.877590Z",
+    "count": 1
+  },
+  {
+    "query": "or kya acha he",
+    "lang": "hi",
+    "reason": "post_llm_fact_guard: invented numbers",
+    "timestamp": "2026-07-09T03:17:11.886641Z",
+    "count": 1
+  },
+  {
+    "query": "fuck you",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-07-09T03:17:58.591022Z",
+    "count": 1
+  },
+  {
+    "query": "fuck you",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-07-09T03:20:20.378550Z",
+    "count": 1
+  },
+  {
+    "query": "what his contact info number or mil",
+    "lang": "en",
+    "reason": "hallucination_guard: entities not found in context: ['0343', '2501353', '03432501353']",
+    "timestamp": "2026-07-09T03:20:27.072319Z",
+    "count": 1
+  },
+  {
+    "query": "or kya acha he",
+    "lang": "hi",
+    "reason": "post_llm_fact_guard: invented numbers",
+    "timestamp": "2026-07-09T03:23:11.905912Z",
+    "count": 1
+  },
+  {
+    "query": "college me kya hai",
+    "lang": "hi",
+    "reason": "post_llm_fact_guard: invented numbers",
+    "timestamp": "2026-07-09T03:23:31.395680Z",
+    "count": 1
+  },
+  {
+    "query": "or kya acha he",
+    "lang": "hi",
+    "reason": "post_llm_fact_guard: invented numbers",
+    "timestamp": "2026-07-09T03:25:51.276232Z",
+    "count": 1
+  },
+  {
+    "query": "ai ka nam bohut sunne me a raha he",
+    "lang": "hi",
+    "reason": "post_llm_fact_guard: invented numbers",
+    "timestamp": "2026-07-09T03:26:01.494830Z",
+    "count": 1
+  },
+  {
+    "query": "college me kya hai",
+    "lang": "hi",
+    "reason": "post_llm_fact_guard: invented numbers",
+    "timestamp": "2026-07-09T03:26:10.237595Z",
+    "count": 1
+  },
+  {
+    "query": "fuck you",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-07-09T03:26:36.204177Z",
+    "count": 1
+  },
+  {
+    "query": "broo i am cooked",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-07-09T03:30:13.316402Z",
+    "count": 1
+  },
+  {
+    "query": "bc mera back aa geya or tu yeha mazak kar raha he",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-07-09T03:31:11.627876Z",
+    "count": 1
+  },
+  {
+    "query": "backlog",
+    "lang": "en",
+    "reason": "out_of_kb_deflection",
+    "timestamp": "2026-07-09T03:31:40.350523Z",
+    "count": 1
+  }
+]

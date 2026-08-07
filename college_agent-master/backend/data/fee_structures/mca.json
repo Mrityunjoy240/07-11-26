@@ -1,0 +1,63 @@
+{
+  "_file_meta": {
+    "program": "MCA",
+    "display_name": "Master of Computer Applications",
+    "duration_semesters": 4,
+    "last_updated": "2026-07-10",
+    "updated_by": "System (initial load from verified FEE_GROUP_MAP)",
+    "structure_count": 1,
+    "schema_version": "2.0.0"
+  },
+  "groups": {
+    "mca": { "branches": ["MCA"] }
+  },
+  "structures": [
+    {
+      "version_id": "v2026",
+      "status": "active",
+      "label": "2026-2028 MCA Fee Structure",
+      "admission_batches": ["2026-27", "2027-28"],
+      "effective_date": "2026-07-01",
+      "published_date": "2026-06-15",
+      "source": "BCREC MCA Fee Structure",
+      "groups": {
+        "mca": {
+          "components": [
+            {
+              "id": "admission_fee",
+              "label": "Admission Fee (one-time)",
+              "type": "one_time",
+              "category": "compulsory",
+              "amount": 67800,
+              "charged_in_semester": 1,
+              "notes": "Includes first semester fee and one-time charges"
+            },
+            {
+              "id": "per_semester_tuition",
+              "label": "Per Semester Tuition",
+              "type": "per_semester",
+              "category": "compulsory",
+              "amount": 48600,
+              "applicable_semesters": [2, 3, 4],
+              "notes": "Semester fee for semesters 2, 3, and 4"
+            },
+            {
+              "id": "fourth_semester_adjustment",
+              "label": "Fourth Semester Adjustment",
+              "type": "one_time",
+              "category": "compulsory",
+              "amount": 1000,
+              "charged_in_semester": 4,
+              "notes": "Additional charge in final semester"
+            }
+          ],
+          "computed": {
+            "total_course_fee": 214600,
+            "first_semester_payable": 67800,
+            "regular_semester_fee": 48600
+          }
+        }
+      }
+    }
+  ]
+}

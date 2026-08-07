@@ -4,14 +4,15 @@ STT (Speech-to-Text) API endpoint using Sarvam.ai
 POST /qa/stt - Transcribe audio to text
 GET /qa/stt/languages - List supported languages
 """
-from fastapi import APIRouter, HTTPException, UploadFile, File, Form
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 import logging
 
+from app.api.qa import require_tool_auth
 from app.config import settings
 from app.services.sarvam_service import get_sarvam_service, init_sarvam_service
 
 logger = logging.getLogger(__name__)
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(require_tool_auth)])
 
 SUPPORTED_FORMATS = ["wav", "mp3", "webm", "ogg", "aac", "flac", "m4a"]
 

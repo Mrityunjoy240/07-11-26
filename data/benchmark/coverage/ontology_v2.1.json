@@ -1,0 +1,149 @@
+{
+  "version": "2.1",
+  "created": "2026-07-19",
+  "frozen": true,
+  "description": "v2.1 intent, action, and behavior taxonomy for benchmark conversations",
+
+  "boundary": {
+    "scope": "benchmark_only",
+    "note": "This ontology defines what the BENCHMARK measures, not what the PRODUCTION pipeline uses. The production pipeline maintains its own intent/action vocabulary in src/understanding/engine.py and src/decision/engine.py. A mapping layer (deprecated_intents, deprecated_actions below) tracks how benchmark vocabulary relates to production vocabulary. When the production taxonomy changes, update the mapping — not this ontology.",
+    "production_intents": "src/understanding/engine.py _INTENT_PATTERNS",
+    "production_actions": "src/decision/engine.py _KNOWLEDGE_TO_ACTION",
+    "update_rule": "Freeze this ontology before authoring conversations. Changes require a new version."
+  },
+
+  "intents": {
+    "count": 24,
+    "items": [
+      {"name": "admission", "description": "Eligibility, process, how to apply", "knowledge": ["process", "eligibility"]},
+      {"name": "cutoff", "description": "Previous year cutoffs, closing ranks", "knowledge": ["year", "branch", "category"]},
+      {"name": "seats", "description": "Seat count, intake, capacity", "knowledge": ["branch", "total"]},
+      {"name": "department", "description": "Branch/department information", "knowledge": ["available", "details"]},
+      {"name": "document", "description": "Required documents for admission/counseling", "knowledge": ["list", "format"]},
+      {"name": "fee", "description": "Fee structure, payment, installment", "knowledge": ["tuition", "hostel_fee", "total"]},
+      {"name": "placement", "description": "Job outcomes, recruiters, salary", "knowledge": ["package", "recruiter", "record"]},
+      {"name": "hostel", "description": "Accommodation, mess, facilities", "knowledge": ["room", "mess", "fee", "amenities"]},
+      {"name": "scholarship", "description": "Financial aid, waivers, concessions", "knowledge": ["merit", "sports", "means", "post_matric"]},
+      {"name": "institution", "description": "College info, contact, faculty, HOD, timings", "knowledge": ["contact", "faculty", "hod", "timings"]},
+      {"name": "safety", "description": "Campus safety, security", "knowledge": ["campus", "girls_safe"]},
+      {"name": "transfer", "description": "College transfer, migration", "knowledge": ["process", "eligibility"]},
+      {"name": "distance_education", "description": "Online, correspondence, distance programs", "knowledge": ["university", "recognition"]},
+      {"name": "management_quota", "description": "Paid seats, donation", "knowledge": ["policy", "process"]},
+      {"name": "nri_admission", "description": "International/NRI students", "knowledge": ["quota", "documents"]},
+      {"name": "sports_quota", "description": "Athletic admission", "knowledge": ["certificate", "trial"]},
+      {"name": "lateral_entry", "description": "Diploma to degree, direct second year", "knowledge": ["eligibility", "process"]},
+      {"name": "counseling_info", "description": "Counseling schedule, choice filling", "knowledge": ["dates", "documents"]},
+      {"name": "grievance", "description": "Complaints, re-evaluation, issues", "knowledge": ["process", "escalation"]},
+      {"name": "career_confusion", "description": "Undecided, dilemma", "knowledge": ["guidance"]},
+      {"name": "loan", "description": "Education loan", "knowledge": ["eligibility", "bank"]},
+      {"name": "greeting", "description": "Hello, namaste", "knowledge": []},
+      {"name": "repeat", "description": "Repeat, say again", "knowledge": []},
+      {"name": "unknown", "description": "Unclear or out-of-scope", "knowledge": []}
+    ],
+    "merged_from_v2_0": [
+      {"removed": "faculty", "into": "institution", "knowledge": "faculty"},
+      {"removed": "hod", "into": "institution", "knowledge": "hod"},
+      {"removed": "contact", "into": "institution", "knowledge": "contact"},
+      {"removed": "timings", "into": "institution", "knowledge": "timings"},
+      {"removed": "recommendation", "into": "admission", "knowledge": "general guidance"}
+    ]
+  },
+
+  "actions": {
+    "count": 15,
+    "items": [
+      {"name": "collect_profile", "description": "Ask for rank, PCM, category, interest", "trigger": "profile_incomplete"},
+      {"name": "encourage_and_collect_profile", "description": "Reassure + collect profile", "trigger": "anxious_student_profile_incomplete"},
+      {"name": "recommend_branches", "description": "Branch recommendations based on eligibility", "trigger": "profile_complete_brain_has_data"},
+      {"name": "provide_admission_guidance", "description": "Explain admission process", "trigger": "admission_workflow_questions"},
+      {"name": "provide_cutoff_info", "description": "Cutoff data with branch/category breakdown", "trigger": "cutoff_queries"},
+      {"name": "provide_program_info", "description": "Domain-specific information (parameterized)", "trigger": "any_specific_info_request"},
+      {"name": "provide_fee_info", "description": "Fee structure and payment", "trigger": "fee_queries"},
+      {"name": "provide_placement_info", "description": "Placement statistics and recruiters", "trigger": "placement_queries"},
+      {"name": "provide_hostel_info", "description": "Hostel facilities and fees", "trigger": "hostel_queries"},
+      {"name": "provide_scholarship_info", "description": "Scholarship options and eligibility", "trigger": "scholarship_queries"},
+      {"name": "explain_policy", "description": "Policy explanation (management quota, NRI, transfer)", "trigger": "policy_questions"},
+      {"name": "reassure", "description": "Emotional support, anxiety management", "trigger": "anxious_emotional_student"},
+      {"name": "clarify", "description": "Ask for clarification", "trigger": "ambiguous_unclear_query"},
+      {"name": "provide_guidance", "description": "General personalized guidance", "trigger": "broad_unclear_goals"},
+      {"name": "provide_career_guidance", "description": "Career counseling and path advice", "trigger": "career_confusion"}
+    ],
+    "removed_from_v2_0": [
+      {"removed": "provide_branch_guidance", "mapped_to": "recommend_branches"},
+      {"removed": "provide_distance_ed_info", "mapped_to": "provide_program_info", "knowledge": "distance_education_information"},
+      {"removed": "provide_nri_admission_info", "mapped_to": "explain_policy", "knowledge": "nri_admission_information"},
+      {"removed": "explain_management_quota_policy", "mapped_to": "explain_policy", "knowledge": "management_quota_information"},
+      {"removed": "provide_grievance_process", "mapped_to": "provide_program_info", "knowledge": "grievance_information"},
+      {"removed": "provide_transfer_info", "mapped_to": "explain_policy", "knowledge": "transfer_information"}
+    ],
+    "knowledge_to_action": {
+      "fee_information": "provide_fee_info",
+      "placement_information": "provide_placement_info",
+      "hostel_information": "provide_hostel_info",
+      "scholarship_information": "provide_scholarship_info",
+      "cutoff_information": "provide_cutoff_info",
+      "nri_admission_information": "explain_policy",
+      "management_quota_information": "explain_policy",
+      "transfer_information": "explain_policy"
+    }
+  },
+
+  "behaviors": {
+    "count": 16,
+    "items": [
+      {"name": "greeting", "description": "Acknowledge and initiate", "operators": []},
+      {"name": "information_retrieval", "description": "Answer factual question about college", "operators": ["retrieval"]},
+      {"name": "eligibility_check", "description": "Determine if student qualifies", "operators": ["retrieval", "eligibility"]},
+      {"name": "fee_explanation", "description": "Explain cost structure", "operators": ["retrieval"]},
+      {"name": "branch_recommendation", "description": "Suggest branches based on profile", "operators": ["retrieval", "eligibility", "comparison", "recommendation"]},
+      {"name": "scholarship_guidance", "description": "Explain aid options and eligibility", "operators": ["retrieval", "eligibility"]},
+      {"name": "career_counseling", "description": "Help student decide path", "operators": ["comparison", "recommendation"]},
+      {"name": "emotional_support", "description": "Reassure anxious student", "operators": []},
+      {"name": "correction_handling", "description": "Process student correction to earlier info", "operators": ["correction", "memory_use"]},
+      {"name": "topic_switch", "description": "Handle mid-conversation topic change", "operators": ["memory_use", "follow_up_reference"]},
+      {"name": "follow_up_reference", "description": "Answer follow-up using prior context", "operators": ["memory_use", "follow_up_reference"]},
+      {"name": "policy_explanation", "description": "Explain institutional rules", "operators": ["retrieval", "policy_application"]},
+      {"name": "ambiguous_query_resolution", "description": "Handle unclear questions", "operators": ["clarification"]},
+      {"name": "out_of_scope_handling", "description": "Handle irrelevant or adversarial input", "operators": []},
+      {"name": "multi_constraint_reasoning", "description": "Consider rank + budget + location + interest", "operators": ["comparison", "eligibility", "multi_constraint"]},
+      {"name": "conflict_resolution", "description": "Resolve conflicting student statements", "operators": ["conflict_resolution"]}
+    ]
+  },
+
+  "reasoning_operators": {
+    "count": 10,
+    "items": [
+      {"name": "retrieval", "description": "Look up factual information", "example": "What are the fees?"},
+      {"name": "comparison", "description": "Compare options against criteria", "example": "CSE vs ECE at 25k rank"},
+      {"name": "eligibility", "description": "Check if student qualifies", "example": "Can I get CSE with 82%?"},
+      {"name": "recommendation", "description": "Suggest best option", "example": "Which branch should I pick?"},
+      {"name": "correction", "description": "Process updated/changed information", "example": "Actually my rank is 28000"},
+      {"name": "memory_use", "description": "Reference earlier conversation context", "example": "What about the one you mentioned?"},
+      {"name": "multi_constraint", "description": "Reason across multiple factors", "example": "Rank + budget + location + interest"},
+      {"name": "conflict_resolution", "description": "Resolve contradictory statements", "example": "I want CSE but not interested in coding"},
+      {"name": "follow_up_reference", "description": "Use prior turn's information", "example": "How about for that branch?"},
+      {"name": "policy_application", "description": "Apply institutional rules to student case", "example": "NRI quota requires these documents"}
+    ]
+  },
+
+  "mappings": {
+    "deprecated_intents": {
+      "faculty": "institution",
+      "hod": "institution",
+      "contact": "institution",
+      "timings": "institution",
+      "recommendation": "admission"
+    },
+    "deprecated_actions": {
+      "provide_branch_guidance": "recommend_branches",
+      "provide_lateral_entry_info": "provide_program_info",
+      "provide_distance_ed_info": "provide_program_info",
+      "provide_sports_quota_info": "provide_program_info",
+      "provide_counseling_schedule": "provide_program_info",
+      "provide_grievance_process": "provide_program_info",
+      "provide_nri_admission_info": "explain_policy",
+      "explain_management_quota_policy": "explain_policy",
+      "provide_transfer_info": "explain_policy"
+    }
+  }
+}

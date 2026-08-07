@@ -21,6 +21,8 @@ from src.understanding.profile import (
     is_field_set,
 )
 from src.understanding.vocabulary import INTENT_CONCEPTS, match_concept
+from src.understanding.signals import StructuredSignals, detect_grievance, detect_decision_intent, detect_emotion
+from src.understanding.signals.interaction import analyze_signals
 
 logger = logging.getLogger(__name__)
 
@@ -498,6 +500,21 @@ class UnderstandingEngine:
         # Stage 5: Signals
         signals = self._detect_signals(text, intent, profile)
 
+        # Stage 5b: Structured signals (grievance detection)
+        grievance_signal = detect_grievance(text)
+        # Stage 5c: Structured signals (decision-intent detection)
+        decision_signal = detect_decision_intent(text)
+        # Stage 5d: Structured signals (emotion detection)
+        emotion_signal = detect_emotion(text)
+        structured = StructuredSignals(
+            grievance=grievance_signal,
+            decision=decision_signal,
+            emotion=emotion_signal,
+        )
+
+        # Stage 5e: Signal interaction analysis
+        interaction = analyze_signals(structured)
+
         # Stage 6: Missing information — fully deterministic from profile
         missing = self._compute_missing_from_profile(profile)
 
@@ -510,6 +527,8 @@ class UnderstandingEngine:
             intent=intent,
             profile=profile,
             signals=signals,
+            structured_signals=structured,
+            signal_interaction=interaction,
             missing_info=missing,
             references_previous=references,
             confidence=confidence,

@@ -1,0 +1,230 @@
+{
+  "_file_meta": {
+    "program": "B.Tech",
+    "display_name": "Bachelor of Technology",
+    "duration_semesters": 8,
+    "last_updated": "2026-07-10",
+    "updated_by": "System (initial load from verified FEE_GROUP_MAP)",
+    "structure_count": 1,
+    "schema_version": "2.0.0"
+  },
+  "groups": {
+    "group_a": { "branches": ["CSE", "IT", "ECE"] },
+    "group_b": { "branches": ["EE", "AIML", "DS", "CY", "CSD"] },
+    "group_c": { "branches": ["ME", "CE"] }
+  },
+  "structures": [
+    {
+      "version_id": "v2026",
+      "status": "active",
+      "label": "2026-2030 Fee Structure",
+      "admission_batches": ["2026-27", "2027-28", "2028-29", "2029-30", "2030-31"],
+      "effective_date": "2026-07-01",
+      "published_date": "2026-06-15",
+      "source": "BCREC Fee Structure PDF 2026-30, verified against FEE_GROUP_MAP and combined_kb.json",
+      "groups": {
+        "group_a": {
+          "components": [
+            {
+              "id": "admission_fee",
+              "label": "Admission Fee",
+              "type": "one_time",
+              "category": "compulsory",
+              "amount": 10000,
+              "charged_in_semester": 1,
+              "notes": "Non-refundable admission processing fee"
+            },
+            {
+              "id": "caution_money",
+              "label": "Caution Money (Refundable)",
+              "type": "one_time",
+              "category": "refundable",
+              "amount": 5000,
+              "charged_in_semester": 1,
+              "refundable_at": "course_completion",
+              "notes": "Refundable after course completion, subject to no dues"
+            },
+            {
+              "id": "tuition_fee",
+              "label": "Tuition Fee",
+              "type": "per_semester",
+              "category": "compulsory",
+              "amount": 60500,
+              "applicable_semesters": [1, 2, 3, 4, 5, 6, 7, 8],
+              "notes": "Covers academic instruction"
+            },
+            {
+              "id": "development_fee",
+              "label": "Development Fee",
+              "type": "per_semester",
+              "category": "compulsory",
+              "amount": 9075,
+              "applicable_semesters": [1, 2, 3, 4, 5, 6, 7, 8],
+              "notes": "Infrastructure and campus development"
+            },
+            {
+              "id": "other_semester_charges",
+              "label": "Other Semester Charges (Library, Exam, Welfare)",
+              "type": "per_semester",
+              "category": "compulsory",
+              "amount": 4350,
+              "applicable_semesters": [1, 2, 3, 4, 5, 6, 7, 8],
+              "notes": "Includes library fee, examination fee, student welfare fee, and university charges"
+            },
+            {
+              "id": "first_semester_additional",
+              "label": "First Semester Additional Charges (Registration, Prospectus)",
+              "type": "one_time",
+              "category": "compulsory",
+              "amount": 10300,
+              "charged_in_semester": 1,
+              "notes": "Covers registration, prospectus, and other first-time charges"
+            }
+          ],
+          "semester_overrides": {
+            "8": {
+              "tuition_fee": 61500,
+              "notes": "Eighth semester tuition includes final semester processing"
+            }
+          },
+          "computed": {
+            "total_course_fee": 617700,
+            "first_semester_payable": 99225,
+            "regular_semester_fee": 73925,
+            "eighth_semester_fee": 74925
+          }
+        },
+        "group_b": {
+          "components": [
+            {
+              "id": "admission_fee",
+              "label": "Admission Fee",
+              "type": "one_time",
+              "category": "compulsory",
+              "amount": 10000,
+              "charged_in_semester": 1
+            },
+            {
+              "id": "caution_money",
+              "label": "Caution Money (Refundable)",
+              "type": "one_time",
+              "category": "refundable",
+              "amount": 5000,
+              "charged_in_semester": 1,
+              "refundable_at": "course_completion"
+            },
+            {
+              "id": "tuition_fee",
+              "label": "Tuition Fee",
+              "type": "per_semester",
+              "category": "compulsory",
+              "amount": 55000,
+              "applicable_semesters": [1, 2, 3, 4, 5, 6, 7, 8]
+            },
+            {
+              "id": "development_fee",
+              "label": "Development Fee",
+              "type": "per_semester",
+              "category": "compulsory",
+              "amount": 8250,
+              "applicable_semesters": [1, 2, 3, 4, 5, 6, 7, 8]
+            },
+            {
+              "id": "other_semester_charges",
+              "label": "Other Semester Charges (Library, Exam, Welfare)",
+              "type": "per_semester",
+              "category": "compulsory",
+              "amount": 4350,
+              "applicable_semesters": [1, 2, 3, 4, 5, 6, 7, 8]
+            },
+            {
+              "id": "first_semester_additional",
+              "label": "First Semester Additional Charges (Registration, Prospectus)",
+              "type": "one_time",
+              "category": "compulsory",
+              "amount": 10300,
+              "charged_in_semester": 1
+            }
+          ],
+          "semester_overrides": {
+            "8": {
+              "tuition_fee": 56000,
+              "notes": "Eighth semester tuition adjusted"
+            }
+          },
+          "computed": {
+            "total_course_fee": 567100,
+            "first_semester_payable": 92900,
+            "regular_semester_fee": 67600,
+            "eighth_semester_fee": 68600
+          }
+        },
+        "group_c": {
+          "components": [
+            {
+              "id": "admission_fee",
+              "label": "Admission Fee",
+              "type": "one_time",
+              "category": "compulsory",
+              "amount": 10000,
+              "charged_in_semester": 1
+            },
+            {
+              "id": "caution_money",
+              "label": "Caution Money (Refundable)",
+              "type": "one_time",
+              "category": "refundable",
+              "amount": 5000,
+              "charged_in_semester": 1,
+              "refundable_at": "course_completion"
+            },
+            {
+              "id": "tuition_fee",
+              "label": "Tuition Fee",
+              "type": "per_semester",
+              "category": "compulsory",
+              "amount": 40000,
+              "applicable_semesters": [1, 2, 3, 4, 5, 6, 7, 8]
+            },
+            {
+              "id": "development_fee",
+              "label": "Development Fee",
+              "type": "per_semester",
+              "category": "compulsory",
+              "amount": 6000,
+              "applicable_semesters": [1, 2, 3, 4, 5, 6, 7, 8]
+            },
+            {
+              "id": "other_semester_charges",
+              "label": "Other Semester Charges (Library, Exam, Welfare)",
+              "type": "per_semester",
+              "category": "compulsory",
+              "amount": 4350,
+              "applicable_semesters": [1, 2, 3, 4, 5, 6, 7, 8]
+            },
+            {
+              "id": "first_semester_additional",
+              "label": "First Semester Additional Charges (Registration, Prospectus)",
+              "type": "one_time",
+              "category": "compulsory",
+              "amount": 10300,
+              "charged_in_semester": 1
+            }
+          ],
+          "semester_overrides": {
+            "8": {
+              "tuition_fee": 41000,
+              "notes": "Eighth semester tuition adjusted"
+            }
+          },
+          "computed": {
+            "total_course_fee": 429100,
+            "first_semester_payable": 75650,
+            "regular_semester_fee": 50350,
+            "eighth_semester_fee": 51350
+          }
+        }
+      }
+    }
+  ]
+}

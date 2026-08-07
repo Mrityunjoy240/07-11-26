@@ -1,0 +1,100 @@
+{
+  "id": "BENCH_V21_000005",
+  "domain": "mixed",
+  "difficulty": 1,
+  "primary_language": "en",
+  "languages": [
+    "en"
+  ],
+  "speaker_profile": "student",
+  "features": [],
+  "ground_truth": {
+    "rank": null,
+    "pcm_percentage": null,
+    "category": "",
+    "interest": "",
+    "board": "",
+    "exam": "",
+    "budget": null,
+    "location": ""
+  },
+  "turns": [
+    {
+      "student": "Sorry, can you repeat that?",
+      "expected": {
+        "understanding": {
+          "intent": "repeat",
+          "facts": {},
+          "inference": {},
+          "confidence": "high",
+          "missing": [
+            "rank",
+            "pcm_percentage",
+            "category",
+            "interest",
+            "board"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.0,
+          "confidence": "high",
+          "current_problem": "general_inquiry",
+          "problems": [
+            "general_inquiry"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "clarify",
+          "priority": "normal",
+          "confidence": "high",
+          "why": [
+            "Student asks to repeat previous content",
+            "Provide summary of what was said before"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "summarize",
+              "content_contains": [
+                "previous",
+                "information"
+              ]
+            }
+          ],
+          "confidence": "medium",
+          "dependency_chain": [
+            "Decision=clarify",
+            "Repeat_request"
+          ]
+        }
+      },
+      "must_not": [
+        "recommend_branch",
+        "hallucinate_cutoff"
+      ],
+      "ideal_counselor_notes": "Student asks to repeat. This is typically encountered mid-conversation. In isolation, acknowledge and ask what they need help with."
+    }
+  ],
+  "expected_end_state": "incomplete",
+  "ideal_counselor_notes": "Repeat request in isolation. Acknowledge and try to understand what the student needs.",
+  "author_note": {
+    "primary_capability": "repeat handling",
+    "expected_failure_mode": "intent_classification — might be classified as unknown or admission instead of repeat",
+    "why_this_conversation": "Tests the system's handling of meta-conversational requests. 'Repeat' is a common mid-conversation behavior that should not trigger profile collection."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

@@ -1,0 +1,194 @@
+{
+  "id": "BENCH_V21_000034",
+  "domain": "hostel",
+  "difficulty": 3,
+  "primary_language": "en",
+  "languages": ["en"],
+  "speaker_profile": "student",
+  "features": ["missing_info"],
+  "ground_truth": {
+    "rank": null,
+    "pcm_percentage": null,
+    "category": "",
+    "interest": "",
+    "board": "",
+    "exam": "",
+    "budget": null,
+    "location": "mumbai"
+  },
+  "turns": [
+    {
+      "student": "I want to know about hostel in your college. Can you tell me about it?",
+      "expected": {
+        "understanding": {
+          "intent": "hostel",
+          "facts": {},
+          "inference": {},
+          "confidence": "medium",
+          "missing": ["rank", "pcm_percentage", "category", "interest", "board", "campus"]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.0,
+          "confidence": "high",
+          "current_problem": "needs_hostel_info",
+          "problems": ["needs_hostel_info"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_hostel_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "General hostel query without specifying campus or details",
+            "Need to clarify which campus and gather basic info"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "ask",
+              "content_contains": ["campus", "branch", "exam"]
+            },
+            {
+              "action": "inform",
+              "content_contains": ["hostel", "general", "facilities"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_hostel_info", "Missing_campus_info"]
+        }
+      },
+      "must_not": [
+        "assume_campus",
+        "recommend_branch"
+      ],
+      "ideal_counselor_notes": "Vague hostel query — student hasn't specified campus, branch, or any academic details. Need to ask clarifying questions first."
+    },
+    {
+      "student": "I am from Mumbai. I haven't taken any entrance exam yet. Just asking for future reference.",
+      "expected": {
+        "understanding": {
+          "intent": "hostel",
+          "facts": {
+            "location": "mumbai"
+          },
+          "inference": {},
+          "confidence": "medium",
+          "missing": ["rank", "pcm_percentage", "category", "interest", "board"]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.14,
+          "confidence": "medium",
+          "current_problem": "needs_hostel_info",
+          "problems": ["needs_hostel_info"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_hostel_info",
+          "priority": "normal",
+          "confidence": "medium",
+          "why": [
+            "Student is from Mumbai, no exam taken yet",
+            "Can provide general hostel overview for future reference"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": ["Mumbai", "future", "reference"]
+            },
+            {
+              "action": "inform",
+              "content_contains": ["hostel", "overview", "general info"]
+            }
+          ],
+          "confidence": "medium",
+          "dependency_chain": ["Decision=provide_hostel_info", "No_exam_data", "Future_reference"]
+        }
+      },
+      "must_not": [
+        "force_profile_collection",
+        "recommend_branch"
+      ],
+      "ideal_counselor_notes": "Student from Mumbai with no exam data, just exploring. Provide general hostel overview without forcing profile collection."
+    },
+    {
+      "student": "Which campus has better hostel — the old campus or the new one? Are the facilities different?",
+      "expected": {
+        "understanding": {
+          "intent": "hostel",
+          "facts": {},
+          "inference": {},
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.14,
+          "confidence": "high",
+          "current_problem": "needs_hostel_info",
+          "problems": ["needs_hostel_info"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_hostel_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Specific comparison query about old vs new campus hostel",
+            "Can provide campus-wise hostel comparison"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "recommend",
+              "content_contains": ["campus", "comparison", "hostel"]
+            },
+            {
+              "action": "inform",
+              "content_contains": ["facilities", "old campus", "new campus"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_hostel_info", "Campus_comparison_query"]
+        }
+      },
+      "must_not": [
+        "guarantee_campus_preference",
+        "hallucinate_facility_details"
+      ],
+      "ideal_counselor_notes": "Student asks about campus comparison for hostel. Provide general comparison of old vs new campus hostel facilities."
+    }
+  ],
+  "expected_end_state": "incomplete",
+  "ideal_counselor_notes": "Hostel query with missing info — student doesn't specify campus or provide academic details. Tests ability to handle vague queries and provide general info without forcing profile collection.",
+  "author_note": {
+    "primary_capability": "hostel info with missing information handling",
+    "expected_failure_mode": "reasoning — might force profile collection when student is just exploring, or might assume a specific campus",
+    "why_this_conversation": "Tests missing_info feature in hostel context. Student asks vague hostel question without specifying campus or providing academic details."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

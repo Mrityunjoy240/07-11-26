@@ -25,13 +25,12 @@ from app.api import (
     voice,
     ws_voice,
     knowledge_base,
-    voice_sdk,
 )
 
 # Initialize Database
 init_db()
 
-# Pre-warm vector store (downloads BGE-M3 embeddings if needed)
+# Pre-warm vector store (downloads the shared embedding model if needed)
 logger.info("Pre-warming vector store...")
 try:
     from app.services.vector_store import get_vector_store
@@ -144,7 +143,16 @@ app.include_router(auth_routes.router, tags=["auth"])
 app.include_router(admin.router, prefix="/admin", tags=["admin"])
 app.include_router(knowledge_base.router, prefix="/admin", tags=["kb"])
 app.include_router(voice.router, prefix="/voice", tags=["voice"])
-app.include_router(voice_sdk.router, prefix="/sdk", tags=["sarvam-sdk"])
+
+# Sarvam Agents SDK bridge is a DEV/TEST channel ONLY. Production voice uses
+# Sarvam Inbound Deployment -> Agent Runtime -> HTTP tool -> /qa/query.
+if settings.sarvam_sdk_enabled:
+    from app.api import voice_sdk
+
+    app.include_router(voice_sdk.router, prefix="/sdk", tags=["sarvam-sdk"])
+    logger.info("Sarvam SDK bridge enabled (SARVAM_SDK_ENABLED=true) — /sdk mounted")
+else:
+    logger.info("Sarvam SDK bridge disabled (dev-only channel) — /sdk not mounted")
 
 # Serve Frontend Static Files (if they exist)
 # Check multiple possible locations to support both Local and Docker/Railway
@@ -188,12 +196,18 @@ if __name__ == "__main__":
 
 
 # ---------------------------------------------------------------------------
-# Shutdown hook — always tear down Sarvam SDK bridge sessions cleanly.
+# Shutdown hook — tear down Sarvam SDK bridge sessions cleanly (dev channel).
+# Guarded: never blocks production shutdown if the SDK is disabled or absent.
 # ---------------------------------------------------------------------------
 @app.on_event("shutdown")
 async def shutdown_sarvam_sdk_bridge():
-    from app.services.sarvam_sdk import get_sarvam_sdk_service
+    if not settings.sarvam_sdk_enabled:
+        return
+    try:
+        from app.services.sarvam_sdk import get_sarvam_sdk_service
 
-    service = get_sarvam_sdk_service()
-    logger.info("Shutting down Sarvam SDK bridge...")
-    await service.stop_all()
+        service = get_sarvam_sdk_service()
+        logger.info("Shutting down Sarvam SDK bridge...")
+        await service.stop_all()
+    except Exception as e:  # noqa: BLE001
+        logger.warning("Sarvam SDK shutdown hook skipped: %s", e)

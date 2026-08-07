@@ -1,0 +1,232 @@
+{
+  "id": "BENCH_V21_000033",
+  "domain": "hostel",
+  "difficulty": 4,
+  "primary_language": "bn",
+  "languages": ["bn", "en"],
+  "speaker_profile": "parent",
+  "features": ["language_switch"],
+  "ground_truth": {
+    "rank": 25000,
+    "pcm_percentage": 75,
+    "category": "obc",
+    "interest": "IT",
+    "board": "wbchse",
+    "exam": "wbjee",
+    "budget": null,
+    "location": "siliguri"
+  },
+  "turns": [
+    {
+      "student": "Ami jannte chai ki apnader hostel e kemon accomodation ache? Room gula kemon?",
+      "expected": {
+        "understanding": {
+          "intent": "hostel",
+          "facts": {},
+          "inference": {
+            "parent_mode": true,
+            "language_switch": true
+          },
+          "confidence": "high",
+          "missing": ["rank", "pcm_percentage", "category", "interest"]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.0,
+          "confidence": "high",
+          "current_problem": "needs_hostel_info",
+          "problems": ["needs_hostel_info"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_hostel_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Parent asking about hostel in Bengali",
+            "Need to provide hostel info and collect academic details"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": ["hostel", "room", "accommodation"]
+            },
+            {
+              "action": "ask",
+              "content_contains": ["rank", "exam", "branch"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_hostel_info", "Bengali_input", "Parent_mode"]
+        }
+      },
+      "must_not": [
+        "respond_in_english_only",
+        "recommend_branch"
+      ],
+      "ideal_counselor_notes": "Parent asking in Bengali about hostel rooms. Acknowledge Bengali query and ask for student details to provide personalized info."
+    },
+    {
+      "student": "My son got 25000 rank in WBJEE, PCM 75%. He wants IT. OBC category. I want to know about hostel rooms and facilities.",
+      "expected": {
+        "understanding": {
+          "intent": "hostel",
+          "facts": {
+            "rank": 25000,
+            "pcm_percentage": 75,
+            "category": "obc",
+            "interest": "IT",
+            "board": "wbchse",
+            "exam": "wbjee"
+          },
+          "inference": {
+            "parent_mode": true,
+            "language_switch": true
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "needs_hostel_info",
+          "problems": ["needs_hostel_info"]
+        },
+        "brain": {
+          "eligible_branches": ["IT", "ECE", "EE", "ME", "CE"],
+          "applicable": true,
+          "why": [
+            {
+              "condition": "rank_provided",
+              "met": true,
+              "detail": "Rank=25000"
+            },
+            {
+              "condition": "category_known",
+              "met": true,
+              "detail": "OBC"
+            },
+            {
+              "condition": "rank_within_margin",
+              "met": true,
+              "detail": "25000 < 35000*0.85=29750 for IT/OBC"
+            }
+          ]
+        },
+        "decision": {
+          "action": "provide_hostel_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Parent switched to English with full profile",
+            "Can provide hostel room details and confirm IT eligibility"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": ["rooms", "shared", "hostel"]
+            },
+            {
+              "action": "recommend",
+              "content_contains": ["IT", "eligible", "rank"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_hostel_info", "Language_switch", "Profile_complete"]
+        }
+      },
+      "must_not": [
+        "ignore_language_switch",
+        "guarantee_hostel_seat"
+      ],
+      "ideal_counselor_notes": "Parent switched to English and provided full academic profile. Provide hostel room info and confirm IT eligibility at rank 25000 OBC."
+    },
+    {
+      "student": "You mentioned rooms are shared. Is there an option for 2-person sharing? Also what about internet and WiFi facilities in the hostel?",
+      "expected": {
+        "understanding": {
+          "intent": "hostel",
+          "facts": {},
+          "inference": {},
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "needs_hostel_info",
+          "problems": ["needs_hostel_info"]
+        },
+        "brain": {
+          "eligible_branches": ["IT", "ECE", "EE", "ME", "CE"],
+          "applicable": true,
+          "why": [
+            {
+              "condition": "rank_provided",
+              "met": true,
+              "detail": "Rank=25000"
+            },
+            {
+              "condition": "category_known",
+              "met": true,
+              "detail": "OBC"
+            }
+          ]
+        },
+        "decision": {
+          "action": "provide_hostel_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Follow-up referencing earlier room info",
+            "Specific question about room sharing and internet facilities"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "clarify",
+              "content_contains": ["2-person", "sharing", "room options"]
+            },
+            {
+              "action": "inform",
+              "content_contains": ["WiFi", "internet", "facilities"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_hostel_info", "Follow_up_reference", "Room_details"]
+        }
+      },
+      "must_not": [
+        "guarantee_2person_room",
+        "hallucinate_internet_speed"
+      ],
+      "ideal_counselor_notes": "Parent asks follow-up about room sharing and internet. Provide info about room sharing options and internet facilities. Conversation covers hostel comprehensively."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "Bengali-speaking parent asks about hostel, switches to English. Follow-up references earlier room info. Tests language handling and follow-up reference tracking.",
+  "author_note": {
+    "primary_capability": "multilingual hostel query with follow-up reference",
+    "expected_failure_mode": "language — might not handle Bengali correctly, or might lose context of earlier room info in follow-up",
+    "why_this_conversation": "Tests Bengali-to-English language switch in hostel context. Parent provides profile after initial Bengali query, then follows up referencing earlier room info."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

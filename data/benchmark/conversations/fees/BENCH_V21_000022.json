@@ -1,0 +1,200 @@
+{
+  "id": "BENCH_V21_000022",
+  "domain": "fees",
+  "difficulty": 2,
+  "primary_language": "hi",
+  "languages": ["hi"],
+  "speaker_profile": "student",
+  "features": [],
+  "ground_truth": {
+    "rank": 30000,
+    "pcm_percentage": 72,
+    "category": "obc",
+    "interest": "IT",
+    "board": "cbse",
+    "exam": "jee",
+    "budget": 200000,
+    "location": "kolkata"
+  },
+  "turns": [
+    {
+      "student": "Mujhe IT branch ka fee structure chahiye. Mera JEE rank 30000 hai aur PCM mein 72% hai.",
+      "expected": {
+        "understanding": {
+          "intent": "fee",
+          "facts": {
+            "rank": 30000,
+            "pcm_percentage": 72,
+            "interest": "IT",
+            "exam": "jee"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": ["category", "budget"]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.43,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": ["needs_fee_information", "needs_profile_completion"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_fee_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Direct fee query for IT branch in Hindi",
+            "Rank and PCM provided, can give general fee range"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": ["fee", "IT", "range"]
+            },
+            {
+              "action": "ask",
+              "content_contains": ["category", "budget"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_fee_info", "Student_asks_fees"]
+        }
+      },
+      "must_not": [
+        "respond_in_english",
+        "recommend_branch",
+        "hallucinate_exact_fees"
+      ],
+      "ideal_counselor_notes": "Student asks about IT fee structure in Hindi. Provide fee range in Hindi and ask for category and budget."
+    },
+    {
+      "student": "Main OBC category se hoon. Budget lagbhag 2 lakh tak hai.",
+      "expected": {
+        "understanding": {
+          "intent": "fee",
+          "facts": {
+            "category": "obc",
+            "budget": 200000
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.71,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": ["needs_fee_information"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_fee_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Category and budget now known",
+            "Can provide more targeted fee comparison within budget"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": ["category", "obc"]
+            },
+            {
+              "action": "inform",
+              "content_contains": ["fee", "budget", "2 lakh"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_fee_info", "Budget_known"]
+        }
+      },
+      "must_not": [
+        "respond_in_english",
+        "guarantee_fee_under_budget"
+      ],
+      "ideal_counselor_notes": "Student provides OBC category and budget of 2 lakh in Hindi. Confirm fee range and check if budget is sufficient."
+    },
+    {
+      "student": "Theek hai, aur agar scholarship milti hai to fee aur kam ho jayegi na?",
+      "expected": {
+        "understanding": {
+          "intent": "scholarship",
+          "facts": {},
+          "inference": {
+            "connected_to": "fee"
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.71,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": ["needs_fee_information"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_scholarship_info",
+          "priority": "normal",
+          "confidence": "high",
+          "why": [
+            "Natural follow-up from fee to scholarship in Hindi",
+            "Student connecting scholarship to fee reduction"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": ["scholarship", "fee", "reduction"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_scholarship_info", "Fee_to_scholarship"]
+        }
+      },
+      "must_not": [
+        "respond_in_english",
+        "guarantee_scholarship",
+        "hallucinate_scholarship_amount"
+      ],
+      "ideal_counselor_notes": "Student naturally transitions from fees to scholarship in Hindi. Provide scholarship eligibility info in Hindi."
+    }
+  ],
+  "expected_end_state": "incomplete",
+  "ideal_counselor_notes": "All-Hindi fee conversation. Student provides rank, PCM, category, budget. Natural transition to scholarship in turn 3. Tests Hindi comprehension and response throughout.",
+  "author_note": {
+    "primary_capability": "fee query entirely in Hindi",
+    "expected_failure_mode": "language — might respond in English instead of Hindi, or might not parse Hindi numbers ('2 lakh')",
+    "why_this_conversation": "All-Hindi conversation testing Hindi fee explanation. Student provides budget and category, then naturally asks about scholarship. Tests consistent Hindi usage."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

@@ -1,0 +1,476 @@
+{
+  "id": "BENCH_V21_000011",
+  "domain": "admission",
+  "difficulty": 4,
+  "primary_language": "en",
+  "languages": [
+    "en"
+  ],
+  "speaker_profile": "student",
+  "features": [
+    "correction",
+    "topic_switch"
+  ],
+  "ground_truth": {
+    "rank": 12000,
+    "pcm_percentage": 88,
+    "category": "obc",
+    "interest": "ECE",
+    "board": "cbse",
+    "exam": "wbjee",
+    "budget": null,
+    "location": "kolkata"
+  },
+  "turns": [
+    {
+      "student": "I got 12000 rank in WBJEE. Can you tell me about CSE admissions?",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {
+            "rank": 12000,
+            "exam": "wbjee",
+            "interest": "CSE"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": [
+            "pcm_percentage",
+            "category",
+            "board"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.29,
+          "confidence": "high",
+          "current_problem": "needs_profile_completion",
+          "problems": [
+            "needs_profile_completion"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "collect_profile",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Rank and interest known",
+            "Need PCM, category, board for eligibility"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "rank",
+                "CSE"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "PCM",
+                "category",
+                "board"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=collect_profile",
+            "Missing=pcm,category,board"
+          ]
+        }
+      },
+      "must_not": [
+        "recommend_branch",
+        "hallucinate_cutoff"
+      ],
+      "ideal_counselor_notes": "Rank 12000 with CSE interest. Need PCM, category, board before eligibility check."
+    },
+    {
+      "student": "My PCM is 88%, CBSE board. I am OBC category.",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {
+            "pcm_percentage": 88,
+            "board": "cbse",
+            "category": "obc"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "comparing_options",
+          "problems": []
+        },
+        "brain": {
+          "eligible_branches": [
+            "CSE",
+            "IT",
+            "ECE"
+          ],
+          "applicable": true,
+          "why": [
+            {
+              "condition": "Rank 12000 OBC — CSE cutoff typically ~15000",
+              "met": true,
+              "detail": "Rank 12000 OBC — CSE cutoff typically ~15000"
+            },
+            {
+              "condition": "ECE cutoff ~20000",
+              "met": true,
+              "detail": "ECE cutoff ~20000"
+            }
+          ]
+        },
+        "decision": {
+          "action": "recommend_branches",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Complete profile available",
+            "Multiple branches eligible"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "88%",
+                "CBSE",
+                "OBC"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "eligible",
+                "CSE",
+                "ECE",
+                "IT"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=recommend_branches",
+            "Profile_complete"
+          ]
+        }
+      },
+      "must_not": [
+        "hallucinate_exact_cutoff"
+      ],
+      "ideal_counselor_notes": "Profile complete. Recommend CSE, IT, ECE based on rank 12000 OBC."
+    },
+    {
+      "student": "Wait, actually I want ECE not CSE. Can you tell me about ECE?",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {
+            "interest": "ECE"
+          },
+          "inference": {
+            "interest_changed": true
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "comparing_options",
+          "problems": []
+        },
+        "brain": {
+          "eligible_branches": [
+            "ECE",
+            "IT"
+          ],
+          "applicable": true,
+          "why": [
+            {
+              "condition": "Rank 12000 OBC — ECE cutoff ~20000",
+              "met": true,
+              "detail": "Rank 12000 OBC — ECE cutoff ~20000"
+            }
+          ]
+        },
+        "decision": {
+          "action": "recommend_branches",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student corrected interest from CSE to ECE",
+            "ECE is well within eligibility"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "ECE"
+              ]
+            },
+            {
+              "action": "recommend",
+              "content_contains": [
+                "electronics",
+                "eligible",
+                "rank"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=recommend_branches",
+            "Interest_correction"
+          ]
+        }
+      },
+      "must_not": [
+        "recommend_CSE"
+      ],
+      "ideal_counselor_notes": "Student corrects interest from CSE to ECE. Acknowledge correction and provide ECE-specific guidance."
+    },
+    {
+      "student": "By the way, how are the hostel facilities there?",
+      "expected": {
+        "understanding": {
+          "intent": "hostel",
+          "facts": {},
+          "inference": {},
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "medium",
+          "current_problem": "needs_hostel_info",
+          "problems": [
+            "needs_hostel_info"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_hostel_info",
+          "priority": "normal",
+          "confidence": "high",
+          "why": [
+            "Student switched topic to hostel",
+            "Provide available hostel information"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "hostel",
+                "facilities",
+                "accommodation"
+              ]
+            },
+            {
+              "action": "recommend",
+              "content_contains": [
+                "hostel facilities",
+                "visit",
+                "rooms"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_hostel_info",
+            "Topic_switch"
+          ]
+        }
+      },
+      "must_not": [
+        "recommend_branch"
+      ],
+      "ideal_counselor_notes": "Topic switch from admission to hostel. Provide hostel info and keep profile in memory for later."
+    },
+    {
+      "student": "Ok sounds good. Coming back to ECE, what is the expected cutoff for OBC?",
+      "expected": {
+        "understanding": {
+          "intent": "cutoff",
+          "facts": {},
+          "inference": {},
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance",
+          "problems": [
+            "needs_cutoff_information"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [
+            "ECE"
+          ],
+          "applicable": true,
+          "why": [
+            {
+              "condition": "Returning to ECE discussion",
+              "met": true,
+              "detail": "Returning to ECE discussion"
+            }
+          ]
+        },
+        "decision": {
+          "action": "provide_cutoff_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student returned to ECE topic",
+            "Asking specifically about OBC cutoff"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "cutoff",
+                "ECE",
+                "OBC",
+                "rank"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "need",
+                "additional",
+                "information"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_cutoff_info",
+            "Topic_return"
+          ]
+        }
+      },
+      "must_not": [
+        "recommend_CSE"
+      ],
+      "ideal_counselor_notes": "Student returns to ECE after hostel detour. Provide ECE OBC cutoff and confirm eligibility."
+    },
+    {
+      "student": "Thank you! So ECE at 12000 rank OBC looks safe?",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {},
+          "inference": {
+            "confirmation_request": true
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "comparing_options",
+          "problems": []
+        },
+        "brain": {
+          "eligible_branches": [
+            "ECE"
+          ],
+          "applicable": true,
+          "why": [
+            {
+              "condition": "Student seeking confirmation",
+              "met": true,
+              "detail": "Student seeking confirmation"
+            }
+          ]
+        },
+        "decision": {
+          "action": "recommend_branches",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Confirmation request",
+            "ECE safe at 12000 OBC"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "safe"
+              ]
+            },
+            {
+              "action": "reassure",
+              "content_contains": [
+                "safe option",
+                "ECE",
+                "12000",
+                "OBC"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=recommend_branches",
+            "Confirmation"
+          ]
+        }
+      },
+      "must_not": [
+        "guarantee_admission"
+      ],
+      "ideal_counselor_notes": "Final confirmation turn. Reassure about ECE eligibility and provide closing guidance."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "6-turn conversation with correction (CSE→ECE), topic switch (hostel detour), and return to main topic. Tests multi-context retention and correction handling.",
+  "author_note": {
+    "primary_capability": "correction handling + topic switch + multi-context retention",
+    "expected_failure_mode": "correction — might not update interest when student says 'I want ECE not CSE'",
+    "why_this_conversation": "Tests correction (turn 3: CSE→ECE), topic switch (turn 4: hostel), topic return (turn 5: ECE cutoff), and confirmation (turn 6). Requires memory to retain profile across topic switches."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

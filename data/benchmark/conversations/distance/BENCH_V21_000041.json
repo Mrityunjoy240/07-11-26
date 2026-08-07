@@ -1,0 +1,140 @@
+{
+  "id": "BENCH_V21_000041",
+  "domain": "distance",
+  "difficulty": 3,
+  "primary_language": "hi",
+  "languages": ["hi"],
+  "speaker_profile": "student",
+  "features": [],
+  "ground_truth": {
+    "rank": null,
+    "pcm_percentage": 60,
+    "category": "obc",
+    "interest": "CSE",
+    "board": "state",
+    "exam": "",
+    "budget": 150000,
+    "location": "kolkata"
+  },
+  "turns": [
+    {
+      "student": "Mujhe distance education se B.Tech CSE karna hai. Kya aapke college mein ye available hai?",
+      "expected": {
+        "understanding": {
+          "intent": "distance_education",
+          "facts": {"interest": "CSE"},
+          "inference": {},
+          "confidence": "high",
+          "missing": ["rank", "pcm_percentage", "category", "board", "budget", "location"]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.14,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance",
+          "problems": ["needs_admission_guidance"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_program_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student asking about distance B.Tech CSE in Hindi",
+            "Need to explain available distance programs and eligibility"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": ["distance education", "B.Tech CSE"]
+            },
+            {
+              "action": "ask",
+              "content_contains": ["percentage", "category", "budget"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_program_info", "Student_asks_distance"]
+        }
+      },
+      "must_not": ["guarantee_admission", "ignore_accreditation"],
+      "ideal_counselor_notes": "Student asking about distance B.Tech CSE in Hindi. Explain available distance programs and ask for academic details."
+    },
+    {
+      "student": "Mera PCM 60% hai, OBC category, state board se. Kolkata mein rehta hoon. Budget around 1.5 lakh hai. Kya options milenge?",
+      "expected": {
+        "understanding": {
+          "intent": "distance_education",
+          "facts": {
+            "pcm_percentage": 60,
+            "category": "obc",
+            "board": "state",
+            "location": "kolkata",
+            "budget": 150000
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance",
+          "problems": ["needs_admission_guidance"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_program_info",
+          "priority": "high",
+          "confidence": "medium",
+          "why": [
+            "All key profile info available for distance education guidance",
+            "Can recommend specific programs within 1.5 lakh budget"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": ["CSE programs", "distance universities"]
+            },
+            {
+              "action": "recommend",
+              "content_contains": ["accredited options", "fee structure", "eligibility"]
+            }
+          ],
+          "confidence": "medium",
+          "dependency_chain": ["Decision=provide_program_info", "Profile_sufficient"]
+        }
+      },
+      "must_not": ["recommend_unaccredited", "ignore_budget"],
+      "ideal_counselor_notes": "Student provided full profile. Recommend accredited distance universities for CSE within 1.5 lakh budget."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "Two-turn Hindi conversation about distance B.Tech CSE. Profile builds from interest only to near-complete across turns. Budget and location help narrow university options.",
+  "author_note": {
+    "primary_capability": "distance education guidance in Hindi with profile collection",
+    "expected_failure_mode": "multilingual — might respond in English instead of matching Hindi",
+    "why_this_conversation": "Tests distance education guidance in Hindi. Turn 1 extracts interest from natural Hindi query. Turn 2 tests multi-field extraction from a single Hindi statement."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

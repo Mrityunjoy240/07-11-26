@@ -7,6 +7,8 @@ from src.understanding.interpreter import DomainInterpretation as DomainInterpre
 
 # Import StudentProfile but keep it optional — it's set during pipeline run
 from src.understanding.profile import StudentProfile as StudentProfile, compute_missing
+from src.understanding.signals.conversation import StructuredSignals as StructuredSignals
+from src.understanding.signals.interaction import SignalInteraction as SignalInteraction
 
 
 @dataclass
@@ -88,6 +90,10 @@ class UnderstandingResult:
     intent: UnderstandingIntent = field(default_factory=UnderstandingIntent)
     profile: StudentProfile = field(default_factory=StudentProfile)
     signals: ConversationSignals = field(default_factory=ConversationSignals)
+    structured_signals: StructuredSignals = field(default_factory=StructuredSignals)
+    signal_interaction: SignalInteraction = field(default_factory=lambda: SignalInteraction(
+        overlap_tags=(), primary_dimension="none", confidence_ranking=(),
+    ))
     missing_info: MissingInformation = field(default_factory=MissingInformation)
     references_previous: bool = False
     confidence: float = 0.0

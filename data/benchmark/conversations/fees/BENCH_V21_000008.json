@@ -1,0 +1,249 @@
+{
+  "id": "BENCH_V21_000008",
+  "domain": "fees",
+  "difficulty": 2,
+  "primary_language": "en",
+  "languages": [
+    "en"
+  ],
+  "speaker_profile": "student",
+  "features": [],
+  "ground_truth": {
+    "rank": null,
+    "pcm_percentage": 82,
+    "category": "",
+    "interest": "CSE",
+    "board": "",
+    "exam": "",
+    "budget": null,
+    "location": ""
+  },
+  "turns": [
+    {
+      "student": "What is the fee for CSE? I have 82% in PCM.",
+      "expected": {
+        "understanding": {
+          "intent": "fee",
+          "facts": {
+            "pcm_percentage": 82,
+            "interest": "CSE"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": [
+            "category",
+            "budget"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.29,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": [
+            "needs_fee_information"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_fee_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student explicitly asking about CSE fees",
+            "Can provide general fee range without full profile"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "fees",
+                "CSE",
+                "range"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "category",
+                "budget"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_fee_info",
+            "Student_asks_fees"
+          ]
+        }
+      },
+      "must_not": [
+        "recommend_branch",
+        "hallucinate_exact_fees"
+      ],
+      "ideal_counselor_notes": "Student asks about CSE fees with partial profile. Provide fee range and ask for category for more specific info."
+    },
+    {
+      "student": "I am general category. Is there any scholarship available?",
+      "expected": {
+        "understanding": {
+          "intent": "scholarship",
+          "facts": {
+            "category": "general"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": [
+            "rank"
+          ]
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.43,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": [
+            "needs_fee_information"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_scholarship_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student asked about scholarships after fee query",
+            "Can provide general scholarship info"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "category",
+                "general"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "scholarship",
+                "merit",
+                "eligibility"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "rank",
+                "WBJEE"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_scholarship_info",
+            "Also_needs_rank"
+          ]
+        }
+      },
+      "must_not": [
+        "guarantee_scholarship",
+        "hallucinate_scholarship_amount"
+      ],
+      "ideal_counselor_notes": "Student shifts from fees to scholarship. Provide scholarship eligibility info and continue collecting rank."
+    },
+    {
+      "student": "I have 82% in PCM, general category, budget 200000.",
+      "expected": {
+        "understanding": {
+          "intent": "fee",
+          "facts": {
+            "pcm_percentage": 82,
+            "category": "general",
+            "budget": 200000
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "decision",
+          "profile_completeness": 0.57,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": []
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_fee_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Budget now known, can compare against CSE fee range",
+            "General category with 82% PCM may qualify for merit-based scholarship"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "PCM",
+                "general",
+                "budget"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "CSE fee",
+                "scholarship eligibility"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_fee_info",
+            "Budget_known"
+          ]
+        }
+      },
+      "must_not": [
+        "recommend_branch",
+        "hallucinate_exact_fees"
+      ],
+      "ideal_counselor_notes": "Student provides budget and confirms category. Provide specific CSE fee range and mention scholarship eligibility based on 82% PCM and general category."
+    }
+  ],
+  "expected_end_state": "incomplete",
+  "ideal_counselor_notes": "Fee query followed by scholarship question then budget reveal. Profile built across turns. Budget enables fee feasibility assessment.",
+  "author_note": {
+    "primary_capability": "fee information with budget assessment",
+    "expected_failure_mode": "retrieval — might give exact fees when only ranges are available in KB",
+    "why_this_conversation": "Tests fee query with partial profile building to full profile. Turn 2 shifts to scholarship, turn 3 provides budget enabling specific fee guidance and scholarship eligibility."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

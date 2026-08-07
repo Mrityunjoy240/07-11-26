@@ -251,8 +251,10 @@ def _unicode_normalize(text: str) -> str:
 # ---------------------------------------------------------------------------
 def _clean_punctuation(text: str) -> str:
     text = re.sub(r"[()\[\]{}<>]", " ", text)
-    text = re.sub(r"[,@\"#$%^&*+=\\|:;~`?!-]", " ", text)
-    text = re.sub(r"\s*\.\s*", " ", text)
+    text = re.sub(r"[@\"#$%^&*+=|:;~`?!]", " ", text)
+    # Preserve decimal points and digit-grouping commas (4.5, 92.5, 6,17,700),
+    # drop sentence punctuation and any other dot/comma.
+    text = re.sub(r"(?<!\d)[.,](?!\d)", " ", text)
     return text
 
 

@@ -1,0 +1,251 @@
+{
+  "id": "BENCH_V21_000017",
+  "domain": "admission",
+  "difficulty": 2,
+  "primary_language": "en",
+  "languages": [
+    "en"
+  ],
+  "speaker_profile": "student",
+  "features": [],
+  "ground_truth": {
+    "rank": null,
+    "pcm_percentage": null,
+    "category": "",
+    "interest": "CSE",
+    "board": "",
+    "exam": "",
+    "budget": null,
+    "location": ""
+  },
+  "turns": [
+    {
+      "student": "What documents do I need for admission?",
+      "expected": {
+        "understanding": {
+          "intent": "document",
+          "facts": {},
+          "inference": {},
+          "confidence": "high",
+          "missing": [
+            "rank",
+            "category",
+            "interest"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.0,
+          "confidence": "high",
+          "current_problem": "general_inquiry",
+          "problems": [
+            "needs_document_info"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_program_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Document query — provide standard admission document list"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "documents",
+                "admission"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "the documents",
+                "marksheets",
+                "certificate"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_program_info",
+            "Document_query"
+          ]
+        }
+      },
+      "must_not": [
+        "hallucinate_specific_documents"
+      ],
+      "ideal_counselor_notes": "Document query. Provide standard admission document list."
+    },
+    {
+      "student": "I have my 10th and 12th marksheets. Is that enough? I want to apply for CSE.",
+      "expected": {
+        "understanding": {
+          "intent": "document",
+          "facts": {
+            "interest": "CSE"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": [
+            "rank",
+            "category",
+            "pcm_percentage"
+          ]
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.14,
+          "confidence": "high",
+          "current_problem": "general_inquiry",
+          "problems": [
+            "needs_document_info"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_program_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student confirming document checklist",
+            "CSE interest noted"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "10th",
+                "12th",
+                "CSE"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "marksheets",
+                "transfer",
+                "migration",
+                "category certificate"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "rank",
+                "category"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_program_info",
+            "Document_checklist"
+          ]
+        }
+      },
+      "must_not": [
+        "guarantee_admission"
+      ],
+      "ideal_counselor_notes": "Follow-up on document list. Provide complete checklist and ask about profile for CSE guidance."
+    },
+    {
+      "student": "I am general category. I have not appeared for WBJEE yet. Can I still apply?",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {
+            "category": "general"
+          },
+          "inference": {
+            "no_exam_yet": true
+          },
+          "confidence": "high",
+          "missing": [
+            "rank"
+          ]
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.29,
+          "confidence": "medium",
+          "current_problem": "needs_admission_guidance",
+          "problems": [
+            "future_planning"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_admission_guidance",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "No exam yet — provide guidance on admission process and timeline"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "general",
+                "not appeared"
+              ]
+            },
+            {
+              "action": "recommend",
+              "content_contains": [
+                "process",
+                "timeline",
+                "WBJEE",
+                "apply"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_admission_guidance",
+            "Future_student"
+          ]
+        }
+      },
+      "must_not": [
+        "hallucinate_cutoff"
+      ],
+      "ideal_counselor_notes": "Future student asking about application process. Provide timeline and preparation guidance."
+    }
+  ],
+  "expected_end_state": "incomplete",
+  "ideal_counselor_notes": "3-turn document query. Tests document info retrieval and transitions to future student scenario.",
+  "author_note": {
+    "primary_capability": "document information retrieval",
+    "expected_failure_mode": "retrieval — might miss some required documents or hallucinate specific requirements",
+    "why_this_conversation": "Tests document intent (new to v2.1). Turn 1: document query. Turn 2: checklist confirmation. Turn 3: future student scenario."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

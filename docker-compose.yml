@@ -20,14 +20,14 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_DB: bcrec
-      POSTGRES_USER: bcrec
-      POSTGRES_PASSWORD: bcrec_dev
+      POSTGRES_DB: ${POSTGRES_DB:-bcrec}
+      POSTGRES_USER: ${POSTGRES_USER:-bcrec}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-bcrec_dev}
     volumes:
       - postgres-data:/var/lib/postgresql/data
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U bcrec"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-bcrec}"]
       interval: 5s
       timeout: 3s
       retries: 5

@@ -1,0 +1,269 @@
+{
+  "id": "BENCH_V21_000014",
+  "domain": "admission",
+  "difficulty": 3,
+  "primary_language": "bn",
+  "languages": [
+    "bn",
+    "en"
+  ],
+  "speaker_profile": "student",
+  "features": [
+    "language_switch"
+  ],
+  "ground_truth": {
+    "rank": 18000,
+    "pcm_percentage": 78,
+    "category": "general",
+    "interest": "ECE",
+    "board": "wbchse",
+    "exam": "wbjee",
+    "budget": null,
+    "location": "siliguri"
+  },
+  "turns": [
+    {
+      "student": "WBJEE te amar rank 18000. ECE te ki chances ache? Ami general category.",
+      "expected": {
+        "understanding": {
+          "intent": "cutoff",
+          "facts": {
+            "rank": 18000,
+            "category": "general",
+            "interest": "ECE",
+            "exam": "wbjee"
+          },
+          "inference": {},
+          "confidence": "medium",
+          "missing": [
+            "pcm_percentage",
+            "board"
+          ]
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.43,
+          "confidence": "medium",
+          "current_problem": "needs_admission_guidance",
+          "problems": []
+        },
+        "brain": {
+          "eligible_branches": [
+            "ECE"
+          ],
+          "applicable": true,
+          "why": [
+            {
+              "condition": "Rank 18000 General — ECE cutoff ~20000",
+              "met": true,
+              "detail": "Rank 18000 General — ECE cutoff ~20000"
+            }
+          ]
+        },
+        "decision": {
+          "action": "provide_cutoff_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Have rank, category, interest",
+            "Can provide ECE cutoff info"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "18000",
+                "ECE",
+                "general"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "cutoff",
+                "electronics",
+                "the general",
+                "the 18000"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_cutoff_info",
+            "Profile_sufficient"
+          ]
+        }
+      },
+      "must_not": [
+        "hallucinate_cutoff"
+      ],
+      "ideal_counselor_notes": "Bengali cutoff query. Have rank, category, interest. Provide ECE general cutoff range."
+    },
+    {
+      "student": "Can you also tell me about IT cutoff? I am confused between ECE and IT.",
+      "expected": {
+        "understanding": {
+          "intent": "cutoff",
+          "facts": {
+            "interest": "IT"
+          },
+          "inference": {
+            "interest_expanded": true,
+            "language_switch_detected": true
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.43,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance",
+          "problems": []
+        },
+        "brain": {
+          "eligible_branches": [
+            "ECE",
+            "IT"
+          ],
+          "applicable": true,
+          "why": [
+            {
+              "condition": "Both ECE and IT at rank 18000 General",
+              "met": true,
+              "detail": "Both ECE and IT at rank 18000 General"
+            }
+          ]
+        },
+        "decision": {
+          "action": "provide_cutoff_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student confused between ECE and IT",
+            "Provide comparison"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "IT",
+                "confused"
+              ]
+            },
+            {
+              "action": "recommend",
+              "content_contains": [
+                "ECE",
+                "IT branch",
+                "compare",
+                "cutoff"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_cutoff_info",
+            "Comparison_request"
+          ]
+        }
+      },
+      "must_not": [
+        "recommend_branch"
+      ],
+      "ideal_counselor_notes": "Language switch to English. Compare ECE and IT cutoffs and provide guidance on choosing."
+    },
+    {
+      "student": "Dhonnobad! ECE niye apply korbo.",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {
+            "interest": "ECE"
+          },
+          "inference": {
+            "decision_made": true
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.43,
+          "confidence": "high",
+          "current_problem": "general_inquiry",
+          "problems": []
+        },
+        "brain": {
+          "eligible_branches": [
+            "ECE"
+          ],
+          "applicable": true,
+          "why": [
+            {
+              "condition": "Student decided on ECE",
+              "met": true,
+              "detail": "Student decided on ECE"
+            }
+          ]
+        },
+        "decision": {
+          "action": "reassure",
+          "priority": "normal",
+          "confidence": "high",
+          "why": [
+            "Student made decision",
+            "Close with encouragement"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "ECE",
+                "apply"
+              ]
+            },
+            {
+              "action": "reassure",
+              "content_contains": [
+                "good",
+                "electronics",
+                "all the best"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=reassure",
+            "Conversation_close"
+          ]
+        }
+      },
+      "must_not": [
+        "pressure_decision"
+      ],
+      "ideal_counselor_notes": "Bengali closing. Student decided on ECE. Reassure and wish well."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "3-turn cutoff conversation with language switch (Bengali → English → Bengali). Tests multilingual understanding and cutoff comparison.",
+  "author_note": {
+    "primary_capability": "cutoff information + language_switch + multilingual comparison",
+    "expected_failure_mode": "multilingual — might not parse Bengali cutoff query or miss interest expansion",
+    "why_this_conversation": "Tests language_switch feature: Bengali opener, English middle, Bengali closer. Cutoff comparison for ECE vs IT."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

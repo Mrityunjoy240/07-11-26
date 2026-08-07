@@ -1,0 +1,190 @@
+{
+  "id": "BENCH_V21_000046",
+  "domain": "admission",
+  "difficulty": 3,
+  "primary_language": "hi",
+  "languages": ["hi", "en"],
+  "speaker_profile": "student",
+  "features": ["language_switch"],
+  "ground_truth": {
+    "rank": null,
+    "pcm_percentage": 80,
+    "category": "general",
+    "interest": "CSE",
+    "board": "cbse",
+    "exam": "",
+    "budget": null,
+    "location": "patna"
+  },
+  "turns": [
+    {
+      "student": "Campus safety ke baare mein jaanna hai. Kya aapke college mein safe hai? Ladkiyon ke liye kya arrangements hain?",
+      "expected": {
+        "understanding": {
+          "intent": "safety",
+          "facts": {},
+          "inference": {},
+          "confidence": "high",
+          "missing": ["rank", "pcm_percentage", "category", "interest", "board"]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.0,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance",
+          "problems": ["needs_admission_guidance"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_program_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student asking about campus safety in Hindi",
+            "Safety is important concern — address before collecting profile"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "reassure",
+              "content_contains": ["campus safety", "security"]
+            },
+            {
+              "action": "ask",
+              "content_contains": ["academic details", "interest"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_program_info", "Safety_query"]
+        }
+      },
+      "must_not": ["dismiss_concern", "give_vague_answer"],
+      "ideal_counselor_notes": "Student asking about campus safety in Hindi, specifically for women. Address safety concern first, then ask for academic profile."
+    },
+    {
+      "student": "Mujhe CSE mein admission lena hai. PCM 80% hai, CBSE board, general category. Patna se hoon. Safety ke baare mein batao please.",
+      "expected": {
+        "understanding": {
+          "intent": "safety",
+          "facts": {
+            "pcm_percentage": 80,
+            "board": "cbse",
+            "category": "general",
+            "interest": "CSE",
+            "location": "patna"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": ["rank"]
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.71,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance",
+          "problems": ["needs_admission_guidance"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_program_info",
+          "priority": "high",
+          "confidence": "medium",
+          "why": [
+            "Student provided academic profile while still asking about safety",
+            "Need to address both safety and admission interest"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": ["CSE admission", "Patna student", "profile"]
+            },
+            {
+              "action": "ask",
+              "content_contains": ["safety concerns", "hostel preference"]
+            }
+          ],
+          "confidence": "medium",
+          "dependency_chain": ["Decision=provide_program_info", "Hindi_query", "Profile_partial"]
+        }
+      },
+      "must_not": ["respond_english_only", "ignore_safety_query"],
+      "ideal_counselor_notes": "Student provided academic profile in Hindi while still asking about safety. Continue in Hindi, acknowledge the profile, and probe specific safety concerns."
+    },
+    {
+      "student": "I am actually concerned about the hostel security and anti-ragging measures. Can you tell me about those in detail? Also, what are the CSE placement statistics?",
+      "expected": {
+        "understanding": {
+          "intent": "safety",
+          "facts": {},
+          "inference": {"language_switch": true},
+          "confidence": "high",
+          "missing": ["rank"]
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.71,
+          "confidence": "high",
+          "current_problem": "needs_hostel_info",
+          "problems": ["needs_hostel_info", "needs_placement_data"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_program_info",
+          "priority": "high",
+          "confidence": "medium",
+          "why": [
+            "Student switched to English with specific safety and placement questions",
+            "Must address hostel security, anti-ragging, and placement queries",
+            "Language switch detected — can respond in English"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": ["hostel security", "anti-ragging"]
+            },
+            {
+              "action": "inform",
+              "content_contains": ["security measures", "placement statistics", "CSE"]
+            }
+          ],
+          "confidence": "medium",
+          "dependency_chain": ["Decision=provide_program_info", "Language_switch", "Multi_query"]
+        }
+      },
+      "must_not": ["ignore_language_switch", "give_incomplete_answer"],
+      "ideal_counselor_notes": "Student switched to English with specific questions about hostel security, anti-ragging, and CSE placements. Address all three concerns comprehensively."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "Student asks about campus safety in Hindi, provides academic profile, then switches to English for detailed safety and placement queries. Key challenge: handling language switch while maintaining context and addressing multiple concerns.",
+  "author_note": {
+    "primary_capability": "safety guidance with Hindi-to-English language switch",
+    "expected_failure_mode": "language_switch — might not handle Hindi input correctly or might switch language prematurely",
+    "why_this_conversation": "Tests campus safety guidance with language switching. Student starts in Hindi, provides profile in Hindi, then switches to English for detailed queries. The system must handle the transition smoothly."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

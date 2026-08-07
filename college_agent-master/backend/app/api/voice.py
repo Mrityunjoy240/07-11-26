@@ -6,6 +6,7 @@ import uuid
 
 from fastapi import (
     APIRouter,
+    Depends,
     HTTPException,
     Request,
     Response,
@@ -19,6 +20,7 @@ except ImportError:
     import audioop_lts as audioop
 from livekit import api, rtc
 
+from app.api.qa import require_tool_auth
 from app.services.livekit_session import get_livekit_service
 from app.services.telephony.twilio_service import get_twilio_service
 
@@ -36,7 +38,7 @@ class OutboundCallRequest(BaseModel):
     base_url: str
 
 
-@router.post("/token")
+@router.post("/token", dependencies=[Depends(require_tool_auth)])
 async def get_token(request: TokenRequest):
     lk = get_livekit_service()
     if not lk.is_available():
@@ -51,7 +53,7 @@ async def get_token(request: TokenRequest):
     return {"token": token, "identity": identity, "server_url": lk.url}
 
 
-@router.post("/call-me")
+@router.post("/call-me", dependencies=[Depends(require_tool_auth)])
 async def call_me(request: OutboundCallRequest):
     twilio = get_twilio_service()
     # Pass phone number in query param to the webhook

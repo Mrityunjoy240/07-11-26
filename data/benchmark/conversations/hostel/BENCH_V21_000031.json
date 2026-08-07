@@ -1,0 +1,246 @@
+{
+  "id": "BENCH_V21_000031",
+  "domain": "hostel",
+  "difficulty": 2,
+  "primary_language": "en",
+  "languages": ["en"],
+  "speaker_profile": "student",
+  "features": [],
+  "ground_truth": {
+    "rank": 15000,
+    "pcm_percentage": 78,
+    "category": "general",
+    "interest": "CSE",
+    "board": "cbse",
+    "exam": "wbjee",
+    "budget": null,
+    "location": "kolkata"
+  },
+  "turns": [
+    {
+      "student": "I want to know about the hostel facilities. Is there accommodation for new students?",
+      "expected": {
+        "understanding": {
+          "intent": "hostel",
+          "facts": {},
+          "inference": {},
+          "confidence": "high",
+          "missing": ["rank", "pcm_percentage", "category", "interest", "board"]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.0,
+          "confidence": "high",
+          "current_problem": "needs_hostel_info",
+          "problems": ["needs_hostel_info"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_hostel_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student directly asking about hostel facilities",
+            "Can provide general hostel information without profile"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "reassure",
+              "content_contains": ["hostel", "available", "new students"]
+            },
+            {
+              "action": "ask",
+              "content_contains": ["rank", "exam", "branch"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_hostel_info", "Student_asks_hostel"]
+        }
+      },
+      "must_not": [
+        "recommend_branch",
+        "hallucinate_fee"
+      ],
+      "ideal_counselor_notes": "Open-ended hostel query. Acknowledge availability and ask for student details to personalize response."
+    },
+    {
+      "student": "I got 15000 rank in WBJEE. PCM is 78% from CBSE board. I want CSE.",
+      "expected": {
+        "understanding": {
+          "intent": "hostel",
+          "facts": {
+            "rank": 15000,
+            "pcm_percentage": 78,
+            "board": "cbse",
+            "exam": "wbjee",
+            "interest": "CSE"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": ["category"]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.57,
+          "confidence": "high",
+          "current_problem": "needs_hostel_info",
+          "problems": ["needs_hostel_info"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_hostel_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student provided academic details",
+            "Can now give hostel info relevant to admitted students"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": ["rank", "15000", "CSE"]
+            },
+            {
+              "action": "inform",
+              "content_contains": ["hostel", "rooms", "accommodation"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_hostel_info", "Profile_partially_known"]
+        }
+      },
+      "must_not": [
+        "recommend_branch",
+        "ignore_hostel_query"
+      ],
+      "ideal_counselor_notes": "Good profile info provided. Provide hostel room details and ask about category for more specific info."
+    },
+    {
+      "student": "What about the mess food? Is it vegetarian only or do they serve non-veg?",
+      "expected": {
+        "understanding": {
+          "intent": "hostel",
+          "facts": {},
+          "inference": {},
+          "confidence": "high",
+          "missing": ["category"]
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.57,
+          "confidence": "high",
+          "current_problem": "needs_hostel_info",
+          "problems": ["needs_hostel_info"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_hostel_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Specific follow-up about mess food",
+            "Natural extension of hostel inquiry"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": ["mess", "food", "variety"]
+            },
+            {
+              "action": "recommend",
+              "content_contains": ["menu", "quality", "non-veg"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_hostel_info", "Mess_query"]
+        }
+      },
+      "must_not": [
+        "guarantee_food_quality",
+        "hallucinate_menu"
+      ],
+      "ideal_counselor_notes": "Student asking about mess food options. Provide general information about mess facilities and food variety."
+    },
+    {
+      "student": "Are there single occupancy rooms or only shared rooms? What is the room fee?",
+      "expected": {
+        "understanding": {
+          "intent": "hostel",
+          "facts": {},
+          "inference": {},
+          "confidence": "high",
+          "missing": ["category"]
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.57,
+          "confidence": "high",
+          "current_problem": "needs_hostel_info",
+          "problems": ["needs_hostel_info"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_hostel_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Specific query about room types and fees",
+            "Can provide room type and fee range information"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "clarify",
+              "content_contains": ["single", "shared", "room types"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_hostel_info", "Room_type_query"]
+        }
+      },
+      "must_not": [
+        "guarantee_room_availability",
+        "hallucinate_exact_fees"
+      ],
+      "ideal_counselor_notes": "Student wants to know about room types and fees. Provide room options and general fee range. Conversation ends with hostel info covered."
+    }
+  ],
+  "expected_end_state": "incomplete",
+  "ideal_counselor_notes": "Golden hostel conversation. 4-turn flow covering accommodation, rooms, mess, and room types. Basic hostel info query without complex features.",
+  "author_note": {
+    "primary_capability": "hostel information retrieval across multiple sub-topics",
+    "expected_failure_mode": "retrieval — might give incorrect room types or hallucinate specific mess menu items",
+    "why_this_conversation": "Golden conversation for hostel domain. Tests basic hostel info retrieval across 4 turns covering rooms, mess, and facilities."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

@@ -1,0 +1,451 @@
+{
+  "id": "BENCH_V21_000050",
+  "domain": "sports",
+  "difficulty": 5,
+  "primary_language": "en",
+  "languages": ["en"],
+  "speaker_profile": "student",
+  "features": ["correction", "emotion"],
+  "ground_truth": {
+    "rank": 60000,
+    "pcm_percentage": 58,
+    "category": "general",
+    "interest": "CSE",
+    "board": "cbse",
+    "exam": "wbjee",
+    "budget": null,
+    "location": "kolkata"
+  },
+  "turns": [
+    {
+      "student": "I want to apply through sports quota. I am a state-level football player. Can I get admission? I am really worried about my future.",
+      "expected": {
+        "understanding": {
+          "intent": "sports_quota",
+          "facts": {},
+          "inference": {"anxiety": true},
+          "confidence": "high",
+          "missing": ["rank", "pcm_percentage", "category", "interest", "board"]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.0,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance",
+          "problems": ["needs_admission_guidance", "expressing_anxiety"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_program_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student anxious about admission through sports quota",
+            "State-level football achievement is relevant for sports admission"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "reassure",
+              "content_contains": ["sports quota", "state level"]
+            },
+            {
+              "action": "ask",
+              "content_contains": ["sport", "category", "academic details"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_program_info", "Student_anxious", "Sports_query"]
+        }
+      },
+      "must_not": ["guarantee_admission", "dismiss_anxiety"],
+      "ideal_counselor_notes": "Anxious student asking about sports quota for football. Reassure first, then ask for academic and sports details."
+    },
+    {
+      "student": "I am from Kolkata, CBSE board. My PCM is 58%. General category. I want CSE branch. Is sports quota available for CSE?",
+      "expected": {
+        "understanding": {
+          "intent": "sports_quota",
+          "facts": {
+            "pcm_percentage": 58,
+            "board": "cbse",
+            "category": "general",
+            "interest": "CSE",
+            "location": "kolkata"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": ["rank"]
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.71,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance",
+          "problems": ["needs_admission_guidance"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_program_info",
+          "priority": "high",
+          "confidence": "medium",
+          "why": [
+            "Good profile info with football state-level achievement",
+            "Need to explain sports quota process for CSE specifically"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": ["sports quota", "CSE", "Kolkata"]
+            },
+            {
+              "action": "ask",
+              "content_contains": ["football certificates", "WBJEE rank"]
+            }
+          ],
+          "confidence": "medium",
+          "dependency_chain": ["Decision=provide_program_info", "Profile_partial", "Football_state_level"]
+        }
+      },
+      "must_not": ["guarantee_branch", "ignore_academic_minimum"],
+      "ideal_counselor_notes": "Student provided academic profile with state-level football. Explain sports quota availability for CSE and ask for football certificates and rank details."
+    },
+    {
+      "student": "My WBJEE rank is 60000. I have state-level football certificates from Bihar state championship.",
+      "expected": {
+        "understanding": {
+          "intent": "sports_quota",
+          "facts": {"rank": 60000},
+          "inference": {},
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance",
+          "problems": ["needs_admission_guidance"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_program_info",
+          "priority": "high",
+          "confidence": "medium",
+          "why": [
+            "Rank 60000 provided with state-level football from Bihar",
+            "Need to verify football certificates from Bihar for Kolkata colleges"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": ["rank 60000", "Bihar championship"]
+            },
+            {
+              "action": "inform",
+              "content_contains": ["sports eligibility", "certificate verification", "football quota"]
+            }
+          ],
+          "confidence": "medium",
+          "dependency_chain": ["Decision=provide_program_info", "Profile_complete", "Bihar_certificates"]
+        }
+      },
+      "must_not": ["ignore_inter_state_certificate", "guarantee_seat"],
+      "ideal_counselor_notes": "Student provided rank and football certificates from Bihar. Note that inter-state certificates may have different verification process for Kolkata colleges."
+    },
+    {
+      "student": "Wait, I need to correct something important. I actually play cricket, not football. I said football by mistake. I have state-level cricket certificates from Bengal cricket association.",
+      "expected": {
+        "understanding": {
+          "intent": "sports_quota",
+          "facts": {},
+          "inference": {},
+          "confidence": "medium",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "medium",
+          "current_problem": "needs_admission_guidance",
+          "problems": ["needs_admission_guidance"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_program_info",
+          "priority": "high",
+          "confidence": "medium",
+          "why": [
+            "Student corrected sport from football to cricket",
+            "Cricket certificates from Bengal cricket association are more relevant for Kolkata colleges",
+            "Must reassess sports quota eligibility with corrected information"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "reassure",
+              "content_contains": ["correction", "no problem", "cricket"]
+            },
+            {
+              "action": "inform",
+              "content_contains": ["cricket quota", "Bengal association", "eligibility"]
+            }
+          ],
+          "confidence": "medium",
+          "dependency_chain": ["Decision=provide_program_info", "Sport_corrected", "Cricket_bengal"]
+        }
+      },
+      "must_not": ["blame_for_mistake", "ignore_correction", "carry_forward_football_info"],
+      "ideal_counselor_notes": "Student corrected sport from football to cricket. Cricket from Bengal cricket association is more relevant for Kolkata colleges. Handle correction gracefully and reassess."
+    },
+    {
+      "student": "Yes, I have certificates from Bengal Cricket Association. State-level under-19 cricket. Is this accepted for sports quota in engineering colleges?",
+      "expected": {
+        "understanding": {
+          "intent": "sports_quota",
+          "facts": {},
+          "inference": {},
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance",
+          "problems": ["needs_admission_guidance"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_program_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "State-level under-19 cricket from Bengal Cricket Association is strong credential",
+            "This is directly relevant for Kolkata engineering colleges",
+            "Can now provide specific college recommendations"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": ["under-19 cricket", "Bengal Association"]
+            },
+            {
+              "action": "recommend",
+              "content_contains": ["cricket sports quota", "Kolkata colleges", "CSE"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_program_info", "Cricket_verified", "Strong_credential"]
+        }
+      },
+      "must_not": ["ignore_cricket_credential", "forget_CSE_interest"],
+      "ideal_counselor_notes": "Strong cricket credential from Bengal Cricket Association. This is highly relevant for Kolkata colleges. Provide specific recommendations combining sports quota and CSE admission."
+    },
+    {
+      "student": "Which colleges in Kolkata specifically accept cricket players? And what are the chances for CSE with my rank?",
+      "expected": {
+        "understanding": {
+          "intent": "sports_quota",
+          "facts": {},
+          "inference": {},
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "decision",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance",
+          "problems": ["needs_admission_guidance"]
+        },
+        "brain": {
+          "eligible_branches": ["CSE", "AIML", "IT"],
+          "applicable": true,
+          "why": [
+            {"condition": "sports_achievement_verified", "met": true, "detail": "State-level cricket from Bengal CA"},
+            {"condition": "academic_minimum_met", "met": true, "detail": "58% PCM — meets minimum for sports quota"},
+            {"condition": "rank_known", "met": true, "detail": "Rank=60000 — sports quota relaxes cutoff"}
+          ]
+        },
+        "decision": {
+          "action": "provide_program_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "All information available for specific college recommendations",
+            "Sports quota with state-level cricket significantly improves chances",
+            "Can now provide concrete college list for CSE"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": ["Kolkata colleges", "cricket sports quota", "CSE"]
+            },
+            {
+              "action": "encourage",
+              "content_contains": ["strong profile", "cricket achievement"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_program_info", "All_info_available", "Sports_CSE_query"]
+        }
+      },
+      "must_not": ["guarantee_CSE_allotment", "ignore_counseling_process"],
+      "ideal_counselor_notes": "Student asking for specific college recommendations. List Kolkata colleges accepting cricket sports quota for CSE and encourage the student."
+    },
+    {
+      "student": "I prefer colleges near South Kolkata. What about Heritage Institute or Institute of Engineering and Management? Do they have sports quota?",
+      "expected": {
+        "understanding": {
+          "intent": "sports_quota",
+          "facts": {},
+          "inference": {},
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "decision",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance",
+          "problems": ["needs_admission_guidance"]
+        },
+        "brain": {
+          "eligible_branches": ["CSE", "AIML", "IT"],
+          "applicable": true,
+          "why": [
+            {"condition": "sports_achievement_verified", "met": true, "detail": "State-level cricket Bengal CA"},
+            {"condition": "academic_minimum_met", "met": true, "detail": "58% PCM"},
+            {"condition": "college_shortlist", "met": true, "detail": "Heritage and IEM — both have sports quota"}
+          ]
+        },
+        "decision": {
+          "action": "provide_program_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student named specific colleges — both Heritage and IEM have sports quota",
+            "South Kolkata location preference narrows options",
+            "Can provide detailed guidance for these specific colleges"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": ["Heritage sports quota", "IEM cricket", "South Kolkata"]
+            },
+            {
+              "action": "recommend",
+              "content_contains": ["application process", "trial dates", "documents"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_program_info", "Specific_colleges", "Location_preference"]
+        }
+      },
+      "must_not": ["misrepresent_college_policy", "skip_document_requirements"],
+      "ideal_counselor_notes": "Student named Heritage and IEM. Both have sports quota programs. Provide specific details about their cricket sports quota, application process, and required documents."
+    },
+    {
+      "student": "Thank you so much. This is really helpful. I will apply to both. What documents do I need to submit for sports quota application?",
+      "expected": {
+        "understanding": {
+          "intent": "sports_quota",
+          "facts": {},
+          "inference": {},
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "post_admission",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance",
+          "problems": ["needs_admission_guidance"]
+        },
+        "brain": {
+          "eligible_branches": ["CSE", "AIML", "IT"],
+          "applicable": true,
+          "why": [
+            {"condition": "sports_achievement_verified", "met": true, "detail": "State-level cricket Bengal CA"},
+            {"condition": "academic_minimum_met", "met": true, "detail": "58% PCM"},
+            {"condition": "colleges_selected", "met": true, "detail": "Heritage and IEM"}
+          ]
+        },
+        "decision": {
+          "action": "provide_program_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student ready to apply — needs document checklist",
+            "Sports quota has specific document requirements",
+            "Final turn — provide comprehensive summary"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": ["sports quota documents", "cricket certificates", "Bengal CA"]
+            },
+            {
+              "action": "summarize",
+              "content_contains": ["application checklist", "timeline", "next steps"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_program_info", "Document_query", "Final_turn"]
+        }
+      },
+      "must_not": ["give_incomplete_list", "forget_academic_documents"],
+      "ideal_counselor_notes": "Final turn — student ready to apply. Provide comprehensive document checklist for sports quota including cricket certificates, Bengal CA verification, academic documents, and application timeline."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "Student asking about sports quota with sport correction (football to cricket). Long 8-turn conversation testing correction handling, emotional support, and multi-constraint reasoning with sports quota plus academic requirements. Key challenge: graceful correction handling and providing actionable college recommendations.",
+  "author_note": {
+    "primary_capability": "sports quota guidance with sport correction and multi-turn reasoning",
+    "expected_failure_mode": "correction — might not properly update sport from football to cricket, or might carry forward incorrect football information to later turns",
+    "why_this_conversation": "Tests sports quota guidance with 8-turn conversation. The sport correction in turn 4 is the critical test — the system must discard all football-related context and rebuild with cricket information. The long conversation tests memory retention across many turns."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

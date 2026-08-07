@@ -6,6 +6,7 @@ still works. These prevent regressions during future refactoring.
 import pytest
 from src.pipeline import PipelineOrchestrator, ConversationState
 from src.reasoning.engine import ReasoningEngine
+from src.reasoning.context import ReasoningContext
 from src.reasoning.models import ReasoningResult
 from src.decision.engine import DecisionEngine
 from src.engines.interfaces import DecisionInput, DecisionOutput
@@ -19,18 +20,20 @@ from src.planner.engine import MinimalPlanner
 class TestPhase2Reasoning:
     """Regressions for reasoning engine bugs fixed in Phase 2."""
 
-    def test_assess_completeness_no_double_counting(self):
-        """Bug: _assess_completeness double-counted fields when profile
-        had both nested and flat keys (e.g., academic.rank and rank).
-        Fix: Flatten profile before counting."""
+    def test_domain_readiness_turn_only(self):
+        """_domain_readiness only counts fields from understanding profile,
+        not from state.profile fallback."""
         engine = ReasoningEngine()
         state = ConversationState(
             session_id="test",
             profile={"rank": 12000, "pcm_percentage": 82, "category": "general"},
         )
         understanding = UnderstandingResult(text="test")
-        result = engine._assess_completeness(understanding, state)
-        assert 0.3 < result < 1.0
+        ctx = ReasoningContext.from_understanding_result(understanding)
+        result = engine._domain_readiness(ctx, "regular", understanding, state)
+        assert result.ready is False
+        assert len(result.missing_critical) > 0
+        assert result.completeness == 0.0
 
     def test_knowledge_needed_not_tautological(self):
         """Bug: _determine_knowledge_needed always returned empty because
@@ -39,7 +42,9 @@ class TestPhase2Reasoning:
         engine = ReasoningEngine()
         understanding = UnderstandingResult(text="test")
         understanding.intent = UnderstandingIntent(primary="admission", confidence=0.8)
-        needed = engine._determine_knowledge_needed(understanding, "discovery")
+        from src.reasoning.context import ReasoningContext
+        ctx = ReasoningContext.from_understanding_result(understanding)
+        needed = engine._determine_knowledge_needed(ctx, understanding, "discovery")
         assert len(needed) > 0
         assert any("admission" in n for n in needed)
 
@@ -49,7 +54,9 @@ class TestPhase2Reasoning:
         engine = ReasoningEngine()
         understanding = UnderstandingResult(text="test")
         understanding.intent = UnderstandingIntent(primary="transfer", confidence=0.8)
-        needed = engine._determine_knowledge_needed(understanding, "discovery")
+        from src.reasoning.context import ReasoningContext
+        ctx = ReasoningContext.from_understanding_result(understanding)
+        needed = engine._determine_knowledge_needed(ctx, understanding, "discovery")
         assert "transfer_information" in needed
 
     def test_knowledge_needed_for_sports(self):
@@ -58,7 +65,9 @@ class TestPhase2Reasoning:
         engine = ReasoningEngine()
         understanding = UnderstandingResult(text="test")
         understanding.intent = UnderstandingIntent(primary="sports_quota", confidence=0.8)
-        needed = engine._determine_knowledge_needed(understanding, "discovery")
+        from src.reasoning.context import ReasoningContext
+        ctx = ReasoningContext.from_understanding_result(understanding)
+        needed = engine._determine_knowledge_needed(ctx, understanding, "discovery")
         assert "sports_quota_information" in needed
 
 
@@ -262,15 +271,16 @@ class TestPhase5Decision:
 class TestPhase5Planner:
     """Regressions for planner bugs fixed in Phase 5."""
 
-    def test_hostel_safety_triggers_empathy(self):
-        """Bug: Hostel safety query got inform instead of reassure.
-        Fix: Student text routing detects safety keywords."""
+    def test_hostel_safety_answers_partially(self):
+        """Hostel safety query answered generally even with missing critical fields."""
         pipeline = PipelineOrchestrator()
         result = pipeline.run(
             "I am a parent. My daughter got 35k rank. Is the girls hostel safe?"
         )
         actions = [t.action for t in result.plan.turns]
-        assert "reassure" in actions
+        assert result.reasoning.current_problem == "needs_hostel_information"
+        assert not result.reasoning.readiness.blocked
+        assert any(a in actions for a in ["inform", "recommend"])
 
     def test_legacy_triggers_acknowledge(self):
         """Bug: Legacy context got recommend without empathy.
@@ -305,12 +315,15 @@ class TestPhase5Planner:
         assert len(result.plan.turns) >= 2
 
     def test_generalization_womens_hostel(self):
-        """Generalization: 'women's hostel' should trigger same empathy
-        as 'girls hostel'."""
+        """Generalization: hostel safety answered generally even without profile."""
         pipeline = PipelineOrchestrator()
         result = pipeline.run("Is the women's hostel safe for students?")
         actions = [t.action for t in result.plan.turns]
-        assert "reassure" in actions
+        assert result.reasoning.current_problem == "needs_hostel_information"
+        assert not result.reasoning.readiness.blocked
+        assert any(a in actions for a in ["reassure", "inform", "recommend"])
+
+
 
     def test_generalization_cousin_legacy(self):
         """Generalization: 'cousin studied here' should trigger same

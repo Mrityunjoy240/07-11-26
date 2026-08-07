@@ -1,0 +1,205 @@
+{
+  "id": "BENCH_V21_000040",
+  "domain": "transfer",
+  "difficulty": 4,
+  "primary_language": "en",
+  "languages": ["en"],
+  "speaker_profile": "student",
+  "features": ["correction"],
+  "ground_truth": {
+    "rank": null,
+    "pcm_percentage": 72,
+    "category": "obc",
+    "interest": "IT",
+    "board": "state",
+    "exam": "",
+    "budget": null,
+    "location": "hyderabad"
+  },
+  "turns": [
+    {
+      "student": "I want to know about lateral entry transfer. I have a diploma in computer science. Can I get direct admission to second year B.Tech?",
+      "expected": {
+        "understanding": {
+          "intent": "transfer",
+          "facts": {
+            "interest": "computer science"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": ["rank", "pcm_percentage", "category"]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.0,
+          "confidence": "high",
+          "current_problem": "has_transfer_query",
+          "problems": ["has_transfer_query"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "explain_policy",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student has diploma, asking about lateral entry transfer",
+            "Lateral entry has specific requirements and policy"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": ["lateral entry", "diploma", "second year"]
+            },
+            {
+              "action": "ask",
+              "content_contains": ["diploma percentage", "category", "state"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=explain_policy", "Diploma_holder", "Lateral_entry_query"]
+        }
+      },
+      "must_not": [
+        "guarantee_admission",
+        "assume_eligibility"
+      ],
+      "ideal_counselor_notes": "Diploma holder asking about lateral entry. Explain the policy and process, and ask for more academic details."
+    },
+    {
+      "student": "I have 72% in my diploma. I think I am general category. Can I get into CSE second year?",
+      "expected": {
+        "understanding": {
+          "intent": "transfer",
+          "facts": {
+            "pcm_percentage": 72,
+            "category": "general",
+            "interest": "CSE"
+          },
+          "inference": {},
+          "confidence": "medium",
+          "missing": ["rank"]
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.43,
+          "confidence": "medium",
+          "current_problem": "has_transfer_query",
+          "problems": ["has_transfer_query"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "explain_policy",
+          "priority": "high",
+          "confidence": "medium",
+          "why": [
+            "Student provided diploma percentage and category",
+            "Need to explain lateral entry policy for CSE branch switch"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "clarify",
+              "content_contains": ["CSE", "branch switch", "lateral entry"]
+            },
+            {
+              "action": "listen",
+              "content_contains": ["72%", "general", "diploma"]
+            }
+          ],
+          "confidence": "medium",
+          "dependency_chain": ["Decision=explain_policy", "Branch_switch_query", "General_category"]
+        }
+      },
+      "must_not": [
+        "guarantee_branch_switch",
+        "assume_category_without_verification"
+      ],
+      "ideal_counselor_notes": "Student provides diploma details and asks about CSE lateral entry. Explain branch switch policy and ask for verification of category."
+    },
+    {
+      "student": "Wait, actually I need to correct that. I am OBC category, not general. My diploma is in IT, not computer science. Is lateral entry still possible for me?",
+      "expected": {
+        "understanding": {
+          "intent": "transfer",
+          "facts": {
+            "category": "obc",
+            "interest": "IT"
+          },
+          "inference": {
+            "confusion": true
+          },
+          "confidence": "medium",
+          "missing": ["rank"]
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.43,
+          "confidence": "medium",
+          "current_problem": "has_transfer_query",
+          "problems": ["has_transfer_query"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "explain_policy",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student corrected category (general→OBC) and diploma field (CS→IT)",
+            "OBC may have different eligibility criteria",
+            "IT diploma to IT lateral entry is straightforward"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "reassure",
+              "content_contains": ["no problem", "corrected", "OBC"]
+            },
+            {
+              "action": "recommend",
+              "content_contains": ["IT", "lateral entry", "eligible"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=explain_policy", "Category_corrected", "IT_diploma", "OBC_eligible"]
+        }
+      },
+      "must_not": [
+        "blame_student_for_mistake",
+        "ignore_correction",
+        "guarantee_admission"
+      ],
+      "ideal_counselor_notes": "Student corrected category (general→OBC) and diploma field (CS→IT). IT diploma to IT lateral entry is more straightforward. Must handle corrections gracefully and provide updated policy info."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "Student asks about lateral entry with corrections. Initially says general category and CS diploma, corrects to OBC and IT diploma. Tests correction handling in transfer policy context.",
+  "author_note": {
+    "primary_capability": "lateral entry policy explanation with correction handling",
+    "expected_failure_mode": "correction — might not update both corrected fields (category + diploma), or might penalize student for mistake",
+    "why_this_conversation": "Tests transfer policy explanation with multi-field correction. Student corrects both category and diploma field in one turn."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

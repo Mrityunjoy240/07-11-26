@@ -1,0 +1,269 @@
+{
+  "_meta": {
+    "version": "1.0.0",
+    "last_updated": "2026-07-13",
+    "college": "Dr. B.C. Roy Engineering College"
+  },
+
+  "college": {
+    "name": "Dr. B.C. Roy Engineering College",
+    "short_name": "BCREC",
+    "address": "Jemua Road, Fuljhore, Durgapur - 713206, West Bengal",
+    "phone": "0343-2501353",
+    "phone_secondary": "0343-2502449",
+    "email": "info@bcrec.ac.in",
+    "website": "www.bcrec.ac.in",
+    "established": "August 2000",
+    "autonomous": true,
+    "naac_grade": "B+",
+    "naac_cgpa": "2.83",
+    "nirf_rank": "201-250",
+    "campus_acres": 17,
+    "faculty_count": 208,
+    "student_count": 3000
+  },
+
+  "principal": {
+    "name": "Dr. Sanjay S. Pawar",
+    "phone": "0343-2501353"
+  },
+
+  "vice_principal": {
+    "name": "Prof. Dr. Partha Pratim Sarkar"
+  },
+
+  "departments": {
+    "CSE": {
+      "full_name": "Computer Science and Engineering",
+      "intake": 120,
+      "hod": "Prof. (Dr.) Raj Kumar Samanta",
+      "hod_email": "raj.samanta@bcrec.ac.in",
+      "fees": {
+        "total": 604700,
+        "per_semester": 73925,
+        "admission": 99225
+      },
+      "placement": {
+        "rate": "93.6%",
+        "avg_package": "4.25 LPA",
+        "max_package": "7 LPA",
+        "top_recruiters": ["TCS", "Infosys", "Wipro", "Capgemini", "Accenture"]
+      },
+      "nba_accredited": true
+    },
+    "IT": {
+      "full_name": "Information Technology",
+      "intake": 60,
+      "hod": "Dr. Dinesh Kumar Pradhan",
+      "fees": {
+        "total": 604700,
+        "per_semester": 73925,
+        "admission": 99225
+      },
+      "placement": {
+        "rate": "90%",
+        "avg_package": "4.0 LPA",
+        "max_package": "6 LPA",
+        "top_recruiters": ["TCS", "Infosys", "Wipro"]
+      },
+      "nba_accredited": true
+    },
+    "ECE": {
+      "full_name": "Electronics and Communication Engineering",
+      "intake": 60,
+      "hod": "Dr. Mrinmoy Chakraborty",
+      "fees": {
+        "total": 604700,
+        "per_semester": 73925,
+        "admission": 99225
+      },
+      "placement": {
+        "rate": "88%",
+        "avg_package": "3.8 LPA",
+        "max_package": "6 LPA",
+        "top_recruiters": ["TCS", "Infosys", "Wipro", "HCL"]
+      },
+      "nba_accredited": true
+    },
+    "EE": {
+      "full_name": "Electrical Engineering",
+      "intake": 60,
+      "hod": "Dr. Shibendu Mahata",
+      "fees": {
+        "total": 567100,
+        "per_semester": 67600,
+        "admission": 92900
+      },
+      "placement": {
+        "rate": "85%",
+        "avg_package": "3.5 LPA",
+        "max_package": "5.5 LPA",
+        "top_recruiters": ["TCS", "Wipro", "HCL"]
+      },
+      "nba_accredited": true
+    },
+    "ME": {
+      "full_name": "Mechanical Engineering",
+      "intake": 60,
+      "hod": "Dr. Chandan Chattoraj",
+      "fees": {
+        "total": 429100,
+        "per_semester": 50350,
+        "admission": 75650
+      },
+      "placement": {
+        "rate": "80%",
+        "avg_package": "3.2 LPA",
+        "max_package": "5 LPA",
+        "top_recruiters": ["TCS", "Wipro", "Capgemini"]
+      },
+      "nba_accredited": true
+    },
+    "CE": {
+      "full_name": "Civil Engineering",
+      "intake": 60,
+      "hod": "Dr. Sanjay Sengupta",
+      "fees": {
+        "total": 429100,
+        "per_semester": 50350,
+        "admission": 75650
+      },
+      "placement": {
+        "rate": "75%",
+        "avg_package": "3.0 LPA",
+        "max_package": "4.5 LPA",
+        "top_recruiters": ["TCS", "Wipro"]
+      },
+      "nba_accredited": false
+    },
+    "CSD": {
+      "full_name": "Computer Science and Design",
+      "intake": 30,
+      "hod": "N/A",
+      "fees": {
+        "total": 567100,
+        "per_semester": 67600,
+        "admission": 92900
+      },
+      "placement": {
+        "rate": "85%",
+        "avg_package": "3.8 LPA",
+        "max_package": "6 LPA",
+        "top_recruiters": ["TCS", "Infosys"]
+      },
+      "nba_accredited": false
+    },
+    "AIML": {
+      "full_name": "Artificial Intelligence and Machine Learning",
+      "intake": 30,
+      "hod": "N/A",
+      "fees": {
+        "total": 567100,
+        "per_semester": 67600,
+        "admission": 92900
+      },
+      "placement": {
+        "rate": "88%",
+        "avg_package": "4.0 LPA",
+        "max_package": "6.5 LPA",
+        "top_recruiters": ["TCS", "Infosys", "Wipro"]
+      },
+      "nba_accredited": false
+    },
+    "DS": {
+      "full_name": "Data Science",
+      "intake": 30,
+      "hod": "N/A",
+      "fees": {
+        "total": 567100,
+        "per_semester": 67600,
+        "admission": 92900
+      },
+      "placement": {
+        "rate": "85%",
+        "avg_package": "3.8 LPA",
+        "max_package": "6 LPA",
+        "top_recruiters": ["TCS", "Infosys"]
+      },
+      "nba_accredited": false
+    },
+    "CY": {
+      "full_name": "Cyber Security",
+      "intake": 30,
+      "hod": "N/A",
+      "fees": {
+        "total": 567100,
+        "per_semester": 67600,
+        "admission": 92900
+      },
+      "placement": {
+        "rate": "82%",
+        "avg_package": "3.5 LPA",
+        "max_package": "5.5 LPA",
+        "top_recruiters": ["TCS", "Wipro"]
+      },
+      "nba_accredited": false
+    }
+  },
+
+  "hostel": {
+    "available": true,
+    "total": 7,
+    "boys": 5,
+    "girls": 2,
+    "capacity": 1500,
+    "fee_single": 30000,
+    "fee_shared": 10000,
+    "mess_fee": 5000
+  },
+
+  "admission": {
+    "process": "Through WBJEE or JEE Main counselling",
+    "eligibility": "10+2 with Physics, Chemistry, Mathematics with minimum 50% marks",
+    "counselling": "WBJEE Counselling (80% seats), JEE Main (10% seats), Management Quota (10% seats)",
+    "documents": [
+      "10th Marksheet",
+      "12th Marksheet",
+      "WBJEE/JEE Main Admit Card",
+      "WBJEE/JEE Main Rank Card",
+      "Migration Certificate",
+      "Transfer Certificate",
+      "Caste Certificate (if applicable)",
+      "Income Certificate (if applicable)"
+    ]
+  },
+
+  "placements": {
+    "overall_rate": "91%",
+    "avg_package": "4.25 LPA",
+    "highest_package": "7 LPA",
+    "students_placed_2025": 1017,
+    "companies_visited": 100,
+    "top_recruiters": ["TCS", "Infosys", "Wipro", "Capgemini", "Accenture", "Amazon", "HCL"]
+  },
+
+  "scholarships": [
+    "TFW (Tuition Fee Waiver)",
+    "Swami Vivekananda Merit-cum-Means Scholarship",
+    "Kanyashree Prakalpa",
+    "OASIS/Aikyashree Scholarship"
+  ],
+
+  "anti_ragging": {
+    "policy": "Strictly prohibited. Anti-ragging committee active.",
+    "helpline": "9851006415",
+    "women_safety": "9851006415 (24x7)"
+  },
+
+  "faq": {
+    "greeting_en": "Hello! I'm the BCREC AI assistant. How can I help you with admissions, fees, courses, or hostel details?",
+    "greeting_hi": "Namaste! Main BCREC AI assistant hoon. Admissions, fees, courses, ya hostel ke baare mein koi sawal hai?",
+    "greeting_bn": "নমস্কার! আমি BCREC AI assistant। Admissions, fees, courses, বা hostel সম্পর্কে কোনো প্রশ্ন আছে?",
+    "unknown_en": "I don't have that information right now. Please call 0343-2501353.",
+    "unknown_hi": "Mere paas iski jankari abhi nahi hai. College ko 0343-2501353 par call karein.",
+    "unknown_bn": "এই বিষয়ে আমার কাছে এখন তথ্য নেই। কলেজে 0343-2501353 নম্বরে কল করুন।",
+    "ood_en": "I can only answer questions about BCREC — admissions, courses, fees, placements, and campus facilities.",
+    "ood_hi": "Main sirf BCREC ke baare mein sawalon ka jawab de sakta hoon.",
+    "ood_bn": "আমি শুধুমাত্র BCREC সম্পর্কে প্রশ্নের উত্তর দিতে পারি।"
+  }
+}

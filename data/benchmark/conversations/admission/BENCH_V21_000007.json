@@ -1,0 +1,176 @@
+{
+  "id": "BENCH_V21_000007",
+  "domain": "admission",
+  "difficulty": 2,
+  "primary_language": "hi",
+  "languages": [
+    "hi"
+  ],
+  "speaker_profile": "student",
+  "features": [],
+  "ground_truth": {
+    "rank": null,
+    "pcm_percentage": 80,
+    "category": "",
+    "interest": "IT",
+    "board": "wbjee",
+    "exam": "wbjee",
+    "budget": null,
+    "location": ""
+  },
+  "turns": [
+    {
+      "student": "Mujhe admission lena hai engineering mein. Kaise hoga?",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {},
+          "inference": {},
+          "confidence": "medium",
+          "missing": [
+            "rank",
+            "pcm_percentage",
+            "category",
+            "interest",
+            "board"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.0,
+          "confidence": "high",
+          "current_problem": "needs_profile_completion",
+          "problems": [
+            "needs_profile_completion"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "collect_profile",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student wants admission in Hindi",
+            "No profile information available",
+            "Start by asking for rank and exam"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "ask",
+              "content_contains": [
+                "rank",
+                "exam",
+                "WBJEE"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=collect_profile",
+            "Missing=all_profile_fields"
+          ]
+        }
+      },
+      "must_not": [
+        "recommend_branch",
+        "hallucinate_cutoff",
+        "respond_in_english"
+      ],
+      "ideal_counselor_notes": "Hindi speaker asking about admission process. Ask for exam and rank first, respond in Hindi."
+    },
+    {
+      "student": "WBJEE diya tha, 32000 rank aaya. PCM 80% hai. Mujhe IT chahiye.",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {
+            "rank": 32000,
+            "pcm_percentage": 80,
+            "board": "wbjee",
+            "exam": "wbjee",
+            "interest": "IT"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": [
+            "category"
+          ]
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.71,
+          "confidence": "high",
+          "current_problem": "needs_profile_completion",
+          "problems": [
+            "needs_profile_completion"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "collect_profile",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Have rank, PCM, board, interest but missing category",
+            "Need category to check IT cutoff eligibility"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "rank",
+                "IT"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "category",
+                "general",
+                "OBC"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=collect_profile",
+            "Missing=category"
+          ]
+        }
+      },
+      "must_not": [
+        "respond_in_english",
+        "recommend_branch",
+        "assume_category"
+      ],
+      "ideal_counselor_notes": "Good progress. Rank 32000 with IT interest. Need category for cutoff check. Continue in Hindi."
+    }
+  ],
+  "expected_end_state": "incomplete",
+  "ideal_counselor_notes": "Hindi admission conversation. Profile builds across 2 turns. Category still needed for branch recommendation.",
+  "author_note": {
+    "primary_capability": "profile collection (Hindi, multi-field extraction)",
+    "expected_failure_mode": "multilingual — system might respond in English or fail to extract Hindi facts",
+    "why_this_conversation": "Hindi variant of V21_006. Tests that fact extraction and profile collection work identically in Hindi."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

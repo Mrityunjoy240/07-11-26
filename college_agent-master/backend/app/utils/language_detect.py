@@ -87,7 +87,6 @@ BANGLA_ROMAN_WORDS = frozenset(
         "akta",
         "ekta",
         "help",
-        "healp",
         "bolun",
         "sahajjo",
         "sahajja",
@@ -237,6 +236,15 @@ HINDI_ROMAN_WORDS = frozenset(
         "yahan",
         "unka",
         "mujhe",
+        "mughe",
+        "muje",
+        "janna",
+        "baare",
+        "chyea",
+        "chaie",
+        "chye",
+        "chahiay",
+        "chahie",
         "tumhe",
         "humara",
         "tumhara",
@@ -301,6 +309,32 @@ def _load_model():
         return None
 
 
+# English words that are also roman-script markers for Bengali/Hindi.
+# A LONE loanword must never decide the language (e.g. "help" -> bn,
+# "me" -> hi), or English queries like "I need help" get mis-detected.
+# Loanwords only count when the same language has at least one other real marker.
+# "take"/"bar"/"jan" are in BANGLA_ROMAN_WORDS, "main" is in HINDI_ROMAN_WORDS;
+# all are common English words, so a lone occurrence must not flip to bn/hi.
+ENGLISH_LOANWORDS = frozenset(
+    {"help", "healp", "problem", "me", "he", "take", "main", "jan", "bar"}
+)
+
+
+def count_markers(words: set, markers: frozenset) -> int:
+    """Count roman-script keyword markers, ignoring a lone English loanword.
+
+    If every matched marker of this language is an English loanword (e.g. only
+    "help" or only "me"), the word is not reliable evidence of Bengali/Hindi
+    and returns 0.
+    """
+    matched = words & markers
+    count = len(matched)
+    loan = len(matched & ENGLISH_LOANWORDS)
+    if count - loan == 0 and loan >= 1:
+        return 0
+    return count
+
+
 def detect_language(text: str) -> Literal["en", "hi", "bn"]:
     """
     Detect whether `text` is English, Hindi, or Bengali.
@@ -342,8 +376,8 @@ def detect_language(text: str) -> Literal["en", "hi", "bn"]:
 
     text_words = set(re.sub(r"[^\w\s]", " ", text_lower).split())
 
-    bn_count = len(text_words & BANGLA_ROMAN_WORDS)
-    hi_count = len(text_words & HINDI_ROMAN_WORDS)
+    bn_count = count_markers(text_words, BANGLA_ROMAN_WORDS)
+    hi_count = count_markers(text_words, HINDI_ROMAN_WORDS)
 
     # If keyword signal is strong, use it directly (bypasses FastText confusion on mixed text)
     if bn_count >= 1 and bn_count > hi_count:

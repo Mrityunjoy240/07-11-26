@@ -1,0 +1,238 @@
+{
+  "id": "BENCH_V21_000027",
+  "domain": "placement",
+  "difficulty": 2,
+  "primary_language": "en",
+  "languages": [
+    "en"
+  ],
+  "speaker_profile": "student",
+  "features": [],
+  "ground_truth": {
+    "rank": null,
+    "pcm_percentage": 80,
+    "category": "general",
+    "interest": "CSE",
+    "board": "cbse",
+    "exam": "",
+    "budget": null,
+    "location": ""
+  },
+  "turns": [
+    {
+      "student": "What are the placement statistics for CSE? I have 80% in PCM.",
+      "expected": {
+        "understanding": {
+          "intent": "placement",
+          "facts": {
+            "pcm_percentage": 80,
+            "interest": "CSE"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": [
+            "rank",
+            "category"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.14,
+          "confidence": "high",
+          "current_problem": "needs_placement_data",
+          "problems": [
+            "needs_placement_data"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_placement_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Direct placement query for CSE",
+            "Can provide general placement statistics"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "placement",
+                "CSE",
+                "statistics",
+                "average"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "rank",
+                "category"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_placement_info",
+            "Student_asks_placement"
+          ]
+        }
+      },
+      "must_not": [
+        "guarantee_placement",
+        "hallucinate_exact_placement_percentage"
+      ],
+      "ideal_counselor_notes": "Student asks about CSE placement statistics. Provide general placement data and ask for rank to give more specific info."
+    },
+    {
+      "student": "My JEE rank is around 35000. Is CSE placement good at this rank level?",
+      "expected": {
+        "understanding": {
+          "intent": "placement",
+          "facts": {
+            "rank": 35000,
+            "exam": "jee"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": [
+            "category"
+          ]
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.43,
+          "confidence": "high",
+          "current_problem": "needs_placement_data",
+          "problems": [
+            "needs_placement_data"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_placement_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student wants placement info specific to their rank range",
+            "Can provide rank-based placement guidance"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "rank",
+                "35000"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "placement",
+                "your rank",
+                "CSE"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_placement_info",
+            "Rank_provided"
+          ]
+        }
+      },
+      "must_not": [
+        "guarantee_placement",
+        "recommend_branch_without_context"
+      ],
+      "ideal_counselor_notes": "Student provides rank. Give placement info relevant to that rank range and the colleges accessible at that rank."
+    },
+    {
+      "student": "Which companies visit for CSE placements? And what is the average salary?",
+      "expected": {
+        "understanding": {
+          "intent": "placement",
+          "facts": {},
+          "inference": {
+            "topic": "company_visits_and_salary"
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.43,
+          "confidence": "high",
+          "current_problem": "needs_placement_data",
+          "problems": [
+            "needs_placement_data"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_placement_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Follow-up about visiting companies and average salary",
+            "Natural extension of placement conversation"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "companies",
+                "salary",
+                "average",
+                "CSE"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_placement_info",
+            "Company_salary_query"
+          ]
+        }
+      },
+      "must_not": [
+        "guarantee_salary",
+        "hallucinate_company_names"
+      ],
+      "ideal_counselor_notes": "Student asks about visiting companies and average salary. Provide general info about top recruiters and average salary ranges for CSE."
+    }
+  ],
+  "expected_end_state": "incomplete",
+  "ideal_counselor_notes": "Golden placement conversation. Simple 3-turn flow: placement stats, rank-based guidance, company/salary info. Clean and easy to verify.",
+  "author_note": {
+    "primary_capability": "placement information retrieval",
+    "expected_failure_mode": "retrieval — might give exact company names not in KB, or might overstate average salary",
+    "why_this_conversation": "Golden conversation for placement info. Tests basic placement data retrieval with progressive profile building."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

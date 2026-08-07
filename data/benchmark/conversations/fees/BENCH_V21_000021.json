@@ -1,0 +1,198 @@
+{
+  "id": "BENCH_V21_000021",
+  "domain": "fees",
+  "difficulty": 2,
+  "primary_language": "en",
+  "languages": ["en"],
+  "speaker_profile": "student",
+  "features": [],
+  "ground_truth": {
+    "rank": 15000,
+    "pcm_percentage": 78,
+    "category": "general",
+    "interest": "CSE",
+    "board": "cbse",
+    "exam": "jee",
+    "budget": null,
+    "location": ""
+  },
+  "turns": [
+    {
+      "student": "I want to know the fee structure for CSE branch. My JEE rank is 15000 and I have 78% in PCM.",
+      "expected": {
+        "understanding": {
+          "intent": "fee",
+          "facts": {
+            "rank": 15000,
+            "pcm_percentage": 78,
+            "interest": "CSE",
+            "exam": "jee",
+            "board": "cbse"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": ["category", "budget"]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.57,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": ["needs_fee_information", "needs_profile_completion"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_fee_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student explicitly requesting CSE fee structure",
+            "Rank and PCM provided, enough for general fee range"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": ["fees", "CSE", "structure"]
+            },
+            {
+              "action": "ask",
+              "content_contains": ["category", "budget"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_fee_info", "Student_asks_fees"]
+        }
+      },
+      "must_not": [
+        "recommend_branch",
+        "hallucinate_exact_fees"
+      ],
+      "ideal_counselor_notes": "Student provides rank and PCM percentage while asking about CSE fees. Provide fee range and ask for category."
+    },
+    {
+      "student": "I am general category. Is the fee same across all colleges or does it vary?",
+      "expected": {
+        "understanding": {
+          "intent": "fee",
+          "facts": {
+            "category": "general"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": ["budget"]
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.71,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": ["needs_fee_information"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_fee_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Follow-up question about fee variation across colleges",
+            "Category now known, can give more specific range"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": ["category", "general"]
+            },
+            {
+              "action": "inform",
+              "content_contains": ["fee", "variation", "college"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_fee_info", "Category_known"]
+        }
+      },
+      "must_not": [
+        "recommend_specific_college",
+        "guarantee_exact_fees"
+      ],
+      "ideal_counselor_notes": "Student clarifies category and asks about fee variation. Explain how fees differ by college type and location."
+    },
+    {
+      "student": "OK got it. What about hostel fees? Is that included in the college fee or separate?",
+      "expected": {
+        "understanding": {
+          "intent": "fee",
+          "facts": {},
+          "inference": {
+            "topic": "hostel_fees"
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.71,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": ["needs_fee_information"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_fee_info",
+          "priority": "normal",
+          "confidence": "high",
+          "why": [
+            "Follow-up reference to hostel fees within fee domain",
+            "Natural extension of fee conversation"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": ["hostel", "fee", "separate"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_fee_info", "Follow_up_reference"]
+        }
+      },
+      "must_not": [
+        "hallucinate_hostel_amount",
+        "recommend_college"
+      ],
+      "ideal_counselor_notes": "Student follows up about hostel fees. Clarify that hostel fees are typically separate and provide general range."
+    }
+  ],
+  "expected_end_state": "incomplete",
+  "ideal_counselor_notes": "Three-turn fee conversation with follow-up about fee variation and hostel fees. Profile partially built with rank, PCM, category known. Follow_up_reference behavior tested in turn 3.",
+  "author_note": {
+    "primary_capability": "fee explanation with follow-up reference",
+    "expected_failure_mode": "retrieval — might give exact hostel fees when KB has ranges, or might not connect hostel fee question to previous fee context",
+    "why_this_conversation": "Tests fee explanation with memory of prior context and a natural follow-up reference to hostel fees. Clean and easy to verify."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

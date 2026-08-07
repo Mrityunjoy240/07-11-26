@@ -1,0 +1,273 @@
+{
+  "id": "BENCH_V21_000030",
+  "domain": "placement",
+  "difficulty": 4,
+  "primary_language": "en",
+  "languages": [
+    "en"
+  ],
+  "speaker_profile": "student",
+  "features": [
+    "adversarial",
+    "correction"
+  ],
+  "ground_truth": {
+    "rank": 65000,
+    "pcm_percentage": 62,
+    "category": "general",
+    "interest": "CE",
+    "board": "cbse",
+    "exam": "jee",
+    "budget": null,
+    "location": "kolkata"
+  },
+  "turns": [
+    {
+      "student": "I have 92% in PCM and my JEE rank is 15000. Tell me about placement in Civil Engineering. I want to know which companies come for CE placement.",
+      "expected": {
+        "understanding": {
+          "intent": "placement",
+          "facts": {
+            "pcm_percentage": 92,
+            "rank": 15000,
+            "interest": "CE",
+            "exam": "jee"
+          },
+          "inference": {},
+          "confidence": "medium",
+          "missing": [
+            "category"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.43,
+          "confidence": "medium",
+          "current_problem": "needs_placement_data",
+          "problems": [
+            "needs_placement_data"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_placement_info",
+          "priority": "high",
+          "confidence": "medium",
+          "why": [
+            "Direct CE placement query",
+            "PCM and rank provided but might be contradictory later"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "placement",
+                "CE",
+                "companies"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "category",
+                "location"
+              ]
+            }
+          ],
+          "confidence": "medium",
+          "dependency_chain": [
+            "Decision=provide_placement_info",
+            "Student_asks_placement"
+          ]
+        }
+      },
+      "must_not": [
+        "guarantee_placement",
+        "hallucinate_company_names"
+      ],
+      "ideal_counselor_notes": "Student claims high PCM (92%) and good rank (15000) for CE placement query. These might be contradicted later. Provide CE placement info and ask for category."
+    },
+    {
+      "student": "Actually, I made a mistake. My PCM is 62% and rank is around 65000. I was confused earlier. I am general category from Kolkata. What is the realistic placement scenario for CE at this rank?",
+      "expected": {
+        "understanding": {
+          "intent": "placement",
+          "facts": {
+            "pcm_percentage": 62,
+            "rank": 65000,
+            "category": "general",
+            "location": "kolkata",
+            "interest": "CE"
+          },
+          "inference": {
+            "correction": {
+              "field": "rank",
+              "old_value": 15000,
+              "new_value": 65000
+            },
+            "adversarial": true
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 1.0,
+          "confidence": "high",
+          "current_problem": "needs_placement_data",
+          "problems": [
+            "needs_placement_data"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_placement_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Major correction: PCM 92% to 62%, rank 15000 to 65000",
+            "Must use corrected values for all placement guidance",
+            "Student asking for realistic scenario"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "correction",
+                "62%",
+                "65000",
+                "realistic"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "placement",
+                "CE",
+                "practical",
+                "corrected"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_placement_info",
+            "Major_correction",
+            "Realistic_query"
+          ]
+        }
+      },
+      "must_not": [
+        "use_old_values",
+        "ignore_correction",
+        "overstate_placement_chances",
+        "dismiss_student"
+      ],
+      "ideal_counselor_notes": "Student corrects both PCM (92% to 62%) and rank (15000 to 65000) — major correction. Must acknowledge correction and provide realistic CE placement guidance for corrected profile."
+    },
+    {
+      "student": "Also, I want to know — if I don't get good placement in CE, can I switch to IT or CSE after first year? Some colleges allow that right? What are the chances?",
+      "expected": {
+        "understanding": {
+          "intent": "placement",
+          "facts": {},
+          "inference": {
+            "topic": "branch_switch",
+            "multi_constraint": true,
+            "constraints": [
+              "branch_switch_policy",
+              "rank",
+              "eligibility"
+            ]
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 1.0,
+          "confidence": "high",
+          "current_problem": "needs_placement_data",
+          "problems": [
+            "needs_placement_data"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_placement_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Multi-constraint query about branch switching",
+            "Must consider rank eligibility for branch change and placement implications"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "branch_switch",
+                "IT",
+                "CSE",
+                "first_year"
+              ]
+            },
+            {
+              "action": "recommend",
+              "content_contains": [
+                "the branch_switch",
+                "policy",
+                "eligibility",
+                "placement"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_placement_info",
+            "Branch_switch_query",
+            "Multi_constraint"
+          ]
+        }
+      },
+      "must_not": [
+        "guarantee_branch_switch",
+        "overstate_branch_switch_chances",
+        "ignore_rank_constraint_for_branch_change"
+      ],
+      "ideal_counselor_notes": "Student asks about branch switching from CE to IT/CSE after first year. Explain branch change policies, eligibility criteria, and link back to placement context."
+    }
+  ],
+  "expected_end_state": "incomplete",
+  "ideal_counselor_notes": "Difficulty 4 placement conversation with adversarial and correction features. Student provides contradictory info (PCM 92% then 62%, rank 15000 then 65000), testing correction handling. Turn 3 adds multi-constraint branch switch query. Tests memory_use of corrected values.",
+  "author_note": {
+    "primary_capability": "placement info with adversarial correction and multi-constraint reasoning",
+    "expected_failure_mode": "correction — might use original (wrong) values instead of corrected ones, or might not handle the contradictory initial info gracefully",
+    "why_this_conversation": "Difficulty 4 conversation testing adversarial correction (student changes both PCM and rank dramatically), multi-constraint branch switch query, and memory_use of corrected values across turns."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

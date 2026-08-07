@@ -1,0 +1,193 @@
+{
+  "id": "BENCH_V21_000042",
+  "domain": "distance",
+  "difficulty": 4,
+  "primary_language": "en",
+  "languages": ["en"],
+  "speaker_profile": "student",
+  "features": ["topic_switch"],
+  "ground_truth": {
+    "rank": 50000,
+    "pcm_percentage": 70,
+    "category": "general",
+    "interest": "IT",
+    "board": "cbse",
+    "exam": "jee",
+    "budget": null,
+    "location": "delhi"
+  },
+  "turns": [
+    {
+      "student": "I want to know about distance education for B.Tech in IT. Is it available through your college?",
+      "expected": {
+        "understanding": {
+          "intent": "distance_education",
+          "facts": {"interest": "IT"},
+          "inference": {},
+          "confidence": "high",
+          "missing": ["rank", "pcm_percentage", "category", "board", "location"]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.14,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance",
+          "problems": ["needs_admission_guidance"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_program_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Student asking about distance B.Tech IT",
+            "Need to explain distance education options and limitations"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": ["distance education", "B.Tech IT"]
+            },
+            {
+              "action": "ask",
+              "content_contains": ["rank", "percentage", "board"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_program_info", "Student_asks_distance"]
+        }
+      },
+      "must_not": ["guarantee_placement", "confuse_distance_regular"],
+      "ideal_counselor_notes": "Student asking about distance B.Tech IT. Explain available programs and ask for academic details."
+    },
+    {
+      "student": "I have JEE rank 50000, 70% PCM from CBSE board. I am from Delhi. Can you tell me about distance options?",
+      "expected": {
+        "understanding": {
+          "intent": "distance_education",
+          "facts": {
+            "rank": 50000,
+            "pcm_percentage": 70,
+            "board": "cbse",
+            "location": "delhi"
+          },
+          "inference": {},
+          "confidence": "high",
+          "missing": ["category"]
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.71,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance",
+          "problems": ["needs_admission_guidance"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_program_info",
+          "priority": "high",
+          "confidence": "medium",
+          "why": [
+            "Good profile info for distance education guidance",
+            "Can recommend specific distance universities for IT"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": ["WBJEE", "Delhi"]
+            },
+            {
+              "action": "recommend",
+              "content_contains": ["distance universities", "IT programs", "eligibility"]
+            }
+          ],
+          "confidence": "medium",
+          "dependency_chain": ["Decision=provide_program_info", "Profile_partial"]
+        }
+      },
+      "must_not": ["recommend_regular_admission", "ignore_distance_context"],
+      "ideal_counselor_notes": "Student provided academic details for distance education. Recommend distance universities with IT programs in or near Delhi."
+    },
+    {
+      "student": "Actually, what about regular admission? With 50000 rank, what are my chances for IT in regular mode?",
+      "expected": {
+        "understanding": {
+          "intent": "admission",
+          "facts": {},
+          "inference": {},
+          "confidence": "high",
+          "missing": ["category"]
+        },
+        "reasoning": {
+          "stage": "comparison",
+          "profile_completeness": 0.71,
+          "confidence": "medium",
+          "current_problem": "comparing_options",
+          "problems": ["comparing_options"]
+        },
+        "brain": {
+          "eligible_branches": ["IT", "ECE", "EE", "ME", "CE"],
+          "applicable": true,
+          "why": [
+            {"condition": "rank_provided", "met": true, "detail": "Rank=50000"},
+            {"condition": "category_known", "met": false, "detail": "Category not provided — defaulting to general"},
+            {"condition": "rank_within_margin", "met": false, "detail": "50000 > 40000 cutoff for IT/General — outside margin"}
+          ]
+        },
+        "decision": {
+          "action": "provide_admission_info",
+          "priority": "high",
+          "confidence": "medium",
+          "why": [
+            "Student switched from distance to regular admission inquiry",
+            "Rank 50000 for IT general is borderline — need honest assessment",
+            "Distance education info should inform comparison"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": ["regular admission", "IT"]
+            },
+            {
+              "action": "inform",
+              "content_contains": ["IT cutoff", "general category", "chances"]
+            }
+          ],
+          "confidence": "medium",
+          "dependency_chain": ["Decision=provide_admission_info", "Topic_switch", "Distance_context_available"]
+        }
+      },
+      "must_not": ["guarantee_admission", "forget_distance_context"],
+      "ideal_counselor_notes": "Student switched from distance to regular admission. Use previously collected profile to provide honest assessment of IT chances at rank 50000."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "Student starts with distance education inquiry, provides profile, then switches to regular admission. Key challenge: maintaining context across topic switch and providing comparative guidance.",
+  "author_note": {
+    "primary_capability": "distance education with topic switch to regular admission",
+    "expected_failure_mode": "topic_switch — might lose distance education context when student switches to regular admission",
+    "why_this_conversation": "Tests topic switching from distance to regular admission. The system must retain distance education context and use the same profile for regular admission guidance."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

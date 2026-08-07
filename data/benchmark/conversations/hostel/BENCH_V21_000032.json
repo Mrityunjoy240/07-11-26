@@ -1,0 +1,238 @@
+{
+  "id": "BENCH_V21_000032",
+  "domain": "hostel",
+  "difficulty": 3,
+  "primary_language": "en",
+  "languages": ["en"],
+  "speaker_profile": "parent",
+  "features": ["parent_mode", "emotion"],
+  "ground_truth": {
+    "rank": 8000,
+    "pcm_percentage": 88,
+    "category": "general",
+    "interest": "ECE",
+    "board": "cbse",
+    "exam": "jee",
+    "budget": null,
+    "location": "mumbai"
+  },
+  "turns": [
+    {
+      "student": "Hello, I am calling about my daughter. I am very worried about her staying in a hostel. Is the hostel safe for girls?",
+      "expected": {
+        "understanding": {
+          "intent": "hostel",
+          "facts": {},
+          "inference": {
+            "parent_mode": true,
+            "anxiety": true
+          },
+          "confidence": "high",
+          "missing": ["rank", "pcm_percentage", "category", "interest"]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.0,
+          "confidence": "high",
+          "current_problem": "needs_hostel_info",
+          "problems": ["needs_hostel_info", "expressing_anxiety"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_hostel_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Parent explicitly asking about hostel safety",
+            "Clear anxiety about daughter staying away from home",
+            "Must address safety concern first"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "reassure",
+              "content_contains": ["safe", "hostel", "girls"]
+            },
+            {
+              "action": "inform",
+              "content_contains": ["security", "warden", "CCTV"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_hostel_info", "Anxiety_detected", "Parent_mode"]
+        }
+      },
+      "must_not": [
+        "dismiss_concern",
+        "guarantee_safety",
+        "address_student_directly"
+      ],
+      "ideal_counselor_notes": "Anxious parent worried about daughter's safety. Must address safety concern first before collecting academic details."
+    },
+    {
+      "student": "She got 88% in PCM, JEE rank 8000. She wants ECE. What about the warden and security arrangements? Are there separate floors for girls?",
+      "expected": {
+        "understanding": {
+          "intent": "hostel",
+          "facts": {
+            "rank": 8000,
+            "pcm_percentage": 88,
+            "board": "cbse",
+            "exam": "jee",
+            "interest": "ECE"
+          },
+          "inference": {
+            "parent_mode": true,
+            "anxiety": true
+          },
+          "confidence": "high",
+          "missing": ["category"]
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.57,
+          "confidence": "high",
+          "current_problem": "needs_hostel_info",
+          "problems": ["needs_hostel_info", "expressing_anxiety"]
+        },
+        "brain": {
+          "eligible_branches": ["CSE", "AIML", "IT", "ECE", "EE", "ME", "CE"],
+          "applicable": true,
+          "why": [
+            {
+              "condition": "rank_provided",
+              "met": true,
+              "detail": "Rank=8000"
+            },
+            {
+              "condition": "category_known",
+              "met": false,
+              "detail": "Category unknown, assuming general cutoffs"
+            }
+          ]
+        },
+        "decision": {
+          "action": "provide_hostel_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Parent provided academic details along with hostel security questions",
+            "Address security details and confirm ECE eligibility"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "ask",
+              "content_contains": ["category", "general", "OBC"]
+            },
+            {
+              "action": "listen",
+              "content_contains": ["rank", "8000", "ECE"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_hostel_info", "Profile_partial", "Missing=category"]
+        }
+      },
+      "must_not": [
+        "dismiss_concern",
+        "guarantee_safety",
+        "recommend_branch_prematurely"
+      ],
+      "ideal_counselor_notes": "Parent provided academic details while continuing to ask about security. Need to address security and ask for category."
+    },
+    {
+      "student": "She is general category. Can I visit her on weekends? Are parents allowed inside the hostel campus?",
+      "expected": {
+        "understanding": {
+          "intent": "hostel",
+          "facts": {
+            "category": "general"
+          },
+          "inference": {
+            "parent_mode": true
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.71,
+          "confidence": "high",
+          "current_problem": "needs_hostel_info",
+          "problems": ["needs_hostel_info"]
+        },
+        "brain": {
+          "eligible_branches": ["CSE", "AIML", "IT", "ECE", "EE", "ME", "CE"],
+          "applicable": true,
+          "why": [
+            {
+              "condition": "rank_provided",
+              "met": true,
+              "detail": "Rank=8000"
+            },
+            {
+              "condition": "category_known",
+              "met": true,
+              "detail": "General"
+            },
+            {
+              "condition": "rank_within_margin",
+              "met": true,
+              "detail": "8000 well within ECE general cutoff"
+            }
+          ]
+        },
+        "decision": {
+          "action": "provide_hostel_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Parent asking about visitation policy",
+            "Category now known, can confirm ECE eligibility alongside hostel info"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": ["visiting", "parents", "weekends"]
+            },
+            {
+              "action": "reassure",
+              "content_contains": ["ECE", "eligible", "rank"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_hostel_info", "Profile_complete", "Visitation_query"]
+        }
+      },
+      "must_not": [
+        "guarantee_visitation_hours",
+        "ignore_admission_eligibility"
+      ],
+      "ideal_counselor_notes": "Parent asks about visitation. Provide visitation info and reassure about ECE eligibility at rank 8000 general."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "Parent calling about daughter's hostel safety. Emotional conversation — parent is anxious about daughter staying away from home. Must address safety concern before providing other info.",
+  "author_note": {
+    "primary_capability": "hostel safety reassurance with parent mode and emotion handling",
+    "expected_failure_mode": "reasoning — might not address anxiety first, or might dismiss parent's safety concerns",
+    "why_this_conversation": "Tests parent_mode + emotion handling in hostel context. Parent is anxious about daughter's safety and asks multiple security-related questions."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

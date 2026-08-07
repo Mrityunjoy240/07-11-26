@@ -1,0 +1,488 @@
+{
+  "id": "BENCH_V21_000023",
+  "domain": "fees",
+  "difficulty": 4,
+  "primary_language": "hi",
+  "languages": [
+    "hi",
+    "en"
+  ],
+  "speaker_profile": "parent",
+  "features": [
+    "parent_mode",
+    "correction"
+  ],
+  "ground_truth": {
+    "rank": 45000,
+    "pcm_percentage": 75,
+    "category": "general",
+    "interest": "ECE",
+    "board": "cbse",
+    "exam": "jee",
+    "budget": 250000,
+    "location": "patna"
+  },
+  "turns": [
+    {
+      "student": "Mera beta ka JEE rank 45000 hai. Mujhe ECE branch ka fee pata karna hai. Budget hamara 2.5 lakh hai.",
+      "expected": {
+        "understanding": {
+          "intent": "fee",
+          "facts": {
+            "rank": 45000,
+            "interest": "ECE",
+            "budget": 250000,
+            "exam": "jee"
+          },
+          "inference": {
+            "speaker": "parent"
+          },
+          "confidence": "high",
+          "missing": [
+            "category",
+            "pcm_percentage"
+          ]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.43,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": [
+            "needs_fee_information",
+            "needs_profile_completion"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_fee_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Parent asking about ECE fees for their child",
+            "Rank and budget provided, can give fee range"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "fee",
+                "ECE",
+                "range"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "category",
+                "pcm_percentage"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_fee_info",
+            "Parent_mode"
+          ]
+        }
+      },
+      "must_not": [
+        "address_child_directly",
+        "recommend_branch",
+        "hallucinate_exact_fees"
+      ],
+      "ideal_counselor_notes": "Parent speaking about their child's ECE fee query. Acknowledge parent, provide fee range, ask for category."
+    },
+    {
+      "student": "Beta general category hai. PCM mein 75% hai. Lekin mujhe lagta hai ki rank galat bola hai, 45000 nahi 54000 hai.",
+      "expected": {
+        "understanding": {
+          "intent": "fee",
+          "facts": {
+            "category": "general",
+            "pcm_percentage": 75,
+            "rank": 54000
+          },
+          "inference": {
+            "speaker": "parent",
+            "correction": {
+              "field": "rank",
+              "old_value": 45000,
+              "new_value": 54000
+            }
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": [
+            "needs_fee_information"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_fee_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Parent correcting rank from 45000 to 54000",
+            "Must use corrected rank for fee guidance"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "correction",
+                "rank",
+                "54000"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "fee",
+                "corrected",
+                "your rank"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_fee_info",
+            "Rank_correction"
+          ]
+        }
+      },
+      "must_not": [
+        "use_old_rank",
+        "address_child_directly",
+        "hallucinate_exact_fees"
+      ],
+      "ideal_counselor_notes": "Parent corrects the rank from 45000 to 54000. Counselor must acknowledge correction and use updated rank for fee guidance."
+    },
+    {
+      "student": "General category ke liye koi concession hota hai kya? Government colleges mein kam fees hoti hai na?",
+      "expected": {
+        "understanding": {
+          "intent": "fee",
+          "facts": {},
+          "inference": {
+            "speaker": "parent",
+            "topic": "fee_concession"
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": [
+            "needs_fee_information"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_fee_info",
+          "priority": "normal",
+          "confidence": "high",
+          "why": [
+            "Parent asking about fee concession for general category",
+            "Can explain government vs private fee differences"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": [
+                "concession",
+                "government",
+                "fee"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_fee_info",
+            "Concession_query"
+          ]
+        }
+      },
+      "must_not": [
+        "guarantee_concession",
+        "hallucinate_specific_concession_amount"
+      ],
+      "ideal_counselor_notes": "Parent asks about fee concession for general category. Explain that general category typically has no concession, but government colleges have lower fees."
+    },
+    {
+      "student": "OK, now I want to ask — if we choose IT instead of ECE, will the fee be different? My son is now interested in IT.",
+      "expected": {
+        "understanding": {
+          "intent": "fee",
+          "facts": {
+            "interest": "IT"
+          },
+          "inference": {
+            "speaker": "parent",
+            "language_switch": true,
+            "topic_shift": "ECE_to_IT"
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.86,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": [
+            "needs_fee_information"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_fee_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Parent switches language to English and interest from ECE to IT",
+            "Must handle multi-constraint: fee comparison between branches"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "IT",
+                "interest",
+                "switch"
+              ]
+            },
+            {
+              "action": "recommend",
+              "content_contains": [
+                "fee",
+                "IT branch",
+                "ECE",
+                "comparison"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_fee_info",
+            "Branch_switch",
+            "Language_switch"
+          ]
+        }
+      },
+      "must_not": [
+        "ignore_branch_change",
+        "address_child_directly",
+        "hallucinate_exact_fees"
+      ],
+      "ideal_counselor_notes": "Parent switches to English and changes child's interest from ECE to IT. Handle language switch and branch change gracefully."
+    },
+    {
+      "student": "Haan, aur agar OBC certificate ban jaye to kya fee mein fark padega? Maine bola tha general hai lekin OBC bhi apply kar rahe hain.",
+      "expected": {
+        "understanding": {
+          "intent": "fee",
+          "facts": {
+            "category": "obc"
+          },
+          "inference": {
+            "speaker": "parent",
+            "language_switch": true,
+            "correction": {
+              "field": "category",
+              "old_value": "general",
+              "new_value": "obc (pending)"
+            }
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 1.0,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": [
+            "needs_fee_information"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_fee_info",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Parent correcting category from general to OBC (pending)",
+            "Must handle correction and explain OBC fee implications"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "OBC",
+                "correction",
+                "category"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "fee",
+                "OBC category",
+                "difference"
+              ]
+            },
+            {
+              "action": "recommend",
+              "content_contains": [
+                "certificate",
+                "timeline",
+                "benefit"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_fee_info",
+            "Category_correction"
+          ]
+        }
+      },
+      "must_not": [
+        "guarantee_OBC_certificate",
+        "ignore_correction",
+        "hallucinate_exact_fee_difference"
+      ],
+      "ideal_counselor_notes": "Parent corrects category to OBC (pending application). Explain potential fee difference with OBC and advise on certificate timeline."
+    },
+    {
+      "student": "Thank you. So if I understand correctly — for IT branch, general category, around 2 lakh budget, the fee should be manageable? And OBC would make it even better if certificate comes in time?",
+      "expected": {
+        "understanding": {
+          "intent": "fee",
+          "facts": {},
+          "inference": {
+            "speaker": "parent",
+            "seeking_confirmation": true
+          },
+          "confidence": "high",
+          "missing": []
+        },
+        "reasoning": {
+          "stage": "decision",
+          "profile_completeness": 1.0,
+          "confidence": "high",
+          "current_problem": "needs_fee_information",
+          "problems": [
+            "needs_fee_information"
+          ]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_fee_info",
+          "priority": "normal",
+          "confidence": "high",
+          "why": [
+            "Parent summarizing and seeking confirmation",
+            "Confirm understanding and provide closing guidance"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": [
+                "confirmation",
+                "summary"
+              ]
+            },
+            {
+              "action": "inform",
+              "content_contains": [
+                "confirm",
+                "fee",
+                "manageable"
+              ]
+            },
+            {
+              "action": "ask",
+              "content_contains": [
+                "decision",
+                "timeline",
+                "next_step"
+              ]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": [
+            "Decision=provide_fee_info",
+            "Confirmation"
+          ]
+        }
+      },
+      "must_not": [
+        "overpromise",
+        "guarantee_fee_amount"
+      ],
+      "ideal_counselor_notes": "Parent seeks confirmation of fee understanding. Confirm the general guidance and remind about OBC certificate timeline."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "Complex 6-turn conversation with parent speaking in Hindi and English. Tests parent_mode, rank correction, category correction, language switching, and multi-constraint fee reasoning.",
+  "author_note": {
+    "primary_capability": "fee explanation with parent mode, correction, and language switch",
+    "expected_failure_mode": "multi_constraint — might not track corrections across turns, or might switch to addressing child instead of parent",
+    "why_this_conversation": "Difficulty 4 conversation testing parent_mode, two corrections (rank and category), language switching between Hindi and English, and multi-constraint fee reasoning across 6 turns."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

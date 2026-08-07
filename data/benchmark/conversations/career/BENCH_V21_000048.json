@@ -1,0 +1,350 @@
+{
+  "id": "BENCH_V21_000048",
+  "domain": "career",
+  "difficulty": 4,
+  "primary_language": "hi",
+  "languages": ["hi", "en"],
+  "speaker_profile": "parent",
+  "features": ["parent_mode", "emotion"],
+  "ground_truth": {
+    "rank": 20000,
+    "pcm_percentage": 85,
+    "category": "general",
+    "interest": "",
+    "board": "cbse",
+    "exam": "jee",
+    "budget": null,
+    "location": "delhi"
+  },
+  "turns": [
+    {
+      "student": "Bhaiya, meri beti 12th mein hai aur bahut confusion mein hai. Engineering kare ya medical? Bahut pareshan hai aur padhai mein mann nahi laga raha.",
+      "expected": {
+        "understanding": {
+          "intent": "career_confusion",
+          "facts": {},
+          "inference": {"parent_mode": true, "anxiety": true},
+          "confidence": "high",
+          "missing": ["rank", "pcm_percentage", "category", "interest", "board"]
+        },
+        "reasoning": {
+          "stage": "discovery",
+          "profile_completeness": 0.0,
+          "confidence": "high",
+          "current_problem": "expressing_anxiety",
+          "problems": ["expressing_anxiety"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_career_guidance",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Parent expressing concern about child career confusion",
+            "Need to provide emotional support and collect academic details"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "reassure",
+              "content_contains": ["concern", "normal", "child"]
+            },
+            {
+              "action": "ask",
+              "content_contains": ["PCM scores", "exam rank"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_career_guidance", "Parent_mode", "Emotional_support"]
+        }
+      },
+      "must_not": ["dismiss_anxiety", "rush_to_conclusion"],
+      "ideal_counselor_notes": "Parent worried about child career confusion between engineering and medical. Reassure parent first, then ask for academic details to provide informed guidance."
+    },
+    {
+      "student": "Uska JEE mein 20000 rank aaya hai. PCM 85% hai CBSE board se. Delhi mein rehte hain. Par woh decide nahi kar pa rahi.",
+      "expected": {
+        "understanding": {
+          "intent": "career_confusion",
+          "facts": {"rank": 20000, "pcm_percentage": 85, "board": "cbse", "location": "delhi"},
+          "inference": {"parent_mode": true},
+          "confidence": "high",
+          "missing": ["interest", "category"]
+        },
+        "reasoning": {
+          "stage": "exploration",
+          "profile_completeness": 0.57,
+          "confidence": "high",
+          "current_problem": "expressing_anxiety",
+          "problems": ["expressing_anxiety"]
+        },
+        "brain": {
+          "eligible_branches": [],
+          "applicable": false,
+          "why": []
+        },
+        "decision": {
+          "action": "provide_career_guidance",
+          "priority": "high",
+          "confidence": "medium",
+          "why": [
+            "Strong academic profile — rank 20000 with 85% PCM",
+            "Need to understand child aptitude and interests before advising"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "listen",
+              "content_contains": ["JEE rank", "20000", "strong profile"]
+            },
+            {
+              "action": "ask",
+              "content_contains": ["subjects preference", "career aspirations"]
+            }
+          ],
+          "confidence": "medium",
+          "dependency_chain": ["Decision=provide_career_guidance", "Academic_profile_known"]
+        }
+      },
+      "must_not": ["assume_interest", "push_one_career_path"],
+      "ideal_counselor_notes": "Good academic profile revealed — rank 20000 with 85% PCM. Ask about child specific interests and subject preferences to guide career decision."
+    },
+    {
+      "student": "Usko physics aur math bahut pasand hai. Biology bhi achha hai par utna nahi. Woh kehti hai ki doctors ki life bahut stressful hai.",
+      "expected": {
+        "understanding": {
+          "intent": "career_confusion",
+          "facts": {},
+          "inference": {"parent_mode": true, "confusion": true},
+          "confidence": "high",
+          "missing": ["interest"]
+        },
+        "reasoning": {
+          "stage": "comparison",
+          "profile_completeness": 0.57,
+          "confidence": "high",
+          "current_problem": "comparing_options",
+          "problems": ["comparing_options"]
+        },
+        "brain": {
+          "eligible_branches": ["CSE", "AIML", "IT", "ECE", "EE", "ME", "CE"],
+          "applicable": true,
+          "why": [
+            {"condition": "rank_provided", "met": true, "detail": "Rank=20000 JEE"},
+            {"condition": "academic_strength", "met": true, "detail": "PCM 85% — strong for engineering"},
+            {"condition": "interest_direction", "met": true, "detail": "Physics and math preference aligns with engineering"}
+          ]
+        },
+        "decision": {
+          "action": "provide_career_guidance",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Physics and math preference strongly indicates engineering aptitude",
+            "Child observation about medical career stress shows she is thinking practically",
+            "Can now provide comparison between engineering and medical paths"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": ["engineering path", "physics", "math"]
+            },
+            {
+              "action": "recommend",
+              "content_contains": ["engineering aptitude", "medical comparison"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_career_guidance", "Physics_math_preference", "Comparison_stage"]
+        }
+      },
+      "must_not": ["disparage_medical", "force_engineering"],
+      "ideal_counselor_notes": "Child prefers physics and math over biology. She has realistic view of medical career stress. Use this information to provide balanced comparison favoring engineering."
+    },
+    {
+      "student": "Par engineering mein kaunsa branch choose kare? Bohot saare options hain — CSE, ECE, mechanical. Samajh nahi aa raha.",
+      "expected": {
+        "understanding": {
+          "intent": "career_confusion",
+          "facts": {},
+          "inference": {"parent_mode": true},
+          "confidence": "high",
+          "missing": ["interest"]
+        },
+        "reasoning": {
+          "stage": "comparison",
+          "profile_completeness": 0.57,
+          "confidence": "high",
+          "current_problem": "comparing_options",
+          "problems": ["comparing_options"]
+        },
+        "brain": {
+          "eligible_branches": ["CSE", "AIML", "IT", "ECE", "EE", "ME", "CE"],
+          "applicable": true,
+          "why": [
+            {"condition": "rank_provided", "met": true, "detail": "Rank=20000"},
+            {"condition": "pcm_strong", "met": true, "detail": "PCM 85%"},
+            {"condition": "branch_narrowed", "met": false, "detail": "Child has not specified branch preference yet"}
+          ]
+        },
+        "decision": {
+          "action": "provide_career_guidance",
+          "priority": "high",
+          "confidence": "medium",
+          "why": [
+            "Multiple branch options available at rank 20000",
+            "Need to help narrow down based on interest and aptitude",
+            "Career confusion is now shifting to branch selection"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "clarify",
+              "content_contains": ["branch options", "CSE", "ECE"]
+            },
+            {
+              "action": "ask",
+              "content_contains": ["specific interest", "technology preference"]
+            }
+          ],
+          "confidence": "medium",
+          "dependency_chain": ["Decision=provide_career_guidance", "Branch_selection_query"]
+        }
+      },
+      "must_not": ["recommend_only_one_branch", "ignore_rank_constraint"],
+      "ideal_counselor_notes": "Parent asking about branch selection. Explain key differences between CSE, ECE, and mechanical to help narrow down based on child interests."
+    },
+    {
+      "student": "Woh computers ke saath kaam karna pasand karti hai. Coding bhi thodi bahut aati hai. Par doctor bhi banna chahti thi pehle. Kya CSE sahi rahega?",
+      "expected": {
+        "understanding": {
+          "intent": "career_confusion",
+          "facts": {},
+          "inference": {"parent_mode": true},
+          "confidence": "high",
+          "missing": ["interest"]
+        },
+        "reasoning": {
+          "stage": "decision",
+          "profile_completeness": 0.57,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance",
+          "problems": ["needs_admission_guidance"]
+        },
+        "brain": {
+          "eligible_branches": ["CSE", "AIML", "IT"],
+          "applicable": true,
+          "why": [
+            {"condition": "rank_provided", "met": true, "detail": "Rank=20000"},
+            {"condition": "interest_inferred", "met": true, "detail": "Computers and coding preference — CSE aligned"},
+            {"condition": "rank_within_margin", "met": false, "detail": "20000 > 15000 for CSE/General — CSE competitive but possible"}
+          ]
+        },
+        "decision": {
+          "action": "provide_career_guidance",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Child interest in computers and coding clearly indicates CSE alignment",
+            "Rank 20000 makes CSE competitive — honest assessment needed",
+            "Career decision converging toward CSE — can now provide college guidance"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "encourage",
+              "content_contains": ["CSE interest", "computers", "coding"]
+            },
+            {
+              "action": "recommend",
+              "content_contains": ["CSE", "IT backup", "rank assessment"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_career_guidance", "CSE_interest_clear", "Decision_stage"]
+        }
+      },
+      "must_not": ["guarantee_CSE_admission", "ignore_competitive_rank"],
+      "ideal_counselor_notes": "Child interest in computers and coding aligns with CSE. Encourage this direction but be honest about CSE competitiveness at rank 20000 general. Suggest IT as backup."
+    },
+    {
+      "student": "Thank you bhaiya. Ab clear ho gaya. CSE choose karegi. Kaunse colleges hain Delhi mein rank 20000 ke liye? Aur kya kya karna hai ab?",
+      "expected": {
+        "understanding": {
+          "intent": "career_confusion",
+          "facts": {},
+          "inference": {"parent_mode": true},
+          "confidence": "high",
+          "missing": ["interest"]
+        },
+        "reasoning": {
+          "stage": "decision",
+          "profile_completeness": 0.57,
+          "confidence": "high",
+          "current_problem": "needs_admission_guidance",
+          "problems": ["needs_admission_guidance"]
+        },
+        "brain": {
+          "eligible_branches": ["CSE", "AIML", "IT"],
+          "applicable": true,
+          "why": [
+            {"condition": "rank_provided", "met": true, "detail": "Rank=20000"},
+            {"condition": "interest_decided", "met": true, "detail": "CSE chosen"},
+            {"condition": "rank_within_margin", "met": false, "detail": "20000 for CSE/General — competitive"}
+          ]
+        },
+        "decision": {
+          "action": "provide_career_guidance",
+          "priority": "high",
+          "confidence": "high",
+          "why": [
+            "Career decision made — child will pursue CSE",
+            "Can now provide specific college recommendations for Delhi",
+            "Parent asking for next steps — provide actionable guidance"
+          ]
+        },
+        "planner": {
+          "turns": [
+            {
+              "action": "inform",
+              "content_contains": ["Delhi colleges", "CSE options", "rank 20000"]
+            },
+            {
+              "action": "summarize",
+              "content_contains": ["career path", "action plan", "counseling timeline"]
+            }
+          ],
+          "confidence": "high",
+          "dependency_chain": ["Decision=provide_career_guidance", "CSE_decided", "College_query"]
+        }
+      },
+      "must_not": ["overwhelm_with_options", "skip_counseling_info"],
+      "ideal_counselor_notes": "Career decision finalized — CSE. Provide specific Delhi college recommendations for rank 20000 and summarize the complete action plan including counseling timeline."
+    }
+  ],
+  "expected_end_state": "success",
+  "ideal_counselor_notes": "Parent worried about child career confusion between engineering and medical. Long 6-turn conversation progressing from emotional support through comparison to final CSE decision. Key challenge: providing emotional support while guiding toward an informed career decision.",
+  "author_note": {
+    "primary_capability": "career guidance with emotional support and multi-turn comparison",
+    "expected_failure_mode": "emotion — might not provide adequate emotional support, or might push a career path without sufficient comparison",
+    "why_this_conversation": "Tests career guidance across 6 turns with emotional parent. The conversation progresses through discovery, exploration, comparison, and decision stages. Tests emotional support, comparison guidance, and college recommendation within a single conversation."
+  },
+  "annotation": {
+    "author": "pipeline-author",
+    "reviewer": "",
+    "created": "2026-07-19T12:00:00Z",
+    "reviewed": "",
+    "status": "draft"
+  },
+  "schema_version": "v2"
+}

@@ -1,6 +1,6 @@
 # Benchmark Authoring Guide
 
-**Version**: 2.0  
+**Version**: 2.1  
 **Date**: 2026-07-19  
 **Status**: Active
 
@@ -212,17 +212,9 @@ Status values: `draft` → `reviewed` → `frozen`
 
 ## 7. Controlled Vocabularies
 
-### 7.1 Decision Actions (21)
+### 7.1 Decision Actions
 
-```
-collect_profile, encourage_and_collect_profile, recommend_branches,
-provide_admission_info, provide_fee_info, provide_placement_info,
-provide_hostel_info, provide_scholarship_info, provide_career_guidance,
-provide_counseling_schedule, escalate_to_human, explain_management_quota_policy,
-provide_grievance_process, provide_transfer_info, provide_nri_admission_info,
-provide_branch_guidance, provide_sports_info, provide_distance_ed_info,
-provide_lateral_entry_info, provide_sports_quota_info, clarify
-```
+The canonical action vocabulary is defined in `data/benchmark/coverage/ontology_v2.1.json` (15 actions). The conversation schema also accepts deprecated actions for v2.0 backward compatibility.
 
 ### 7.2 Planner Actions (9)
 

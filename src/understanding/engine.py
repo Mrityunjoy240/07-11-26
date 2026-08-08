@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 def _detect_conflicts(pre: dict[str, float], post: dict[str, float]) -> list[str]:
     """Compare pre/post conflict scores to describe what conflicts fired."""
     conflicts: list[str] = []
-    for intent in set(list(pre.keys()) + list(post.keys())):
+    for intent in sorted(set(list(pre.keys()) + list(post.keys()))):
         pre_val = pre.get(intent, 0)
         post_val = post.get(intent, 0)
         if post_val < pre_val:
@@ -132,7 +132,7 @@ _INTENT_PATTERNS: list[tuple[str, str, float]] = [
     ), 0.8),
     ("seats", r"(?:seat|intake|capacity|strength|सीट|সিট|how\s*many\s*students|available.*seat)", 0.7),
     ("faculty", r"(?:faculty|teacher|professor|शिक्षक|অধ্যাপক|staff|qualification|PhD|experienced)", 0.7),
-    ("hod", r"(?:principal|hod|head|director|dean|निदेशक|অধ্যক্ষ|incharge)", 0.7),
+    ("hod", r"(?:principal|\bhod\b|head|director|dean|निदेशक|অধ্যক্ষ|incharge)", 0.7),
     ("safety", (
         r"(?:safe|safety|security|campus|girl|women|hostel\s*safety|"
         r"सुरक्षा|सुरक्षित|সুরক্ষা|নিরাপত্তা|সুরক্ষিত|"
@@ -211,7 +211,7 @@ _INTENT_PATTERNS: list[tuple[str, str, float]] = [
     ("institution", (
         r"(?:affiliat|accredit|naac|college.*affil|"
         r"college.*name|institution.*name|"
-        r"principal|hod|head\s+of\s+department|director|dean|"
+        r"principal|\bhod\b|head\s+of\s+department|director|dean|"
         r"কলেজের\s+নাম)"
     ), 0.7),
 ]
@@ -240,6 +240,13 @@ def _is_closing_turn(text: str) -> bool:
     if _CLOSING_NOT_RE.search(tl):
         return False
     return True
+
+
+def _deterministic_argmax(scores: dict[str, float]) -> str:
+    """Return the highest-scoring intent; ties break deterministically by
+    intent name so results don't depend on dict/set hash order
+    (PYTHONHASHSEED)."""
+    return max(scores, key=lambda k: (scores[k], k))
 
 
 _NEGATION_PREFIX_RE = re.compile(
@@ -678,7 +685,7 @@ class UnderstandingEngine:
         )
 
         if all_scores:
-            best = max(all_scores, key=all_scores.get)
+            best = _deterministic_argmax(all_scores)
             best_score = all_scores[best]
         else:
             best = "unknown"
@@ -698,6 +705,30 @@ class UnderstandingEngine:
                 if topic in all_scores:
                     best = topic
                     best_score = max(all_scores.get(topic, 0.0), 0.12)
+
+        # Multi-subtopic follow-up persistence: when a follow-up turn raises
+        # several domain candidates that are effectively tied/weak (the top
+        # candidates barely beat each other and the committed conversation
+        # topic is still competitive), keep the committed topic. E.g. a
+        # "hostel security + CSE placements" follow-up inside a safety
+        # conversation (000046 t2) must not hijack safety, but a clear new
+        # question like "tell me about the IT cutoff" (000014 t1) must win.
+        # Only honored when the topic was itself the pre-conflict winner.
+        if best_score < 0.40:
+            topic = (state.goals or {}).get("topic", "") if state else ""
+            pre_winner = (state.goals or {}).get("topic_pre_winner", False) if state else False
+            if (pre_winner and topic and topic not in (
+                "unknown", "general", "greeting", "repeat"
+            ) and topic in all_scores):
+                winner_margin = best_score - all_scores[topic]
+                runner_up = max(
+                    (score for k, score in all_scores.items() if k != best),
+                    default=0.0,
+                )
+                tie_margin = best_score - runner_up
+                if winner_margin < 0.06 and tie_margin < 0.03:
+                    best = topic
+                    best_score = all_scores[topic]
 
         # Closing/gratitude turns revert to the conversation topic when the
         # best candidate is weak (e.g. "Thank you, we will think about IT.").
@@ -721,7 +752,7 @@ class UnderstandingEngine:
             all_scores=all_scores,
             pre_conflict_winner=(
                 bool(pre_conflict)
-                and max(pre_conflict, key=pre_conflict.get) == best
+                and _deterministic_argmax(pre_conflict) == best
             ),
         )
 
@@ -745,7 +776,7 @@ class UnderstandingEngine:
                 best, all_scores, pre_conflict, per_intent_breakdown, _d.conflicts_applied,
             )
             # Ranked intents, margin, confidence class
-            sorted_scores = sorted(all_scores.items(), key=lambda x: -x[1])
+            sorted_scores = sorted(all_scores.items(), key=lambda x: (-x[1], x[0]))
             _d.ranked_intents = sorted_scores
             _d.runner_up_score = sorted_scores[1][1] if len(sorted_scores) > 1 else 0.0
             _d.margin = round(best_score - _d.runner_up_score, 3)
@@ -824,7 +855,7 @@ class UnderstandingEngine:
             contributing.sort(key=lambda x: -x[1])
             parts.append("contributing stages: " + ", ".join(f"{s}={sc:.3f}" for s, sc in contributing))
         loser_parts: list[str] = []
-        for intent, pre_score in sorted(pre.items(), key=lambda x: -x[1]):
+        for intent, pre_score in sorted(pre.items(), key=lambda x: (-x[1], x[0])):
             if intent == winner:
                 continue
             post_score = post.get(intent, 0.0)

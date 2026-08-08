@@ -58,6 +58,7 @@ ANSWERABLE_GENERALLY = {
     "distance_ed", "distance_education", "loan",
     "grievance", "lateral_entry", "sports", "sports_quota",
     "nri", "nri_admission", "counseling_info",
+    "career_confusion",
 }
 
 # Minimum fields that truly block routing for non-answerable intents.

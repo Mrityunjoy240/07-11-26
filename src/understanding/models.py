@@ -52,6 +52,7 @@ class UnderstandingIntent:
     primary: str = "unknown"
     confidence: float = 0.0
     all_scores: dict[str, float] = field(default_factory=dict)
+    pre_conflict_winner: bool = False
 
 
 @dataclass

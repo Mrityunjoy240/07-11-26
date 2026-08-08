@@ -210,6 +210,16 @@ class PipelineOrchestrator:
             # Track resolved intent and problem for multi-turn context
             if understanding and hasattr(understanding, 'intent'):
                 state.goals["primary"] = understanding.intent.primary
+                # Conversation topic = first meaningful intent (used to route
+                # closing/gratitude turns back to the subject).
+                if not state.goals.get("topic"):
+                    if understanding.intent.primary not in (
+                        "unknown", "general", "greeting", "repeat"
+                    ):
+                        state.goals["topic"] = understanding.intent.primary
+                        state.goals["topic_pre_winner"] = (
+                            understanding.intent.pre_conflict_winner
+                        )
             if reasoning and reasoning.current_problem:
                 prev = state.metadata.get("previous_problem", "")
                 current = reasoning.current_problem

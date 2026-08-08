@@ -24,6 +24,31 @@ from src.reasoning.observation import observe, Observer
 
 logger = logging.getLogger(__name__)
 
+_CLOSING_RE = re.compile(
+    r"(?:\bthanks?\b|\bthank\s+(?:you|u)\b|\bthnx\b|\bthx\b|"
+    r"dhonnobad|dhonyobad|dhanyavad|dhanyabad|ধন্যবাদ)",
+    re.IGNORECASE,
+)
+
+_CLOSING_NOT_RE = re.compile(
+    r"\b(?:one\s+more\s+(?:thing|question)|another\s+(?:thing|question)|"
+    r"also|by\s+the\s+way|furthermore|additionally|one\s+thing|"
+    r"if\s+I\s+understand\s+correctly)\b",
+    re.IGNORECASE,
+)
+
+
+def _is_closing_turn(text: str) -> bool:
+    """True when the turn is a pure closing/gratitude (not a follow-up question)."""
+    tl = text.lower().strip()
+    if not _CLOSING_RE.search(tl):
+        return False
+    if tl.rstrip().endswith("?"):
+        return False
+    if _CLOSING_NOT_RE.search(tl):
+        return False
+    return True
+
 # Intents that can be answered without critical profile data
 # (domain readiness is informational — does not block routing)
 ANSWERABLE_GENERALLY = {
@@ -413,15 +438,26 @@ class ReasoningEngine:
         intent = ctx.intent_primary
         dominant_signal, signal_score = ctx.signals.dominant
 
+        # Closing/gratitude turns → reassurance, regardless of intent.
+        if _is_closing_turn(ctx.text):
+            return "needs_reassurance"
+
         if signal_score > 0.4 and dominant_signal == "anxiety":
-            if signal_score > 0.7:
-                return "needs_reassurance"
+            # Domain intents that already convey a specific informational need
+            # keep their routing even under a strong anxiety signal.
             if intent not in ("hostel", "placement", "cutoff", "fee",
                               "scholarship", "grievance"):
                 return "needs_reassurance"
         if signal_score > 0.5 and dominant_signal == "confusion":
             return "needs_clarification"
         if signal_score > 0.5 and dominant_signal == "frustration":
+            return "needs_clarification"
+
+        # Meta-intents short-circuit the domain readiness gate.
+        # Only for non-empty utterances: a blank/no-op turn (e.g. a session
+        # starter with no content) should fall through to profile collection
+        # rather than be treated as a clarification request.
+        if intent in ("repeat", "unknown") and ctx.text.strip():
             return "needs_clarification"
 
         # Domain readiness gate — only block intents that cannot be answered generally

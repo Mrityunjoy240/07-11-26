@@ -101,7 +101,7 @@ _INTENT_PATTERNS: list[tuple[str, str, float]] = [
         r"placements|প্লেসমেন্ট|recruiter|company.*visit)"
     ), 0.8),
     ("hostel", (
-        r"(?:hostel|dorm|accommodation|room|हॉस्टल|আবাসন|"
+        r"(?:hostel|dorm|accommodation|room|warden|हॉस्टल|आबासन|"
         r"mess|boarding|hostel fee|hostel facility|আবাসন)"
     ), 0.8),
     ("scholarship", (
@@ -215,6 +215,32 @@ _INTENT_PATTERNS: list[tuple[str, str, float]] = [
         r"কলেজের\s+নাম)"
     ), 0.7),
 ]
+
+_CLOSING_RE = re.compile(
+    r"(?:\bthanks?\b|\bthank\s+(?:you|u)\b|\bthnx\b|\bthx\b|"
+    r"dhonnobad|dhonyobad|dhanyavad|dhanyabad|ধন্যবাদ)",
+    re.IGNORECASE,
+)
+
+_CLOSING_NOT_RE = re.compile(
+    r"\b(?:one\s+more\s+(?:thing|question)|another\s+(?:thing|question)|"
+    r"also|by\s+the\s+way|furthermore|additionally|one\s+thing|"
+    r"if\s+I\s+understand\s+correctly)\b",
+    re.IGNORECASE,
+)
+
+
+def _is_closing_turn(text: str) -> bool:
+    """True when the turn is a pure closing/gratitude (not a follow-up question)."""
+    tl = text.lower().strip()
+    if not _CLOSING_RE.search(tl):
+        return False
+    if tl.rstrip().endswith("?"):
+        return False
+    if _CLOSING_NOT_RE.search(tl):
+        return False
+    return True
+
 
 _NEGATION_PREFIX_RE = re.compile(
     r'(?:^|\s)(?:not|no|n\'?t|never|don\'?t|doesn\'?t|isn\'?t|aren\'?t|wasn\'?t|weren\'?t|won\'?t|can\'?t|haven\'?t|hasn\'?t)\s+'
@@ -626,10 +652,30 @@ class UnderstandingEngine:
             )
             all_scores[intent] = round(score, 3)
 
+        # Out-of-domain gate: no lexical/entity/domain evidence and no prior
+        # intent → treat as an unknown/off-topic utterance (e.g. weather Q).
+        # An on-domain vocabulary hit (college/university/hostel/… in the text)
+        # keeps the turn in-domain so stage-context can still route it.
+        prev_intent = (state.goals or {}).get("primary", "") if state else ""
+        no_prior = (not prev_intent) or prev_intent in ("unknown", "general", "greeting", "repeat")
+        on_domain = bool(re.search(
+            r"\b(?:college|university|institute|campus|admission|admit|apply|"
+            r"hostel|stay|accommodation|room\b|fee\b|fees|placement|scholarship|"
+            r"course|branch|engineering|exam|rank|percentage|quota|counsel|"
+            r"छात्रावास|कॉलेज|ভর্তি|হোস্টেল)\b",
+            tl,
+        ))
+        if (no_prior and not keyword_scores and not entity_scores
+                and not domain_scores and not wording_scores and not on_domain):
+            all_scores = {}
+
         pre_conflict = dict(all_scores)
 
         # Apply conflict resolution
-        all_scores = self._resolve_intent_conflicts(all_scores, tl, profile, domain)
+        topic = (state.goals or {}).get("topic", "") if state else ""
+        all_scores = self._resolve_intent_conflicts(
+            all_scores, tl, profile, domain, keyword_scores, topic=topic,
+        )
 
         if all_scores:
             best = max(all_scores, key=all_scores.get)
@@ -638,12 +684,46 @@ class UnderstandingEngine:
             best = "unknown"
             best_score = 0.0
 
+        # Continuation persistence: when the turn adds profile/correction data
+        # with no new topic keyword and a weak winner, keep the committed
+        # conversation topic (e.g. 000031 t1 rank/PCM detail in a hostel chat).
+        # Only honored when the topic was itself the pre-conflict winner at
+        # commit time (e.g. NOT a conflict-suppressed winner like 000049 t0).
+        if not keyword_scores and best_score < 0.15:
+            topic = (state.goals or {}).get("topic", "") if state else ""
+            pre_winner = (state.goals or {}).get("topic_pre_winner", False) if state else False
+            if pre_winner and topic and topic not in (
+                "unknown", "general", "greeting", "repeat"
+            ):
+                if topic in all_scores:
+                    best = topic
+                    best_score = max(all_scores.get(topic, 0.0), 0.12)
+
+        # Closing/gratitude turns revert to the conversation topic when the
+        # best candidate is weak (e.g. "Thank you, we will think about IT.").
+        if best_score < 0.15 and _is_closing_turn(tl):
+            topic = (state.goals or {}).get("topic", "") if state else ""
+            pre_winner = (state.goals or {}).get("topic_pre_winner", False) if state else False
+            if pre_winner and topic and topic not in (
+                "unknown", "general", "greeting", "repeat"
+            ):
+                best = topic
+                best_score = max(all_scores.get(topic, 0.0), 0.15)
+
         # Minimum threshold — below this, return unknown
         if best_score < 0.08:
             best = "unknown"
             best_score = 0.0
 
-        intent = UnderstandingIntent(primary=best, confidence=best_score, all_scores=all_scores)
+        intent = UnderstandingIntent(
+            primary=best,
+            confidence=best_score,
+            all_scores=all_scores,
+            pre_conflict_winner=(
+                bool(pre_conflict)
+                and max(pre_conflict, key=pre_conflict.get) == best
+            ),
+        )
 
         if debug:
             _d = diagnostics
@@ -1024,8 +1104,21 @@ class UnderstandingEngine:
         self, scores: dict[str, float], tl: str,
         profile: StudentProfile | None,
         domain: DomainInterpretation | None,
+        keyword_scores: dict[str, float] | None = None,
+        topic: str = "",
     ) -> dict[str, float]:
         result = dict(scores)
+        keyword_scores = keyword_scores or {}
+
+        # "safe"/"secure" used as an eligibility confirmation (e.g. "looks
+        # safe?") should not turn the turn into a safety intent.
+        if result.get("safety", 0) > 0:
+            if re.search(r"\b(safe|secure)\b", tl) and not re.search(
+                r"\b(safety|security|campus|girl|women|girls|hostel|warden|"
+                r"anti.?ragging|ladki|ladkiyon|सुरक्षा|সুরক্ষা|নিরাপত্তা)\b",
+                tl,
+            ):
+                result["safety"] *= 0.2
 
         # "admission" keywords + domain-specific intent → domain wins
         domain_specific = {"lateral_entry", "management_quota", "sports_quota",
@@ -1036,6 +1129,13 @@ class UnderstandingEngine:
         if result.get("admission", 0) > 0:
             for ds in domain_specific:
                 if ds in result and result[ds] >= result["admission"] * 0.3:
+                    # Entity-only (non-keyword) scholarship/safety evidence
+                    # (e.g. category "OBC" → scholarship) must not suppress
+                    # admission when the conversation topic is admission
+                    # itself (e.g. 000011 t5 "…looks safe?").
+                    if ds in ("scholarship", "safety") and ds not in keyword_scores:
+                        if topic == "admission":
+                            continue
                     result["admission"] *= 0.4
 
         # Merge lateral_entry into transfer (granularity fix)
@@ -1335,7 +1435,7 @@ class UnderstandingEngine:
         (["cse", "computer science", "computer", "computer since", "cs"], "CSE"),
         (["ece", "electronics", "electronics and communication", "electronics & communication", "e and c", "ec"], "ECE"),
         (["ee", "electrical", "electrical engineering", "electrical engg"], "EE"),
-        (["me", "mechanical", "mechanical engineering", "machanical", "mechanical engg"], "ME"),
+        (["mechanical", "mechanical engineering", "machanical", "mechanical engg"], "ME"),
         (["ce", "civil", "civil engineering", "civil engg"], "CE"),
         (["biotechnology", "bio tech", "biotech", "bio technology"], "Biotechnology"),
         (["data science", "data science", "data analytics"], "Data Science"),

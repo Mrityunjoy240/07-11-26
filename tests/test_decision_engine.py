@@ -43,12 +43,24 @@ class TestDecisionEngine:
     def test_brain_eligibility_overrides_action(self):
         engine = DecisionEngine()
         brain = CollegeBrain()
+        r = ReasoningResult(current_problem="needs_admission_guidance", confidence=0.5,
+                            profile_completeness=0.8)
+        q = brain.estimate_eligibility(rank=5000)
+        brain_response = type("BR", (), {"admission": q})()
+        output = engine.process(DecisionInput(reasoning=r, brain_response=brain_response))
+        assert output.action == "recommend_branches"
+
+    def test_brain_eligibility_does_not_override_blocked_profile(self):
+        """A blocked/incomplete profile must collect missing fields first even
+        when the brain has eligibility data."""
+        engine = DecisionEngine()
+        brain = CollegeBrain()
         r = ReasoningResult(current_problem="needs_profile_initial", confidence=0.5,
                             profile_completeness=0.5)
         q = brain.estimate_eligibility(rank=5000)
         brain_response = type("BR", (), {"admission": q})()
         output = engine.process(DecisionInput(reasoning=r, brain_response=brain_response))
-        assert output.action == "recommend_branches"
+        assert output.action == "collect_profile"
 
     def test_unknowns_passed_through(self):
         engine = DecisionEngine()

@@ -1079,7 +1079,7 @@ class TestIdentifyProblemIntentEquivalence:
             "sports": "needs_sports_quota_information",
             "lateral_entry": "needs_lateral_entry_information",
             "admission": "needs_admission_guidance",
-            "unknown": "needs_personalized_guidance",
+            "unknown": "needs_clarification",
         }
         for intent, expected in intent_map.items():
             r = _make_result(text=f"tell me about {intent}", intent_primary=intent)
@@ -1112,7 +1112,7 @@ class TestIdentifyProblemIntentEquivalence:
         r = _make_result(text="hello", intent_primary="unknown")
         ctx = ReasoningContext.from_understanding_result(r)
         result = engine._identify_problem(ctx, r, readiness, None)
-        assert result == "needs_personalized_guidance"
+        assert result == "needs_clarification"
 
     def test_dominant_no_signal_falls_through(self):
         """No dominant signal — problem falls through to intent-based routing."""

@@ -65,8 +65,9 @@ _KNOWLEDGE_TO_ACTION: dict[str, str] = {
 _GENERIC_ACTIONS = {"collect_profile", "clarify", "provide_guidance"}
 
 # Actions that are gateway/generic enough to be overridden by recommend_branches
-# when the brain has eligibility data.
-_GATEWAY_ACTIONS = {"collect_profile", "clarify", "provide_guidance",
+# when the brain has eligibility data. collect_profile is deliberately excluded:
+# a blocked/incomplete profile must collect the missing fields first.
+_GATEWAY_ACTIONS = {"clarify", "provide_guidance",
                      "provide_admission_guidance", "provide_branch_guidance"}
 
 

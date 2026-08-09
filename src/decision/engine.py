@@ -1,10 +1,22 @@
 import logging
+import re
 
 from src.decision.models import DecisionDiagnostics, DecisionStep
 from src.engines.interfaces import DecisionInput, DecisionOutput
 from src.registry import CapabilityRegistry
 
 logger = logging.getLogger(__name__)
+
+# Student says the entrance exam has not been taken yet — no rank exists to
+# collect, so profile-incompleteness gating must not force collect_profile.
+_FUTURE_APPLICANT_RE = re.compile(
+    r"\b(?:did\s*not\s+give|haven'?t\s+(?:given|appeared)|"
+    r"have\s+not\s+appeared|not\s+(?:appeared|given)|"
+    r"never\s+(?:appeared|given|took))\b"
+    r"[^.!?]{0,40}?\b(?:yet|this\s+year|next\s+year)\b"
+    r"|\bappear(?:ing)?\s+next\s+year\b",
+    re.IGNORECASE,
+)
 
 # ── Rule tables ─────────────────────────────────────────────────────────────
 
@@ -161,7 +173,10 @@ class DecisionEngine:
                 rationale = "Student asking about counseling schedule and documents"
 
         # ── Step 3: Gateway → collect_profile when very incomplete ──
-        if action in ("provide_admission_guidance", "provide_branch_guidance") and completeness < 0.3:
+        _student_text_low = (input.metadata or {}).get("student_text", "").lower()
+        _future_applicant = bool(_FUTURE_APPLICANT_RE.search(_student_text_low))
+        if (action in ("provide_admission_guidance", "provide_branch_guidance")
+                and completeness < 0.3 and not _future_applicant):
             _step("3 - Incompleteness guard", "collect_profile", "high",
                   "Profile too incomplete for guidance",
                   [f"action was {action}", f"completeness={completeness:.2f}"])

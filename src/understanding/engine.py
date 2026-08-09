@@ -93,7 +93,8 @@ _INTENT_PATTERNS: list[tuple[str, str, float]] = [
         r"যোগ্যতা|eligibility|पात्रतা|কবে|kab se|kab hogi|"
         r"can I get|admission process|প্রক্রিয়া|পদ্ধতি|"
         r"college.*(choose|select|pick|which)|choose.*college|"
-        r"which.*college|college.*for.*engineering)"
+        r"which.*college|college.*for.*engineering|"
+        r"\brank\b[^.!?]{0,40}\b(?:abhi\s+)?(?:nahi|nhi|not)\b[^.!?]{0,20}\b(?:aaya|aayi|aay|come|out|released)\b)"
     ), 0.7),
     ("placement", (
         r"(?:placement|job|package|salary|recruit|hire|"
@@ -102,7 +103,8 @@ _INTENT_PATTERNS: list[tuple[str, str, float]] = [
     ), 0.8),
     ("hostel", (
         r"(?:hostel|dorm|accommodation|room|warden|हॉस्टल|आबासन|"
-        r"mess|boarding|hostel fee|hostel facility|আবাসন)"
+        r"mess\s+(?:food|facility|fee|charge|bill|account|meal|rate|cost|quality|veg|non.?veg)|"
+        r"hostel\s*mess|boarding|hostel fee|hostel facility|আবাসন)"
     ), 0.8),
     ("scholarship", (
         r"(?:scholarship|financial\s*aid|stipend|"
@@ -119,16 +121,18 @@ _INTENT_PATTERNS: list[tuple[str, str, float]] = [
         r"विभाग\s+है|বিভাগ\s+আছে|"
         r"branch(es)?\s+do\s+you|"
         r"departments?\s+are|branch\s+available|"
+        r"what\s+about\s+\w+(?:\s+\w+)?\s+specifically|"
         r"kaun.*branch|kon.*branch|কন.*branch"
         r")"
     ), 0.7),
     ("contact", (
         r"(?:contact|phone|email|address|reach|संपर्क|"
-        r"যোগাযোগ|call|whatsapp|telephone|mobile|office|location)"
+        r"যোগাযোগ|\bcall\b|whatsapp|telephone|mobile|office|location)"
     ), 0.7),
     ("cutoff", (
         r"(?:cutoff|cut\s*off|previous\s*year|last\s*year\s*rank|"
-        r"closing\s*rank|कटऑफ|কাটঅফ|rank.*cutoff|eligibility\s*rank)"
+        r"closing\s*rank|कटऑफ|কাটঅফ|rank.*cutoff|eligibility\s*rank|"
+        r"(?:ki|koto)\s+chances?\s+(?:ache|acha|hai|ne)\b)"
     ), 0.8),
     ("seats", r"(?:seat|intake|capacity|strength|सीट|সিট|how\s*many\s*students|available.*seat)", 0.7),
     ("faculty", r"(?:faculty|teacher|professor|शिक्षक|অধ্যাপক|staff|qualification|PhD|experienced)", 0.7),
@@ -162,7 +166,9 @@ _INTENT_PATTERNS: list[tuple[str, str, float]] = [
     ("grievance", (
         r"(?:grievance|complaint|re.evaluat|rechecking|"
         r"marks.*lower|lower.*expect|issue.*exam|problem.*college|"
-        r"शिकायत|অভিযোগ|not.*renewed|hasn.*t.*been)"
+        r"शिकायत|অভিযোগ|not.*renewed|hasn.*t.*been|"
+        r"absolutely\s+unacceptable|is\s+a\s+mess|"
+        r"speak\s+to\s+someone\s+in\s+charge|nobody\s+has\s+responded)"
     ), 0.7),
     ("counseling_info", (
         r"(?:counseling|counselling|"
@@ -300,6 +306,8 @@ _SIGNAL_PATTERNS: dict[str, list[tuple[str, float]]] = {
         (r'\bdarak\b', 0.3),
         (r'\bdar\s+lag', 0.35),
         (r'\bpare?shan\b', 0.3),
+        (r"\bcan'?t\s+(?:he|she|they|i|we|my|your)\b[^.!?]{0,40}?\banywhere\b", 0.4),
+        (r'\beven\s+in\s+round\s*\d', 0.3),
     ],
     "urgency": [
         (r'\burgent\b', 0.45),
@@ -408,6 +416,7 @@ _SIGNAL_PATTERNS: dict[str, list[tuple[str, float]]] = {
         (r'\bthak\s+gaya\b', 0.3),
         (r'\bnirash\b', 0.35),
         (r'\bwhy\s+is\s+it\s+so\b', 0.2),
+        (r'\babsolutely\s+unacceptable\b', 0.45),
     ],
     "financial_concern": [
         (r'\bexpensive\b', 0.3),
@@ -483,13 +492,18 @@ _SIGNAL_PATTERNS: dict[str, list[tuple[str, float]]] = {
     ],
 }
 
+_SIGNAL_FIELDS = (
+    "anxiety", "urgency", "confusion", "hesitation",
+    "frustration", "financial_concern", "parent_influence",
+)
+
 
 class UnderstandingEngine:
     VERSION = "v6"
 
     def __init__(self, interpreter: DomainInterpreter | None = None):
         self._interpreter = interpreter or DomainInterpreter()
-        self._prev_signals: ConversationSignals | None = None
+        self._prev_signals_by_session: dict[str, ConversationSignals] = {}
 
     def process(self, input: UnderstandingInput) -> UnderstandingResult:
         result = self.understand(input.text, input.state, debug=input.debug)
@@ -531,7 +545,8 @@ class UnderstandingEngine:
             )
 
         # Stage 5: Signals
-        signals = self._detect_signals(text, intent, profile)
+        session_id = state.session_id if state else None
+        signals = self._detect_signals(text, intent, profile, session_id=session_id)
 
         # Stage 5b: Structured signals (grievance detection)
         grievance_signal = detect_grievance(text)
@@ -1022,9 +1037,14 @@ class UnderstandingEngine:
         if profile is not None and profile.personal.category.lower() == "management":
             scores["management_quota"] = max(scores.get("management_quota", 0.0), 0.9)
 
-        # Multi-turn intent context: boost same intent from previous turn
+        # Multi-turn intent context: boost same intent from previous turn.
+        # A fresh budget mention in the current turn is a topic-switching
+        # financial fact (maps to fee/scholarship/loan): do not let the
+        # previous intent's context boost override it (000008 t2 budget
+        # reveal should switch scholarship -> fee).
+        has_fresh_budget = self._extract_budget(tl) is not None
         prev_intent = (state.goals or {}).get("primary", "")
-        if prev_intent and prev_intent not in ("unknown", "general", "greeting", "repeat"):
+        if prev_intent and prev_intent not in ("unknown", "general", "greeting", "repeat") and not has_fresh_budget:
             scores[prev_intent] = max(scores.get(prev_intent, 0.0), 0.7)
 
         # Topic continuity: if previous intent was a persistent topic and
@@ -1168,6 +1188,13 @@ class UnderstandingEngine:
                         if topic == "admission":
                             continue
                     result["admission"] *= 0.4
+
+        # "What documents do I need…" is a document request even when it
+        # names admission — the admission keyword must not outrank the
+        # explicit document question (000017 t0).
+        if "document" in result and "admission" in result:
+            if re.search(r"\bwhat\s+documents?\b|\bdocuments?\s+do\s+i\s+need\b", tl):
+                result["admission"] *= 0.3
 
         # Merge lateral_entry into transfer (granularity fix)
         if "transfer" in result and "lateral_entry" in result:
@@ -1687,6 +1714,7 @@ class UnderstandingEngine:
         text: str,
         intent: UnderstandingIntent | None = None,
         profile: StudentProfile | None = None,
+        session_id: str | None = None,
     ) -> ConversationSignals:
         tl = text.lower()
         signals = ConversationSignals()
@@ -1698,10 +1726,16 @@ class UnderstandingEngine:
         signals = self._apply_intent_boost(signals, intent)
         signals = self._apply_profile_boost(signals, profile, tl)
 
-        if self._prev_signals is not None:
-            signals = self._apply_cross_turn_persistence(signals, self._prev_signals)
-
-        self._prev_signals = signals
+        # Cross-turn persistence is scoped to the conversation/session, not the
+        # engine instance, so conversations sharing a pipeline cannot bleed
+        # signals into each other (000046 t2 reassure-vs-provide_program_info).
+        if session_id:
+            prev = self._prev_signals_by_session.get(session_id)
+            if prev is not None:
+                signals = self._apply_cross_turn_persistence(signals, prev)
+            self._prev_signals_by_session[session_id] = signals
+            if all(getattr(signals, name) == 0.0 for name in _SIGNAL_FIELDS):
+                self._prev_signals_by_session.pop(session_id, None)
         return signals
 
     def _is_negated(self, tl: str, match_start: int, window: int = 40) -> bool:

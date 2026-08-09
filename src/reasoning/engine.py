@@ -307,6 +307,18 @@ class ReasoningEngine:
             return False
         return True
 
+    def _is_future_applicant(self, text: str) -> bool:
+        """True when the student indicates the entrance exam has not been
+        taken yet (future applicant — no rank/result to collect yet)."""
+        return bool(re.search(
+            r"\b(?:did\s*not\s+give|haven'?t\s+(?:given|appeared)|"
+            r"have\s+not\s+appeared|not\s+(?:appeared|given)|"
+            r"never\s+(?:appeared|given|took))\b"
+            r"[^.!?]{0,40}?\b(?:yet|this\s+year|next\s+year)\b"
+            r"|\bappear(?:ing)?\s+next\s+year\b",
+            text, re.IGNORECASE,
+        ))
+
     # ── Eligibility ───────────────────────────────────────────────────
 
     def _estimate_eligibility(
@@ -443,6 +455,13 @@ class ReasoningEngine:
         if _is_closing_turn(ctx.text):
             return "needs_reassurance"
 
+        # A grievance turn venting strong emotion must de-escalate first
+        # (000049 t0), before any signal/intent routing. The venting surfaces
+        # in the flat frustration signal; reasoning never reads structured
+        # signals.
+        if intent == "grievance" and ctx.signals.frustration > 0.4:
+            return "needs_reassurance"
+
         if signal_score > 0.4 and dominant_signal == "anxiety":
             # Domain intents that already convey a specific informational need
             # keep their routing even under a strong anxiety signal.
@@ -460,6 +479,12 @@ class ReasoningEngine:
         # rather than be treated as a clarification request.
         if intent in ("repeat", "unknown") and ctx.text.strip():
             return "needs_clarification"
+
+        # Future applicants (exam not yet taken) need admission-process
+        # guidance, not profile collection — there is no rank to collect yet
+        # (000016 t2, 000017 t2).
+        if intent == "admission" and self._is_future_applicant(ctx.text):
+            return "needs_admission_guidance"
 
         # Domain readiness gate — only block intents that cannot be answered generally
         if readiness.blocked:

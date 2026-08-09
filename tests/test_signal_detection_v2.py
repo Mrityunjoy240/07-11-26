@@ -18,9 +18,7 @@ def engine():
 
 @pytest.fixture
 def fresh_engine():
-    eng = UnderstandingEngine()
-    eng._prev_signals = None
-    return eng
+    return UnderstandingEngine()
 
 
 # =========================================================================
@@ -428,58 +426,68 @@ class TestCrossTurnPersistence:
     def test_high_anxiety_carries_forward(self):
         """Anxiety >= 0.6 in prev turn should carry 50% forward."""
         eng = UnderstandingEngine()
-        eng._prev_signals = ConversationSignals(anxiety=0.8)
-        s = eng._detect_signals("Hello, just checking in", None, None)
+        eng._prev_signals_by_session["s"] = ConversationSignals(anxiety=0.8)
+        s = eng._detect_signals("Hello, just checking in", None, None, session_id="s")
         assert s.anxiety > 0.3
         assert s.anxiety <= 0.5
 
     def test_moderate_anxiety_carries_less(self):
         """Anxiety 0.4-0.6 in prev turn carries 35%."""
         eng = UnderstandingEngine()
-        eng._prev_signals = ConversationSignals(anxiety=0.5)
-        s = eng._detect_signals("Hello", None, None)
+        eng._prev_signals_by_session["s"] = ConversationSignals(anxiety=0.5)
+        s = eng._detect_signals("Hello", None, None, session_id="s")
         assert s.anxiety > 0.0
         assert s.anxiety <= 0.25
 
     def test_low_anxiety_minimal_carry(self):
         """Anxiety < 0.4 in prev turn carries only 15%."""
         eng = UnderstandingEngine()
-        eng._prev_signals = ConversationSignals(anxiety=0.3)
-        s = eng._detect_signals("Hello", None, None)
+        eng._prev_signals_by_session["s"] = ConversationSignals(anxiety=0.3)
+        s = eng._detect_signals("Hello", None, None, session_id="s")
         assert s.anxiety <= 0.1
 
     def test_urgency_persists(self):
         eng = UnderstandingEngine()
-        eng._prev_signals = ConversationSignals(urgency=0.7)
-        s = eng._detect_signals("Hello", None, None)
+        eng._prev_signals_by_session["s"] = ConversationSignals(urgency=0.7)
+        s = eng._detect_signals("Hello", None, None, session_id="s")
         assert s.urgency > 0.3
 
     def test_confusion_persists(self):
         eng = UnderstandingEngine()
-        eng._prev_signals = ConversationSignals(confusion=0.9)
-        s = eng._detect_signals("Hello", None, None)
+        eng._prev_signals_by_session["s"] = ConversationSignals(confusion=0.9)
+        s = eng._detect_signals("Hello", None, None, session_id="s")
         assert s.confusion > 0.3
 
     def test_multiple_signals_persist(self):
         eng = UnderstandingEngine()
-        eng._prev_signals = ConversationSignals(anxiety=0.7, financial_concern=0.6)
-        s = eng._detect_signals("Hello", None, None)
+        eng._prev_signals_by_session["s"] = ConversationSignals(anxiety=0.7, financial_concern=0.6)
+        s = eng._detect_signals("Hello", None, None, session_id="s")
         assert s.anxiety > 0.3
         assert s.financial_concern > 0.2
 
     def test_new_text_adds_to_persisted(self):
         eng = UnderstandingEngine()
-        eng._prev_signals = ConversationSignals(anxiety=0.6)
-        s = eng._detect_signals("I am worried", None, None)
+        eng._prev_signals_by_session["s"] = ConversationSignals(anxiety=0.6)
+        s = eng._detect_signals("I am worried", None, None, session_id="s")
         assert s.anxiety > 0.6
 
     def test_persisted_signal_decays_without_reinforcement(self):
         eng = UnderstandingEngine()
-        eng._prev_signals = ConversationSignals(anxiety=0.9, confusion=0.5, urgency=0.8)
-        s1 = eng._detect_signals("Hello", None, None)
-        s2 = eng._detect_signals("Hello again", None, None)
-        s3 = eng._detect_signals("Hello third time", None, None)
+        eng._prev_signals_by_session["s"] = ConversationSignals(anxiety=0.9, confusion=0.5, urgency=0.8)
+        s1 = eng._detect_signals("Hello", None, None, session_id="s")
+        s2 = eng._detect_signals("Hello again", None, None, session_id="s")
+        s3 = eng._detect_signals("Hello third time", None, None, session_id="s")
         assert s1.anxiety >= s2.anxiety >= s3.anxiety
+
+    def test_sessions_do_not_leak(self):
+        """Persistence is scoped per session: a shared engine running two
+        sessions must not carry signals across them."""
+        eng = UnderstandingEngine()
+        eng._prev_signals_by_session["a"] = ConversationSignals(anxiety=0.9)
+        sa = eng._detect_signals("Hello", None, None, session_id="a")
+        sb = eng._detect_signals("Hello", None, None, session_id="b")
+        assert sa.anxiety > 0.3
+        assert sb.anxiety == 0.0
 
     def test_zero_initial_prev(self, fresh_engine):
         """No previous signals means no carryover."""
@@ -489,8 +497,8 @@ class TestCrossTurnPersistence:
 
     def test_financial_concern_also_persists(self):
         eng = UnderstandingEngine()
-        eng._prev_signals = ConversationSignals(financial_concern=0.8)
-        s = eng._detect_signals("I need to check the weather", None, None)
+        eng._prev_signals_by_session["s"] = ConversationSignals(financial_concern=0.8)
+        s = eng._detect_signals("I need to check the weather", None, None, session_id="s")
         assert s.financial_concern > 0.3
 
 

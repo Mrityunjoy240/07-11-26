@@ -141,7 +141,13 @@ class PipelineOrchestrator:
                     reasoning=reasoning,
                     brain_response=brain_response,
                     capabilities=self.registry,
-                    metadata={"student_text": text},
+                    metadata={
+                        "student_text": text,
+                        "admission_guidance_turns": (
+                            state.metadata.get("admission_guidance_turns", 0)
+                            if state is not None else 0
+                        ),
+                    },
                     debug=debug,
                 )
             )

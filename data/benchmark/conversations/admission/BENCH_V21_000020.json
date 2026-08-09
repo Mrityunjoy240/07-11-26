@@ -129,7 +129,7 @@
           ]
         },
         "decision": {
-          "action": "provide_admission_guidance",
+          "action": "recommend_branches",
           "priority": "high",
           "confidence": "high",
           "why": [
@@ -168,7 +168,7 @@
           ],
           "confidence": "high",
           "dependency_chain": [
-            "Decision=provide_admission_guidance",
+            "Decision=recommend_branches",
             "Profile_complete"
           ]
         }

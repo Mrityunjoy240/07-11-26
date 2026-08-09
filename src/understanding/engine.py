@@ -125,10 +125,6 @@ _INTENT_PATTERNS: list[tuple[str, str, float]] = [
         r"kaun.*branch|kon.*branch|কন.*branch"
         r")"
     ), 0.7),
-    ("contact", (
-        r"(?:contact|phone|email|address|reach|संपर्क|"
-        r"যোগাযোগ|\bcall\b|whatsapp|telephone|mobile|office|location)"
-    ), 0.7),
     ("cutoff", (
         r"(?:cutoff|cut\s*off|previous\s*year|last\s*year\s*rank|"
         r"closing\s*rank|कटऑफ|কাটঅফ|rank.*cutoff|eligibility\s*rank|"
@@ -218,6 +214,8 @@ _INTENT_PATTERNS: list[tuple[str, str, float]] = [
         r"(?:affiliat|accredit|naac|college.*affil|"
         r"college.*name|institution.*name|"
         r"principal|\bhod\b|head\s+of\s+department|director|dean|"
+        r"contact|phone|email|address|reach|संपर्क|"
+        r"যোগাযোগ|\bcall\b|whatsapp|telephone|mobile|office|location|"
         r"কলেজের\s+নাম)"
     ), 0.7),
 ]
@@ -254,6 +252,13 @@ def _deterministic_argmax(scores: dict[str, float]) -> str:
     (PYTHONHASHSEED)."""
     return max(scores, key=lambda k: (scores[k], k))
 
+
+_FEE_AS_SUBJECT_RE = re.compile(
+    r"(?:is|does)\s+the\s+fee\s+include"
+    r"|(?:is\s+it|is\s+that)\s+included\s+in\s+the\s+(?:college\s+)?fee"
+    r"|included\s+in\s+the\s+college\s+fee",
+    re.IGNORECASE,
+)
 
 _NEGATION_PREFIX_RE = re.compile(
     r'(?:^|\s)(?:not|no|n\'?t|never|don\'?t|doesn\'?t|isn\'?t|aren\'?t|wasn\'?t|weren\'?t|won\'?t|can\'?t|haven\'?t|hasn\'?t)\s+'
@@ -947,7 +952,7 @@ class UnderstandingEngine:
         "category": [("admission", 0.3)],
         "interest": [("admission", 0.4)],
         "hostel_required": [("hostel", 0.7)],
-        "location": [("distance_education", 0.2), ("contact", 0.1)],
+        "location": [("distance_education", 0.2), ("institution", 0.1)],
     }
 
     def _entity_intent_evidence(
@@ -1014,7 +1019,7 @@ class UnderstandingEngine:
             scores[intent] = max(scores.get(intent, 0.0), 0.5)
 
         if domain.student_type == "parent":
-            scores["contact"] = max(scores.get("contact", 0.0), 0.2)
+            scores["institution"] = max(scores.get("institution", 0.0), 0.2)
             scores["safety"] = max(scores.get("safety", 0.0), 0.3)
         elif domain.student_type == "existing":
             scores["grievance"] = max(scores.get("grievance", 0.0), 0.3)
@@ -1076,7 +1081,7 @@ class UnderstandingEngine:
             "discovery": {"admission": 0.5, "general": 0.2},
             "evaluation": {"department": 0.5, "cutoff": 0.4, "admission": 0.3},
             "decision": {"fee": 0.5, "hostel": 0.6, "placement": 0.5, "scholarship": 0.4},
-            "application": {"contact": 0.5, "fee": 0.4},
+            "application": {"institution": 0.5, "fee": 0.4},
         }
         for name, boost in stage_scores.get(stage_value, {}).items():
             scores[name] = max(scores.get(name, 0.0), boost)
@@ -1097,7 +1102,7 @@ class UnderstandingEngine:
         if re.search(r'\b(recruit|hire|company|ctc|lpa|salary|package)', tl):
             scores['placement'] = max(scores.get('placement', 0.0), 0.5)
         if re.search(r'\b(call|reach|whatsapp|phone|mobile|telephone)', tl):
-            scores['contact'] = max(scores.get('contact', 0.0), 0.5)
+            scores['institution'] = max(scores.get('institution', 0.0), 0.5)
         if re.search(r'\b(safe|secure|campus|girls?\s*safe|सुरक्षित|সুরক্ষিত|कैंपस)', tl):
             scores['safety'] = max(scores.get('safety', 0.0), 0.6)
         if re.search(r'\b(sports?\s*quota|athlete|player|cricket|football|state.level)', tl):
@@ -1196,18 +1201,32 @@ class UnderstandingEngine:
             if re.search(r"\bwhat\s+documents?\b|\bdocuments?\s+do\s+i\s+need\b", tl):
                 result["admission"] *= 0.3
 
-        # Merge lateral_entry into transfer (granularity fix)
-        if "transfer" in result and "lateral_entry" in result:
-            result["transfer"] = max(result["transfer"], result["lateral_entry"])
-            del result["lateral_entry"]
-        elif "lateral_entry" in result and "transfer" not in result:
-            result["transfer"] = result.pop("lateral_entry")
+        # "lateral_entry" is the specific intent; it wins over generic "transfer"
+        # (lateral-entry keywords only match genuinely specific queries, e.g.
+        # diploma holders asking about second-year entry — 000040/000047).
+        if "lateral_entry" in result:
+            result.pop("transfer", None)
 
         # "hostel" + "fee" → if hostel entity, hostel wins
         if "hostel" in result and "fee" in result:
             if profile and profile.personal.hostel_required is True:
                 result["fee"] *= 0.3
             elif re.search(r'\b(accommodation|room\b|mess\b|dorm\b|boarding)', tl):
+                result["fee"] *= 0.3
+
+        # "fee" as the question's subject (inclusion/separateness phrasing) →
+        # the fee intent wins even when hostel words also appear (000024 t1).
+        # Narrow on-purpose: "What is the room fee?" (000031 t3) or "separate
+        # floors" (000032 t1) must keep hostel.
+        if "hostel" in result and "fee" in result:
+            if _FEE_AS_SUBJECT_RE.search(tl):
+                result["hostel"] *= 0.15
+
+        # "management quota" named explicitly + a fee follow-up ("what are the
+        # fees?") → the management-quota intent wins (000043 t0). Generic fee
+        # keyword must not outrank the explicit quota question.
+        if "management_quota" in result and "fee" in result:
+            if re.search(r"\bmanagement\s*quota\b", tl):
                 result["fee"] *= 0.3
 
         # "scholarship" + "fee" → if scholarship is much stronger, fee suppressed

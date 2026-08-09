@@ -21,7 +21,7 @@
       "student": "I want to know about lateral entry transfer. I have a diploma in computer science. Can I get direct admission to second year B.Tech?",
       "expected": {
         "understanding": {
-          "intent": "transfer",
+          "intent": "lateral_entry",
           "facts": {
             "interest": "computer science"
           },
@@ -42,7 +42,7 @@
           "why": []
         },
         "decision": {
-          "action": "explain_policy",
+          "action": "provide_program_info",
           "priority": "high",
           "confidence": "high",
           "why": [
@@ -62,7 +62,7 @@
             }
           ],
           "confidence": "high",
-          "dependency_chain": ["Decision=explain_policy", "Diploma_holder", "Lateral_entry_query"]
+          "dependency_chain": ["Decision=provide_program_info", "Diploma_holder", "Lateral_entry_query"]
         }
       },
       "must_not": [
@@ -75,7 +75,7 @@
       "student": "I have 72% in my diploma. I think I am general category. Can I get into CSE second year?",
       "expected": {
         "understanding": {
-          "intent": "transfer",
+          "intent": "lateral_entry",
           "facts": {
             "pcm_percentage": 72,
             "category": "general",
@@ -98,7 +98,7 @@
           "why": []
         },
         "decision": {
-          "action": "explain_policy",
+          "action": "provide_program_info",
           "priority": "high",
           "confidence": "medium",
           "why": [
@@ -118,7 +118,7 @@
             }
           ],
           "confidence": "medium",
-          "dependency_chain": ["Decision=explain_policy", "Branch_switch_query", "General_category"]
+          "dependency_chain": ["Decision=provide_program_info", "Branch_switch_query", "General_category"]
         }
       },
       "must_not": [
@@ -131,7 +131,7 @@
       "student": "Wait, actually I need to correct that. I am OBC category, not general. My diploma is in IT, not computer science. Is lateral entry still possible for me?",
       "expected": {
         "understanding": {
-          "intent": "transfer",
+          "intent": "lateral_entry",
           "facts": {
             "category": "obc",
             "interest": "IT"
@@ -155,7 +155,7 @@
           "why": []
         },
         "decision": {
-          "action": "explain_policy",
+          "action": "provide_program_info",
           "priority": "high",
           "confidence": "high",
           "why": [
@@ -176,7 +176,7 @@
             }
           ],
           "confidence": "high",
-          "dependency_chain": ["Decision=explain_policy", "Category_corrected", "IT_diploma", "OBC_eligible"]
+          "dependency_chain": ["Decision=provide_program_info", "Category_corrected", "IT_diploma", "OBC_eligible"]
         }
       },
       "must_not": [

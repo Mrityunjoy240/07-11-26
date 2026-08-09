@@ -42,7 +42,7 @@ class TestSingleIntentDetection:
 
     def test_intent_contact(self, engine):
         result = engine.understand("What is your phone number?")
-        assert result.intent.primary == "contact"
+        assert result.intent.primary == "institution"
 
     def test_intent_greeting(self, engine):
         result = engine.understand("Hello")
@@ -109,7 +109,7 @@ class TestMultiIntentDetection:
 
     def test_placement_and_contact(self, engine):
         result = engine.understand("Placement stats and contact details")
-        assert result.intent.primary in ("placement", "contact")
+        assert result.intent.primary in ("placement", "institution")
 
     def test_fee_and_installment(self, engine):
         result = engine.understand("Can I pay fees in installments?")
@@ -133,7 +133,7 @@ class TestMultiIntentDetection:
 
     def test_contact_and_counseling(self, engine):
         result = engine.understand("What is the counseling helpline number?")
-        assert result.intent.primary in ("counseling_info", "contact")
+        assert result.intent.primary in ("counseling_info", "institution")
 
     def test_fee_and_scholarship_combined(self, engine):
         result = engine.understand("Fees are high, any scholarship or financial aid?")
@@ -269,7 +269,7 @@ class TestIntentFromContext:
     def test_application_stage_contact(self, engine):
         state = ConversationState(session_id="test", stage=ConversationStage.APPLICATION)
         result = engine.understand("Who do I contact?", state)
-        assert result.intent.primary == "contact"
+        assert result.intent.primary == "institution"
 
     def test_existing_student_context(self, engine):
         state = ConversationState(session_id="test", profile={"rank": 48000, "pcm_percentage": 85})
@@ -361,7 +361,7 @@ class TestHindiIntent:
 
     def test_hindi_contact(self, engine):
         result = engine.understand("संपर्क नंबर क्या है?")
-        assert result.intent.primary == "contact"
+        assert result.intent.primary == "institution"
 
     def test_hindi_safety(self, engine):
         result = engine.understand("कैंपस सुरक्षित है क्या?")
@@ -405,7 +405,7 @@ class TestBengaliIntent:
 
     def test_bengali_contact(self, engine):
         result = engine.understand("যোগাযোগের নম্বর দিন")
-        assert result.intent.primary == "contact"
+        assert result.intent.primary == "institution"
 
     def test_bengali_department(self, engine):
         result = engine.understand("কি কি বিভাগ আছে?")

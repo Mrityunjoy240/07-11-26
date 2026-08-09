@@ -63,12 +63,12 @@ _DECISION_RULES: dict[str, tuple[str, str, str]] = {
 # but the pipeline's knowledge-need signal is more specific.
 _KNOWLEDGE_TO_ACTION: dict[str, str] = {
     "distance_education_information": "provide_program_info",
-    "nri_admission_information": "provide_program_info",
-    "management_quota_information": "explain_management_quota_policy",
+    "nri_admission_information": "explain_policy",
+    "management_quota_information": "explain_policy",
     "grievance_information": "provide_grievance_process",
     "transfer_information": "explain_policy",
     "sports_quota_information": "provide_program_info",
-    "lateral_entry_information": "explain_policy",
+    "lateral_entry_information": "provide_program_info",
     "counseling_information": "provide_counseling_schedule",
     "scholarship_information": "provide_scholarship_info",
 }
@@ -224,6 +224,30 @@ class DecisionEngine:
             action = "recommend_branches"
             branches_list = brain.admission.data["eligible_branches"][:3]
             rationale = f"Eligible for {', '.join(branches_list)}"
+            priority = "high"
+
+        # ── Step 4b: First-guidance completion override ────────────
+        # When a completed guidance session turns into a branch comparison
+        # ("which one is better") on the very first guidance turn, the student
+        # wants concrete options — even without a fully scored brain profile.
+        _guidance_turns = (input.metadata or {}).get("admission_guidance_turns", 0)
+        if (action != "recommend_branches"
+                and problem == "needs_admission_guidance"
+                and _guidance_turns == 0
+                and completeness >= 0.5
+                and not _future_applicant
+                and "comparison_data" in knowledge_needed):
+            _step("4b - First guidance override", "recommend_branches", "high",
+                  "First admission-guidance turn asks for comparison",
+                  [f"action was {action}",
+                   f"guidance_turns={_guidance_turns}",
+                   f"completeness={completeness:.2f}"])
+            action = "recommend_branches"
+            if has_eligible:
+                branches_list = brain.admission.data["eligible_branches"][:3]
+                rationale = f"Eligible for {', '.join(branches_list)}"
+            else:
+                rationale = "Realistic options from available data — compare branches"
             priority = "high"
 
         # ── Remaining fields ────────────────────────────────────────

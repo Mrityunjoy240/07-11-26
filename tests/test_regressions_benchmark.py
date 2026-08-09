@@ -32,6 +32,7 @@ import pytest
 from src.conversation.state import ConversationState
 from src.pipeline import PipelineOrchestrator
 from src.reasoning.engine import ANSWERABLE_GENERALLY
+from src.understanding.engine import UnderstandingEngine
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 BENCH_DIR = REPO_ROOT / "data" / "benchmark" / "conversations"
@@ -305,3 +306,165 @@ class Test000049GrievanceReassurance:
         assert log[0]["intent"] == "grievance"
         assert log[0]["action"] == "reassure"
         assert log[0]["problem"] == "needs_reassurance"
+
+
+class TestFirstGuidanceCompletionOverride:
+    """D1: a completed admission-guidance session that asks for a comparison on
+    its very first guidance turn switches to recommend_branches even without a
+    scored brain profile (000006 t2, 000018 t1, 000020 t1)."""
+
+    def test_000006_t2_recommends(self):
+        conv = _load_conv("admission", "000006")
+        log = _run_pipeline_turns(conv)
+        assert log[2]["intent"] == "admission"
+        assert log[2]["action"] == "recommend_branches"
+
+    def test_000018_t1_recommends(self):
+        conv = _load_conv("admission", "000018")
+        log = _run_pipeline_turns(conv)
+        assert log[1]["action"] == "recommend_branches"
+
+    def test_000020_t1_recommends(self):
+        conv = _load_conv("admission", "000020")
+        log = _run_pipeline_turns(conv)
+        assert log[1]["action"] == "recommend_branches"
+
+    def test_later_guidance_turn_stays_guidance(self):
+        # 000018 t2 is the SECOND guidance turn (counter >= 2) — no override.
+        conv = _load_conv("admission", "000018")
+        log = _run_pipeline_turns(conv)
+        assert log[2]["action"] == "provide_admission_guidance"
+
+    def test_future_applicants_stay_guidance(self):
+        # 000016 t2 / 000017 t2 are future applicants — the future-applicant
+        # guard must keep them on guidance.
+        for cid in ("000016", "000017"):
+            conv = _load_conv("admission", cid)
+            log = _run_pipeline_turns(conv)
+            assert log[2]["action"] == "provide_admission_guidance", cid
+
+    def test_unrelated_guidance_conversations_unchanged(self):
+        # 000010-000012 already emit recommend_branches where gold says so; the
+        # override must not disturb them or any other turn in those chats.
+        for cid in ("000010", "000011", "000012"):
+            conv = _load_conv("admission", cid)
+            log = _run_pipeline_turns(conv)
+            for i, (turn, entry) in enumerate(zip(conv["turns"], log, strict=True)):
+                gold_intent = turn["expected"]["understanding"]["intent"]
+                gold_action = turn["expected"]["decision"]["action"]
+                assert entry["intent"] == gold_intent, f"{cid} t{i}"
+                assert entry["action"] == gold_action, f"{cid} t{i}"
+
+
+class Test000004ContactToInstitution:
+    """D2: contact queries (phone/email/address) route as institution intents,
+    which answerable-generally maps to provide_program_info."""
+
+    def test_t0_institution(self):
+        conv = _load_conv("institution", "000004")
+        log = _run_pipeline_turns(conv)
+        assert log[0]["intent"] == "institution"
+        assert log[0]["action"] == "provide_program_info"
+
+
+class TestFeeSubjectHostelPrecedence:
+    """D3: 'does the fee include hostel' / 'included in the college fee' resolve
+    to fee, while 'room fee' or 'separate floors' phrasing must stay hostel."""
+
+    def test_000024_t1_fee_inclusion(self):
+        conv = _load_conv("fees", "000024")
+        log = _run_pipeline_turns(conv)
+        assert log[1]["intent"] == "fee"
+        assert log[1]["action"] == "provide_fee_info"
+
+    def test_000031_t3_room_fee_stays_hostel(self):
+        conv = _load_conv("hostel", "000031")
+        log = _run_pipeline_turns(conv)
+        assert log[3]["intent"] == "hostel"
+        assert log[3]["action"] == "provide_hostel_info"
+
+    def test_000032_t1_separate_floors_stays_hostel(self):
+        conv = _load_conv("hostel", "000032")
+        log = _run_pipeline_turns(conv)
+        assert log[1]["intent"] == "hostel"
+
+    def test_room_fee_wording_stays_hostel(self):
+        engine = UnderstandingEngine()
+        res = engine.understand("What is the room fee?")
+        assert res.intent.primary == "hostel"
+
+    def test_include_phrasing_goes_to_fee(self):
+        engine = UnderstandingEngine()
+        res = engine.understand("Does the fee include hostel or is it separate?")
+        assert res.intent.primary == "fee"
+
+
+class TestManagementQuotaPrecedence:
+    """D4: an explicitly named management quota question with a fee follow-up
+    must resolve to management_quota → explain_policy (000043)."""
+
+    def test_000043_all_turns_match_gold(self):
+        conv = _load_conv("management", "000043")
+        log = _run_pipeline_turns(conv)
+        for i, (turn, entry) in enumerate(zip(conv["turns"], log, strict=True)):
+            gold_intent = turn["expected"]["understanding"]["intent"]
+            gold_action = turn["expected"]["decision"]["action"]
+            assert entry["intent"] == gold_intent, f"turn {i}: {entry['intent']}"
+            assert entry["action"] == gold_action, f"turn {i}: {entry['action']}"
+
+    def test_named_quota_with_fee_wins_over_fee(self):
+        engine = UnderstandingEngine()
+        res = engine.understand("Is management quota available? What are the fees?")
+        assert res.intent.primary == "management_quota"
+
+    def test_fee_without_quota_stays_fee(self):
+        engine = UnderstandingEngine()
+        res = engine.understand("What is the total fee for CSE?")
+        assert res.intent.primary == "fee"
+
+
+class TestNriPolicyMapping:
+    """D5: NRI admission questions resolve to the canonical explain_policy
+    action (000044 t0/t1)."""
+
+    def test_000044_t0_t1_explain_policy(self):
+        conv = _load_conv("nri", "000044")
+        log = _run_pipeline_turns(conv)
+        for i in (0, 1):
+            assert log[i]["intent"] == "nri_admission", f"t{i}"
+            assert log[i]["action"] == "explain_policy", f"t{i}"
+
+
+class TestLateralEntryWins:
+    """D6: lateral-entry queries (diploma → second year) resolve to
+    lateral_entry → provide_program_info, while generic transfer stays
+    transfer."""
+
+    def test_000040_all_turns_match_gold(self):
+        conv = _load_conv("transfer", "000040")
+        log = _run_pipeline_turns(conv)
+        for i, (turn, entry) in enumerate(zip(conv["turns"], log, strict=True)):
+            gold_intent = turn["expected"]["understanding"]["intent"]
+            gold_action = turn["expected"]["decision"]["action"]
+            assert entry["intent"] == gold_intent, f"turn {i}: {entry['intent']}"
+            assert entry["action"] == gold_action, f"turn {i}: {entry['action']}"
+
+    def test_000047_t0_t1_lateral(self):
+        conv = _load_conv("admission", "000047")
+        log = _run_pipeline_turns(conv)
+        assert log[0]["intent"] == "lateral_entry"
+        assert log[0]["action"] == "provide_program_info"
+        assert log[1]["intent"] == "lateral_entry"
+        assert log[1]["action"] == "provide_program_info"
+
+    def test_pure_transfer_stays_transfer(self):
+        engine = UnderstandingEngine()
+        res = engine.understand("Can I switch colleges after the first year?")
+        assert res.intent.primary == "transfer"
+
+    def test_diploma_lateral_is_lateral(self):
+        engine = UnderstandingEngine()
+        res = engine.understand(
+            "I have a diploma. Can I get direct admission to second year BTech?"
+        )
+        assert res.intent.primary == "lateral_entry"

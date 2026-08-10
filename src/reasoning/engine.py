@@ -58,7 +58,7 @@ ANSWERABLE_GENERALLY = {
     "distance_ed", "distance_education", "loan",
     "grievance", "lateral_entry", "sports", "sports_quota",
     "nri", "nri_admission", "counseling_info",
-    "career_confusion",
+    "career_confusion", "program", "faculty", "timings",
 }
 
 # Minimum fields that truly block routing for non-answerable intents.
@@ -494,6 +494,10 @@ class ReasoningEngine:
 
         if intent == "fee":
             return "needs_fee_information"
+        if intent == "program":
+            return "needs_program_information"
+        if intent in ("faculty", "timings"):
+            return "needs_institution_info"
         if intent == "admission":
             if self._should_revert_to_guidance(understanding, state):
                 return "needs_admission_guidance"
@@ -633,6 +637,7 @@ class ReasoningEngine:
         # Intent rules
         INTENT_RULES = [
             ("fee", "needs_fee_information"),
+            ("program", "needs_program_information"),
             ("admission", "needs_admission_guidance"),
             ("placement", "needs_placement_information"),
             ("hostel", "needs_hostel_information"),
@@ -654,6 +659,7 @@ class ReasoningEngine:
             ("document", "needs_document_info"),
             ("safety", "needs_safety_info"),
             ("career_confusion", "needs_career_guidance"),
+            ("faculty/timings", "needs_institution_info"),
         ]
         intent_match_map = {
             "fee": "fee", "admission": "admission", "placement": "placement",
@@ -667,6 +673,7 @@ class ReasoningEngine:
             "institution/hod": ("institution", "hod"), "seats": "seats",
             "repeat": "repeat", "loan": "loan", "document": "document",
             "safety": "safety", "career_confusion": "career_confusion",
+            "program": "program", "faculty/timings": ("faculty", "timings"),
         }
         for rule_key, rule_result in INTENT_RULES:
             targets = intent_match_map[rule_key]

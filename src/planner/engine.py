@@ -11,16 +11,27 @@ class MinimalPlanner:
     VERSION = "v2"
     """Converts a DecisionOutput into an ordered conversation Plan using behavioral patterns."""
 
+    def __init__(self, knowledge: object | None = None) -> None:
+        # Optional knowledge base (src.knowledge.KnowledgeBase). When present
+        # and it returns a grounded answer for the student's question, the
+        # informative turn of an info action is answered from the uploaded
+        # college documents; otherwise the existing deterministic content is
+        # used untouched (this is also exactly what happens with knowledge=None).
+        self.knowledge = knowledge
+
     def process(
         self, decision: DecisionOutput, brain_response: object | None = None,
-        debug: bool = False,
+        debug: bool = False, knowledge: object | None = None,
     ) -> Plan:
         action = decision.action
         rationale = (decision.rationale or "").lower()
 
         handler = _resolve_handler(action, rationale, decision, brain_response)
         handler_name = getattr(handler, "__name__", "unknown")
-        turns = handler(decision, brain_response)
+        kb_answer = _kb_answer_for(
+            decision, knowledge if knowledge is not None else self.knowledge,
+        )
+        turns = handler(decision, brain_response, kb_answer)
 
         plan = Plan(
             turns=turns,
@@ -71,12 +82,10 @@ class MinimalPlanner:
 
         if action == "collect_profile":
             missing = decision.required_info or []
-            has_brain = brain and hasattr(brain, "admission") and brain.admission
-            has_eligible = any(w in rationale for w in ["eligible", "branch", "cutoff"])
-            if has_brain or has_eligible:
-                reason_parts.append("brain_data_available or eligible info in rationale")
+            if any(m in missing for m in ("academic.rank", "rank")):
+                reason_parts.append("rank missing → single_ask")
             else:
-                reason_parts.append("no brain data → single_ask")
+                reason_parts.append("rank known → inform_ask")
             return "; ".join(reason_parts), fallback
 
         if action == "recommend_branches":
@@ -137,11 +146,13 @@ def _resolve_handler(action: str, rationale: str, decision: DecisionOutput, brai
 
     if action == "collect_profile":
         missing = decision.required_info or []
-        has_brain_data = brain and hasattr(brain, "admission") and brain.admission
-        has_eligible_info = any(w in rationale for w in ["eligible", "branch", "cutoff"])
-        if has_brain_data or has_eligible_info:
-            return _beh_inform_ask
-        return _beh_single_ask
+        # Ask for the first genuinely missing core datum (rank) before giving
+        # partial eligibility info. Rank is the blocking field for admission;
+        # once it is known the counselor can inform + collect the rest.
+        needs_rank = any(m in missing for m in ("academic.rank", "rank"))
+        if needs_rank:
+            return _beh_single_ask
+        return _beh_inform_ask
 
     if action == "recommend_branches":
         _legacy_words = ["legacy", "brother", "sister", "alumni", "family", "proud",
@@ -183,15 +194,15 @@ def _resolve_handler(action: str, rationale: str, decision: DecisionOutput, brai
     return _fallback_handler
 
 
-def _beh_single(decision: DecisionOutput, brain: object | None) -> list[Turn]:
+def _beh_single(decision: DecisionOutput, brain: object | None, kb_answer: str | None = None) -> list[Turn]:
     action = decision.action
-    content = _CONTENT_MAP.get(action, "")
+    content = kb_answer or _CONTENT_MAP.get(action, "")
     if not content:
         content = f"Here is information about {action.replace('_', ' ')}."
     return [Turn(action="inform", content=content)]
 
 
-def _beh_single_ask(decision: DecisionOutput, brain: object | None) -> list[Turn]:
+def _beh_single_ask(decision: DecisionOutput, brain: object | None, kb_answer: str | None = None) -> list[Turn]:
     missing = decision.required_info or []
     if not missing:
         return [Turn(action="ask", content="Please tell me your rank, PCM percentage, and which field interests you.")]
@@ -211,6 +222,19 @@ def _beh_single_ask(decision: DecisionOutput, brain: object | None) -> list[Turn
         "scholarship_name": "your scholarship name",
         "department": "your department",
         "previous_year_status": "your previous year status",
+        "academic.rank": "your WBJEE rank",
+        "academic.pcm_percentage": "your PCM percentage",
+        "personal.category": "your category (General/OBC/SC/ST)",
+        "career.interest": "the field you are interested in",
+        "personal.budget": "your approximate budget",
+        "academic.board": "your board (CBSE/WBCHSE/ICSE)",
+        "personal.location": "your preferred location",
+        "personal.hostel_required": "whether you need hostel",
+        "career.preferred_branch": "your preferred branch",
+        "career.career_goal": "your career goal",
+        "academic.diploma_percentage": "your diploma percentage",
+        "personal.scholarship_name": "your scholarship name",
+        "academic.qualification": "your qualification",
     }
     questions = [field_labels.get(f, f.replace("_", " ")) for f in missing]
     first_q = questions[0] if questions else "your details"
@@ -221,19 +245,45 @@ def _beh_single_ask(decision: DecisionOutput, brain: object | None) -> list[Turn
     )]
 
 
-def _beh_inform_ask(decision: DecisionOutput, brain: object | None) -> list[Turn]:
+def _beh_inform_ask(decision: DecisionOutput, brain: object | None, kb_answer: str | None = None) -> list[Turn]:
     action = decision.action
     target = _ASK_TARGET_MAP.get(action, "")
+    student_text = (decision.metadata or {}).get("student_text", "").lower()
 
     ask_content = _CONTENT_MAP.get(f"{action}_ask", "Would you like more details?")
 
     if action == "provide_hostel_info":
         inform_content = "Boys hostel facilities include single and double sharing rooms with mess and wifi. Hostel fee is approximately Rs 60,000 per year."
         ask_content = "What is your admission status? Could you share your rank and preferred branch?"
+    elif action == "provide_fee_info":
+        branch = _detect_branch(student_text)
+        tuition = _brain_fee_tuition(brain)
+        if tuition is not None:
+            inform_content = (
+                f"The annual tuition fee for {branch or 'all B.Tech programs'} is "
+                f"approximately Rs {tuition:,} per year. "
+                "Additional hostel and one-time charges apply."
+            )
+        else:
+            inform_content = _CONTENT_MAP.get("provide_fee_info_inform", "")
+    elif action == "provide_program_info":
+        if any(w in student_text for w in _FACULTY_WORDS):
+            inform_content = _CONTENT_MAP.get("provide_program_info_faculty_inform", "")
+            ask_content = _CONTENT_MAP.get("provide_program_info_faculty_ask", "Which branch's faculty would you like details about?")
+        elif any(w in student_text for w in _TIMING_WORDS):
+            inform_content = _CONTENT_MAP.get("provide_program_info_timings_inform", "")
+            ask_content = _CONTENT_MAP.get("provide_program_info_timings_ask", "Would you like more details?")
+        else:
+            inform_content = _CONTENT_MAP.get("provide_program_info_inform", "")
     else:
         inform_content = _CONTENT_MAP.get(f"{action}_inform", "")
         if not inform_content:
             inform_content = _generate_inform(action, decision, brain)
+
+    if kb_answer:
+        # Grounded answer from the knowledge base replaces the template text,
+        # while the natural follow-up question is preserved.
+        inform_content = kb_answer
 
     return [
         Turn(action="inform", content=inform_content),
@@ -241,7 +291,37 @@ def _beh_inform_ask(decision: DecisionOutput, brain: object | None) -> list[Turn
     ]
 
 
-def _beh_recommend_ask(decision: DecisionOutput, brain: object | None) -> list[Turn]:
+def _beh_program_inform_ask(decision: DecisionOutput, brain: object | None, kb_answer: str | None = None) -> list[Turn]:
+    """Program-curriculum questions: share what the program covers, then check
+    whether the student is exploring admission for that program."""
+    student_text = (decision.metadata or {}).get("student_text", "").lower()
+    branch = _detect_branch(student_text)
+
+    if branch:
+        ask_content = f"Are you looking for admission to {branch}?"
+    else:
+        ask_content = _CONTENT_MAP.get(
+            "provide_program_curriculum_ask",
+            "Are you looking for admission to any of our programs?",
+        )
+
+    if kb_answer:
+        inform_content = kb_answer
+    elif branch:
+        inform_content = _PROGRAM_CURRICULUM.get(
+            branch,
+            _CONTENT_MAP.get("provide_program_curriculum_inform", ""),
+        )
+    else:
+        inform_content = _CONTENT_MAP.get("provide_program_curriculum_inform", "")
+
+    return [
+        Turn(action="inform", content=inform_content),
+        Turn(action="ask", content=ask_content, expected_input="admission_intent"),
+    ]
+
+
+def _beh_recommend_ask(decision: DecisionOutput, brain: object | None, kb_answer: str | None = None) -> list[Turn]:
     branches = _extract_branches(brain, decision)
     if branches:
         top = branches[0]
@@ -259,7 +339,7 @@ def _beh_recommend_ask(decision: DecisionOutput, brain: object | None) -> list[T
     ]
 
 
-def _beh_empathy_reassure(decision: DecisionOutput, brain: object | None) -> list[Turn]:
+def _beh_empathy_reassure(decision: DecisionOutput, brain: object | None, kb_answer: str | None = None) -> list[Turn]:
     branches = _extract_branches(brain, decision)
     if branches:
         b = ", ".join(branches[:3])
@@ -272,7 +352,7 @@ def _beh_empathy_reassure(decision: DecisionOutput, brain: object | None) -> lis
     ]
 
 
-def _beh_empathy_reassure_inform_ask(decision: DecisionOutput, brain: object | None) -> list[Turn]:
+def _beh_empathy_reassure_inform_ask(decision: DecisionOutput, brain: object | None, kb_answer: str | None = None) -> list[Turn]:
     action = decision.action
     target = _ASK_TARGET_MAP.get(action, "")
 
@@ -287,6 +367,9 @@ def _beh_empathy_reassure_inform_ask(decision: DecisionOutput, brain: object | N
         if not inform:
             inform = _generate_inform(action, decision, brain)
 
+    if kb_answer:
+        inform = kb_answer
+
     return [
         Turn(action="reassure", content=empathy),
         Turn(action="inform", content=inform),
@@ -294,7 +377,7 @@ def _beh_empathy_reassure_inform_ask(decision: DecisionOutput, brain: object | N
     ]
 
 
-def _beh_empathy_legacy(decision: DecisionOutput, brain: object | None) -> list[Turn]:
+def _beh_empathy_legacy(decision: DecisionOutput, brain: object | None, kb_answer: str | None = None) -> list[Turn]:
     branches = _extract_branches(brain, decision)
     if branches:
         info = f"With your profile, {branches[0]} is within cutoff."
@@ -308,7 +391,7 @@ def _beh_empathy_legacy(decision: DecisionOutput, brain: object | None) -> list[
     ]
 
 
-def _beh_empathy_reassure_ask(decision: DecisionOutput, brain: object | None) -> list[Turn]:
+def _beh_empathy_reassure_ask(decision: DecisionOutput, brain: object | None, kb_answer: str | None = None) -> list[Turn]:
     branches = _extract_branches(brain, decision)
     if branches:
         info = f"Your profile is strong for {branches[0]} and placements are excellent across all branches."
@@ -320,7 +403,7 @@ def _beh_empathy_reassure_ask(decision: DecisionOutput, brain: object | None) ->
     ]
 
 
-def _beh_empathy_triple(decision: DecisionOutput, brain: object | None) -> list[Turn]:
+def _beh_empathy_triple(decision: DecisionOutput, brain: object | None, kb_answer: str | None = None) -> list[Turn]:
     action = decision.action
     t0_key = f"{action}_t0"
     t1_key = f"{action}_t1"
@@ -337,6 +420,8 @@ def _beh_empathy_triple(decision: DecisionOutput, brain: object | None) -> list[
 
     if not t1_content:
         t1_content = _generate_inform(action, decision, brain)
+    if kb_answer and t1_action == "inform":
+        t1_content = kb_answer
 
     return [
         Turn(action=t0_action, content=t0_content),
@@ -345,12 +430,18 @@ def _beh_empathy_triple(decision: DecisionOutput, brain: object | None) -> list[
     ]
 
 
-def _beh_multi_inform(decision: DecisionOutput, brain: object | None) -> list[Turn]:
+def _beh_multi_inform(decision: DecisionOutput, brain: object | None, kb_answer: str | None = None) -> list[Turn]:
     action = decision.action
     info1 = _CONTENT_MAP.get(f"{action}_info1", "")
     info2 = _CONTENT_MAP.get(f"{action}_info2", "")
     ask_content = _CONTENT_MAP.get(f"{action}_ask", "Would you like more information?")
     target = _ASK_TARGET_MAP.get(action, "")
+
+    if kb_answer:
+        return [
+            Turn(action="inform", content=kb_answer),
+            Turn(action="ask", content=ask_content, expected_input=target),
+        ]
 
     if not info1:
         info1 = _generate_inform(action, decision, brain)
@@ -364,11 +455,68 @@ def _beh_multi_inform(decision: DecisionOutput, brain: object | None) -> list[Tu
     ]
 
 
-def _fallback_handler(decision: DecisionOutput, brain: object | None) -> list[Turn]:
+def _fallback_handler(decision: DecisionOutput, brain: object | None, kb_answer: str | None = None) -> list[Turn]:
     return [Turn(
         action="inform",
         content="I'm here to help with your college admission questions. What would you like to know?",
     )]
+
+
+_FACULTY_WORDS = ["faculty", "teacher", "professor", "lecturer", "lab instructor", "staff member"]
+
+_TIMING_WORDS = ["timing", "class hours", "college hours", "opening time", "closing time"]
+
+_BRANCH_KEYWORDS: list[tuple[list[str], str]] = [
+    (["cse", "computer science", "computer science engineering", "computer engineering", "computers"], "CSE"),
+    (["ece", "electronics and communication", "electronics & communication", "electronics"], "ECE"),
+    (["it", "information technology", "information tech"], "IT"),
+    (["ee", "electrical engineering", "electrical"], "EE"),
+    (["mechanical engineering", "mechanical", "machanical"], "ME"),
+    (["civil engineering", "civil"], "CE"),
+    (["aiml", "ai ml", "ai and ml", "artificial intelligence and machine learning", "artificial intelligence"], "AIML"),
+    (["data science", "data analytics"], "Data Science"),
+    (["biotechnology", "biotech", "bio technology"], "Biotechnology"),
+    (["cyber security", "cybersecurity", "cyber"], "Cyber Security"),
+    (["iot", "internet of things"], "IoT"),
+    (["robotics", "robot"], "Robotics"),
+]
+
+_PROGRAM_CURRICULUM: dict[str, str] = {
+    "CSE": "CSE covers programming, data structures, algorithms, databases, operating systems, computer networks and software engineering.",
+    "ECE": "ECE covers electronic devices and circuits, digital electronics, signals and systems, communication systems, microprocessors and embedded systems.",
+    "IT": "IT covers programming, data structures, web technologies, computer networks, databases and software project management.",
+    "EE": "EE covers electric circuits, electrical machines, power systems, control systems and electrical measurements.",
+    "ME": "ME covers engineering mechanics, thermodynamics, machine design, manufacturing processes and CAD.",
+    "CE": "CE covers structural analysis, geotechnical engineering, transportation engineering and construction management.",
+    "AIML": "AIML covers machine learning, deep learning, data analytics, neural networks and AI applications.",
+    "Data Science": "Data Science covers statistics, data analytics, machine learning, big data and data visualization.",
+    "Biotechnology": "Biotechnology covers molecular biology, biochemistry, genetic engineering and bioprocess technology.",
+    "Cyber Security": "Cyber Security covers network security, cryptography, ethical hacking and security operations.",
+    "IoT": "IoT covers sensors and actuators, embedded systems, wireless communication and IoT application development.",
+    "Robotics": "Robotics covers mechatronics, control systems, sensors, kinematics and robot programming.",
+}
+
+
+def _detect_branch(text: str) -> str | None:
+    for keywords, canonical in _BRANCH_KEYWORDS:
+        for kw in keywords:
+            if len(kw) <= 4:
+                if re.search(rf"\b{re.escape(kw)}\b", text):
+                    return canonical
+            elif kw in text:
+                return canonical
+    return None
+
+
+def _brain_fee_tuition(brain: object | None) -> int | None:
+    if brain is None:
+        return None
+    fees = getattr(brain, "fees", None)
+    data = getattr(fees, "data", None) or {}
+    tuition = data.get("tuition_per_year")
+    if isinstance(tuition, (int, float)) and tuition > 0:
+        return int(tuition)
+    return None
 
 
 def _extract_branches(brain: object | None, decision: DecisionOutput) -> list[str]:
@@ -390,6 +538,26 @@ def _generate_inform(action: str, decision: DecisionOutput, brain: object | None
     if decision.required_info:
         return f"Let me help with {action.replace('_', ' ')}."
     return f"Here is information about {action.replace('_', ' ')}."
+
+
+def _kb_answer_for(decision: DecisionOutput, knowledge: object | None) -> str | None:
+    """Return a grounded knowledge-base answer for the student's question.
+
+    Returns None when no KB is wired, the query is empty, retrieval finds
+    nothing relevant, or anything raises — in every one of those cases the
+    planner keeps its existing deterministic content, so the no-KB path is
+    byte-for-byte identical to today.
+    """
+    if knowledge is None:
+        return None
+    query = (decision.metadata or {}).get("student_text", "").strip()
+    if not query:
+        return None
+    try:
+        answer = knowledge.answer(query)
+    except Exception:
+        return None
+    return answer.text if answer is not None else None
 
 
 _CONTENT_MAP: dict[str, str] = {
@@ -471,11 +639,20 @@ _CONTENT_MAP: dict[str, str] = {
     "provide_program_info_inform": "Our college offers B.Tech programs through regular admission counseling. Program details depend on the branch and your profile.",
     "provide_program_info_ask": "Which program or branch would you like details about?",
 
+    "provide_program_info_faculty_inform": "The college has qualified and experienced faculty in every department. Faculty profiles including qualifications and research areas can be shared for any branch.",
+    "provide_program_info_faculty_ask": "Which branch's faculty would you like details about?",
+
+    "provide_program_info_timings_inform": "College classes typically run on weekdays and the academic office is open during working hours for admission queries.",
+    "provide_program_info_timings_ask": "Would you like help with admissions as well?",
+
+    "provide_program_curriculum_inform": "Our B.Tech programs follow the standard engineering curriculum with core subjects in the first two years and branch-specific subjects later.",
+    "provide_program_curriculum_ask": "Are you looking for admission to any of our programs?",
+
     "provide_scholarship_info_inform": "As an SC category student you are eligible for tuition fee waiver and post-matric scholarships.",
     "provide_scholarship_info_ask": "What is your family budget? Let me know your financial need for additional aid.",
 }
 
-def _beh_clarify(decision: DecisionOutput, brain: object | None) -> list[Turn]:
+def _beh_clarify(decision: DecisionOutput, brain: object | None, kb_answer: str | None = None) -> list[Turn]:
     return [Turn(action="clarify", content="I'm not sure I understood that. Could you rephrase your question?", expected_input="clarification")]
 
 
@@ -498,6 +675,7 @@ _ACTION_BEHAVIOR: dict[str, object] = {
     "provide_nri_admission_info": _beh_multi_inform,
     "provide_scholarship_info": _beh_inform_ask,
     "provide_program_info": _beh_inform_ask,
+    "provide_program_curriculum": _beh_program_inform_ask,
     "provide_career_guidance": _beh_empathy_triple,
     "provide_grievance_process": _beh_empathy_triple,
     "investigate_scholarship_renewal": _beh_empathy_triple,
@@ -533,6 +711,7 @@ _ASK_TARGET_MAP: dict[str, str] = {
     "provide_guidance": "topic",
     "provide_scholarship_info": "budget",
     "provide_program_info": "branch",
+    "provide_program_curriculum": "admission_intent",
     "provide_grievance_process": "department,year,subject",
     "investigate_scholarship_renewal": "scholarship_type,department",
     "provide_distance_ed_info": "interest,branch",

@@ -40,6 +40,7 @@ class ResponseComposer:
         brain_response: BrainResponse | None = None,
         user_text: str = "",
         history: list[dict] | None = None,
+        kb_context: str = "",
         debug: bool = False,
     ) -> ComposerResult:
         t0 = time.perf_counter()
@@ -49,13 +50,19 @@ class ResponseComposer:
         history_list = history or []
         history_block = self._format_history(history_list)
 
+        knowledge_block = (
+            f"## Knowledge Base (from uploaded college documents)\n{kb_context}\n"
+            if kb_context.strip()
+            else ""
+        )
         prompt = (
             f"{_SYSTEM_PROMPT}\n\n"
             f"## Conversation History\n{history_block}\n"
             f"## Student's Last Message\n{user_text}\n\n"
             f"## Plan — Follow This Exactly\n{plan_block}\n"
             f"## Decision Context\n{decision_block}\n"
-            f"## College Data\n{brain_block}\n\n"
+            f"## College Data\n{brain_block}\n"
+            f"{knowledge_block}"
             "Generate a natural, conversational assistant response following the plan above."
         )
         result = self._llm.generate(prompt)

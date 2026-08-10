@@ -125,6 +125,15 @@ _INTENT_PATTERNS: list[tuple[str, str, float]] = [
         r"kaun.*branch|kon.*branch|কন.*branch"
         r")"
     ), 0.7),
+    ("program", (
+        r"(?:"
+        r"\bwhat\b[^.!?]{0,35}?\b(?:subjects?|syllabus|curriculum|course\s+content|topics|modules)\b|"
+        r"\b(?:subjects?|syllabus|curriculum|course\s+content|topics|modules)\b[^.!?]{0,35}?\b(?:in|of|for|taught|covered|studied|include)\b|"
+        r"\bwhat\s+do\s+(?:we|you|students)\s+(?:study|learn)\b|"
+        r"\bwhat\s+is\s+studied\b|"
+        r"\bwhat\s+do\s+you\s+teach\b"
+        r")"
+    ), 0.8),
     ("cutoff", (
         r"(?:cutoff|cut\s*off|previous\s*year|last\s*year\s*rank|"
         r"closing\s*rank|कटऑफ|কাটঅফ|rank.*cutoff|eligibility\s*rank|"

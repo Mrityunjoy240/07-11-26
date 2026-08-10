@@ -49,6 +49,7 @@ class PipelineResult:
     llm_prompt: str = ""
     llm_diagnostics: Any = None
     confidence: float = 0.0
+    knowledge: Any = None
     errors: list[str] = field(default_factory=list)
     latency_ms: dict[str, int] = field(default_factory=dict)
     versions: dict[str, str] = field(default_factory=dict)
@@ -65,13 +66,20 @@ class PipelineOrchestrator:
         planner: MinimalPlanner | None = None,
         llm: LLMAdapter | None = None,
         composer: ResponseComposer | None = None,
+        knowledge: Any = None,
     ) -> None:
         self.understanding = understanding or UnderstandingEngine()
         self.reasoning = reasoning or ReasoningEngine()
         self.brain = brain or CollegeBrain()
         self.registry = registry or CapabilityRegistry()
         self.decision = decision or DecisionEngine()
+        # Knowledge base is strictly opt-in: passing None (the default) keeps
+        # the pipeline byte-identical to the benchmarked behavior, no matter
+        # what documents exist on disk.
+        self.knowledge = knowledge
         self.planner = planner or MinimalPlanner()
+        if self.knowledge is not None and getattr(self.planner, "knowledge", None) is None:
+            self.planner.knowledge = self.knowledge
         self._llm = llm or self._default_llm()
         self.composer = composer or ResponseComposer(self._llm)
 
@@ -167,16 +175,19 @@ class PipelineOrchestrator:
 
         response = ""
         llm_diagnostics = None
+        kb_result = None
         if plan:
             try:
                 t = time.perf_counter()
                 history = self._get_history(state)
+                kb_context, kb_result = self._kb_context_for(text)
                 composer_result = self.composer.compose(
                     plan=plan,
                     decision=decision,
                     brain_response=brain_response,
                     user_text=text,
                     history=history,
+                    kb_context=kb_context,
                     debug=debug,
                 )
                 response = composer_result.text
@@ -255,10 +266,32 @@ class PipelineOrchestrator:
             llm_prompt=llm_prompt,
             llm_diagnostics=llm_diagnostics,
             confidence=getattr(reasoning, "confidence", 0.0),
+            knowledge=kb_result,
             errors=errors,
             latency_ms=latencies,
             versions=versions,
         )
+
+    def _kb_context_for(self, text: str) -> tuple[str, Any]:
+        """Retrieve a grounded KB context for the student's message (opt-in)."""
+        if self.knowledge is None:
+            return "", None
+        try:
+            result = self.knowledge.retrieve(text)
+            if not result.hits:
+                return "", {"kb_version": getattr(self.knowledge, "fingerprint", "")}
+            answer = self.knowledge.answer(text)
+            context = ""
+            if answer is not None:
+                context = answer.text
+            return context, {
+                "kb_version": getattr(self.knowledge, "fingerprint", ""),
+                "answer": answer.text if answer is not None else None,
+                "sources": list(answer.sources) if answer is not None else [],
+                "confidence": answer.confidence if answer is not None else 0.0,
+            }
+        except Exception:
+            return "", None
 
     @staticmethod
     def _build_brain_query(

@@ -27,6 +27,8 @@ _DECISION_RULES: dict[str, tuple[str, str, str]] = {
                                  "Partial profile — collect remaining fields"),
     "needs_fee_information": ("provide_fee_info", "normal",
                               "Student asking about fees"),
+    "needs_program_information": ("provide_program_curriculum", "normal",
+                                  "Student asking about program curriculum/subjects"),
     "needs_admission_guidance": ("provide_admission_guidance", "high",
                                  "Student asking about admission process"),
     "needs_placement_information": ("provide_placement_info", "normal",
@@ -202,6 +204,7 @@ class DecisionEngine:
             "needs_safety_info", "needs_institution_info",
             "needs_seat_info", "needs_loan_info", "needs_document_info",
             "needs_career_guidance", "needs_grievance_resolution",
+            "needs_program_information",
         )
         _student_text = (input.metadata or {}).get("student_text", "").lower()
         _has_empathy_context = any(w in _student_text for w in [

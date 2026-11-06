@@ -10,7 +10,7 @@
 |-----------|---------|
 | **Established** | August 2000 |
 | **Location** | Durgapur, West Bengal |
-| **Campus Area** | 17 acres |
+| **Campus Area** | 14 acres |
 | **Affiliation** | MAKAUT |
 | **Autonomous** | Yes (from 2024-25 batch) |
 | **Accreditation** | NAAC B+ |

@@ -6,6 +6,7 @@ import re
 from src.conversation.state import ConversationState
 from src.engines.interfaces import UnderstandingInput
 from src.understanding.interpreter import DomainInterpreter
+from src.understanding.llm_intent import CONVERSATIONAL_INTENTS
 from src.understanding.models import (
     ConversationSignals,
     IntentDiagnostics,
@@ -20,11 +21,19 @@ from src.understanding.profile import (
     compute_missing,
     is_field_set,
 )
+from src.understanding.semantic_nlu import SemanticNLU, SemanticUnderstanding
 from src.understanding.vocabulary import INTENT_CONCEPTS, match_concept
 from src.understanding.signals import StructuredSignals, detect_grievance, detect_decision_intent, detect_emotion
 from src.understanding.signals.interaction import analyze_signals
 
 logger = logging.getLogger(__name__)
+
+# Intents that never become a committed "conversation topic" (they are
+# conversational glue, not a subject the student is asking about).
+NON_TOPIC_INTENTS = (
+    "unknown", "general", "greeting", "repeat",
+    "help_request", "self_introduction", "social_return",
+)
 
 
 def _detect_conflicts(pre: dict[str, float], post: dict[str, float]) -> list[str]:
@@ -218,6 +227,13 @@ _INTENT_PATTERNS: list[tuple[str, str, float]] = [
         r"(?:education\s*loan|student\s*loan|loan|शिक्षा\s*ऋण|"
         r"bank.*loan|loan.*amount|loan.*interest|loan.*apply|"
         r"কতটাকা\s*ঋণ|how\s*much\s*loan|loan\s*available)"
+    ), 0.8),
+    ("backlog", (
+        r"(?:backlog|arrear|arrears|failed\s+(?:subject|paper|exam|semester)|"
+        r"failed\s*in|fail\s+in|supplementary|supply\s*exam|"
+        r"got\s+a\s*back|got\s+back\s+in|back\s+in\s+(?:one|a|two|three)?\s*(?:subject|sub|paper|sem)|"
+        r"clear.*(?:backlog|arrear)|re.?exam|re-exam|reappear|"
+        r"बैकलॉग|ক্যারি\s*ওভার|ব্যাকলগ)"
     ), 0.8),
     ("institution", (
         r"(?:affiliat|accredit|naac|college.*affil|"
@@ -515,8 +531,17 @@ _SIGNAL_FIELDS = (
 class UnderstandingEngine:
     VERSION = "v6"
 
-    def __init__(self, interpreter: DomainInterpreter | None = None):
+    def __init__(
+        self,
+        interpreter: DomainInterpreter | None = None,
+        semantic_nlu: SemanticNLU | None = None,
+    ):
         self._interpreter = interpreter or DomainInterpreter()
+        # Optional hybrid semantic NLU. When attached, it runs a fast
+        # deterministic semantic reading and only consults the LLM when that
+        # reading is not confident; when absent the engine is byte-identical
+        # to the benchmarked deterministic behavior.
+        self._semantic_nlu = semantic_nlu
         self._prev_signals_by_session: dict[str, ConversationSignals] = {}
 
     def process(self, input: UnderstandingInput) -> UnderstandingResult:
@@ -558,6 +583,37 @@ class UnderstandingEngine:
                 all_scores={domain.primary_intent: 0.6}
             )
 
+        # Stage 4b: Hybrid semantic NLU (optional). The NLU first tries a fast
+        # deterministic semantic reading (typo/Banglish-aware, sub-ms); only
+        # when that is not confident does it call the LLM through the strict
+        # LLMAdapter interface. Its profile entities are merged and its intent
+        # reading is applied only when it is more reliable than the
+        # deterministic winner. Absent → byte-identical benchmark behavior.
+        if self._semantic_nlu is not None:
+            topic = (state.goals or {}).get("topic", "") if state else ""
+            sem = self._semantic_nlu.interpret(text, topic=topic)
+            self._merge_semantic_entities(profile, sem)
+            if sem.intent and sem.intent != "unknown":
+                target = sem.intent
+                if target == "category":
+                    # A category/profile-fact reading continues the committed
+                    # topic; with no topic it is an admission-profile fact.
+                    target = sem.topic if sem.topic else "admission"
+                if self._should_apply_semantic_intent(intent.primary, intent.confidence, target, sem):
+                    # A semantic reading answers an explicit informational
+                    # request (e.g. a scholarship question without a profile
+                    # yet), so readiness must not block it — mirroring the
+                    # llm_override flag. Only set on semantic re-labels; the
+                    # benchmark path (no NLU) never sets it.
+                    intent = UnderstandingIntent(
+                        primary=target,
+                        confidence=sem.confidence,
+                        all_scores={target: sem.confidence},
+                        llm_override=True,
+                    )
+                    if debug and diagnostics is not None:
+                        diagnostics.llm_intent = target
+
         # Stage 5: Signals
         session_id = state.session_id if state else None
         signals = self._detect_signals(text, intent, profile, session_id=session_id)
@@ -598,7 +654,69 @@ class UnderstandingEngine:
         )
         if debug and diagnostics:
             result.metadata["_diag_raw"] = diagnostics
+        if self._semantic_nlu is not None:
+            result.metadata["nlu"] = {
+                "intent": sem.intent,
+                "subtopic": sem.subtopic,
+                "entities": sem.entities,
+                "confidence": sem.confidence,
+                "topic": sem.topic,
+                "source": sem.source,
+                "summary": self._semantic_nlu.summary,
+            }
         return result
+
+    def _should_apply_semantic_intent(
+        self, current: str, current_score: float,
+        target: str, sem: SemanticUnderstanding,
+    ) -> bool:
+        """Decide whether the semantic reading replaces the deterministic intent.
+
+        Rules:
+        - the deterministic winner stands when it is an equally reliable
+          domain reading (fast path);
+        - generic/conversational readings never demote a concrete topic
+          ("thank you, we will think about IT" stays IT);
+        - a confident deterministic domain reading (>= 0.30) is trusted;
+        - otherwise a confident semantic reading wins — an unambiguous
+          LLM reading (source="semantic_nlu") or a very confident fast
+          reading (>= 0.85, e.g. "category", typo'd help/greeting).
+        """
+        if target == current or sem.intent in ("unknown", "general"):
+            return False
+        if target in CONVERSATIONAL_INTENTS and current not in NON_TOPIC_INTENTS:
+            return False
+        if current not in NON_TOPIC_INTENTS and current_score >= 0.30:
+            return False
+        if sem.confidence >= 0.85:
+            return True
+        if sem.source == "semantic_nlu" and sem.confidence >= 0.7:
+            return True
+        return False
+
+    def _merge_semantic_entities(
+        self, profile: StudentProfile, sem: SemanticUnderstanding,
+    ) -> None:
+        """Overlay NLU-extracted entities onto the student profile.
+
+        Only fills fields the deterministic extractor did not already set, so
+        the semantic NLU never contradicts a deterministic reading.
+        """
+        entities = sem.entities
+        category = entities.get("category")
+        if isinstance(category, str) and category and not profile.personal.category:
+            profile.personal.category = category
+        rank = entities.get("rank")
+        if isinstance(rank, int) and rank > 0 and profile.academic.rank is None:
+            profile.academic.rank = rank
+        percentage = entities.get("percentage")
+        if (isinstance(percentage, (int, float))
+                and 0 <= percentage <= 100
+                and profile.academic.pcm_percentage is None):
+            profile.academic.pcm_percentage = float(percentage)
+        branch = entities.get("branch")
+        if isinstance(branch, str) and branch and not profile.career.interest:
+            profile.career.interest = branch
 
     def _detect_language(self, text: str) -> str:
         if any("\u0980" <= c <= "\u09ff" for c in text):
@@ -693,7 +811,7 @@ class UnderstandingEngine:
         # An on-domain vocabulary hit (college/university/hostel/… in the text)
         # keeps the turn in-domain so stage-context can still route it.
         prev_intent = (state.goals or {}).get("primary", "") if state else ""
-        no_prior = (not prev_intent) or prev_intent in ("unknown", "general", "greeting", "repeat")
+        no_prior = (not prev_intent) or prev_intent in NON_TOPIC_INTENTS
         on_domain = bool(re.search(
             r"\b(?:college|university|institute|campus|admission|admit|apply|"
             r"hostel|stay|accommodation|room\b|fee\b|fees|placement|scholarship|"
@@ -729,7 +847,7 @@ class UnderstandingEngine:
             topic = (state.goals or {}).get("topic", "") if state else ""
             pre_winner = (state.goals or {}).get("topic_pre_winner", False) if state else False
             if pre_winner and topic and topic not in (
-                "unknown", "general", "greeting", "repeat"
+                *NON_TOPIC_INTENTS,
             ):
                 if topic in all_scores:
                     best = topic
@@ -746,9 +864,8 @@ class UnderstandingEngine:
         if best_score < 0.40:
             topic = (state.goals or {}).get("topic", "") if state else ""
             pre_winner = (state.goals or {}).get("topic_pre_winner", False) if state else False
-            if (pre_winner and topic and topic not in (
-                "unknown", "general", "greeting", "repeat"
-            ) and topic in all_scores):
+            if (pre_winner and topic and topic not in NON_TOPIC_INTENTS
+                    and topic in all_scores):
                 winner_margin = best_score - all_scores[topic]
                 runner_up = max(
                     (score for k, score in all_scores.items() if k != best),
@@ -764,9 +881,7 @@ class UnderstandingEngine:
         if best_score < 0.15 and _is_closing_turn(tl):
             topic = (state.goals or {}).get("topic", "") if state else ""
             pre_winner = (state.goals or {}).get("topic_pre_winner", False) if state else False
-            if pre_winner and topic and topic not in (
-                "unknown", "general", "greeting", "repeat"
-            ):
+            if pre_winner and topic and topic not in NON_TOPIC_INTENTS:
                 best = topic
                 best_score = max(all_scores.get(topic, 0.0), 0.15)
 
@@ -860,7 +975,7 @@ class UnderstandingEngine:
                     evidence.append(f"{inferred} (domain inference)")
         elif stage == "context" and state:
             prev_intent = (state.goals or {}).get("primary", "")
-            if prev_intent and prev_intent not in ("unknown", "general", "greeting", "repeat"):
+            if prev_intent and prev_intent not in NON_TOPIC_INTENTS:
                 evidence.append(f"prev_intent={prev_intent}")
             if state.stage:
                 evidence.append(f"stage={state.stage.value if hasattr(state.stage, 'value') else state.stage}")
@@ -1058,7 +1173,7 @@ class UnderstandingEngine:
         # reveal should switch scholarship -> fee).
         has_fresh_budget = self._extract_budget(tl) is not None
         prev_intent = (state.goals or {}).get("primary", "")
-        if prev_intent and prev_intent not in ("unknown", "general", "greeting", "repeat") and not has_fresh_budget:
+        if prev_intent and prev_intent not in NON_TOPIC_INTENTS and not has_fresh_budget:
             scores[prev_intent] = max(scores.get(prev_intent, 0.0), 0.7)
 
         # Topic continuity: if previous intent was a persistent topic and

@@ -1,18 +1,20 @@
 # Fee Structure at BCREC
 
-## B.Tech Fees
+## B.Tech Fees (2026-30, verified from official fee PDFs)
 
-| Branch Group | Total Fee | Admission Fee | Per Semester |
-|-------------|-----------|---------------|-------------|
-| **CSE, IT, ECE** | Rs. 6,04,700 | Rs. 98,225 | Rs. 72,925 |
-| **EE, AIML, DS, CY, CSD** | Rs. 5,54,100 | Rs. 91,900 | Rs. 66,100 |
-| **ME, CE** | Rs. 4,44,100 | Rs. 78,150 | Rs. 40,800 |
+| Branch Group | Total Fee (derived) | 1st Semester | Per Semester | 8th Semester |
+|-------------|-----------|---------------|-------------|-------------|
+| **CSE, IT, ECE** | Rs. 6,17,700 | Rs. 99,225 | Rs. 73,925 | Rs. 74,925 |
+| **EE, AIML, DS, CY, CSD** | Rs. 5,67,100 | Rs. 92,900 | Rs. 67,600 | Rs. 68,600 |
+| **ME, CE** | Rs. 4,57,100 | Rs. 79,150 | Rs. 53,850 | Rs. 54,850 |
 
-| Program | Total Fee | Admission Fee |
-|---------|-----------|---------------|
-| **MBA** | Rs. 4,19,200 | Rs. 1,21,400 |
-| **MCA** | Rs. 2,17,400 | Rs. 67,200 |
-| **M.Tech** | Rs. 1,26,000 to 2,06,000 | Rs. 41,200 |
+With hostel, add: seat rent Rs. 10,000/sem + mess Rs. 5,500/mo + hostel caution Rs. 2,000 (1st sem only).
+
+| Program | Total Fee | 1st Semester |
+|---------|-----------|-------------|
+| **MBA** | Rs. 4,22,000 (printed; per-sem sum 4,26,400 - pending confirm) | Rs. 1,21,400 |
+| **MCA** | Rs. 2,16,600 | Rs. 67,800 |
+| **M.Tech** | Rs. 1,28,000 (others) to 2,28,000 (CSE) | Rs. 66,200 (CSE) / Rs. 41,200 (others) |
 
 ## Payment Modes
 

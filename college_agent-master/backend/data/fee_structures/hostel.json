@@ -71,7 +71,7 @@
               "amount": 12000,
               "charged_in_semester": 1,
               "refundable_at": "course_completion",
-              "notes": "Admission caution deposit for students opting for hostel"
+              "notes": "PDF header text. NOTE: 2026-30 B.Tech fee PDF header says 12,000 (with)/10,000 (without) but semester tables compute totals with Rs. 5,000 caution both ways (99,225/138,725). PENDING COLLEGE CONFIRMATION."
             },
             {
               "id": "admission_caution_without_hostel",
@@ -81,7 +81,7 @@
               "amount": 10000,
               "charged_in_semester": 1,
               "refundable_at": "course_completion",
-              "notes": "Admission caution deposit for students NOT opting for hostel"
+              "notes": "Admission caution deposit for students NOT opting for hostel. See with-hostel component note re header-vs-table contradiction."
             },
             {
               "id": "mess_charges",

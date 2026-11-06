@@ -42,8 +42,8 @@ from livekit.agents import (
     voice,
     vad,
 )
-from livekit.plugins import deepgram
 from livekit.plugins import silero
+from groq import Groq
 
 from app.database import get_db, init_db
 from app.services.llm.groq_service import get_groq_service, SYSTEM_PROMPT
@@ -58,6 +58,54 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 logger = logging.getLogger("livekit-agent")
+
+# ---------------------------------------------------------------------------
+# LANGUAGE PREFERENCE (chosen at greeting, becomes the session default)
+# ---------------------------------------------------------------------------
+_LANG_PREF_PATTERNS: dict[str, tuple[str, ...]] = {
+    "en": (
+        "english",
+        "in english",
+        "english me",
+        "angrezi",
+        "english please",
+    ),
+    "hi": (
+        "hindi",
+        "in hindi",
+        "hindi me",
+        "hindi mein",
+        "हिंदी",
+        "हिन्दी",
+    ),
+    "bn": (
+        "bengali",
+        "bangla",
+        "bangali",
+        "in bengali",
+        "bengali me",
+        "bangla te",
+        "বাংলা",
+    ),
+}
+
+_LANG_ACK_TEXT = {
+    "en": "Great, I will respond in English. How can I help you today?",
+    "hi": "ठीक है, मैं हिंदी में जवाब दूँगा। बताइए, आज आपकी क्या मदद कर सकता हूँ?",
+    "bn": "ঠিক আছে, আমি বাংলায় উত্তর দেব। বলুন, আজ আপনাকে কীভাবে সাহায্য করতে পারি?",
+}
+
+
+def _parse_lang_preference(query: str) -> str | None:
+    """Return 'en'/'hi'/'bn' if the first-turn reply is choosing a language."""
+    q = query.strip().lower()
+    if not q:
+        return None
+    for lang, patterns in _LANG_PREF_PATTERNS.items():
+        for pat in patterns:
+            if q == pat or q.startswith(pat):
+                return lang
+    return None
 
 # ---------------------------------------------------------------------------
 # PHONETIC LEXICON & NUMBER CONVERSION
@@ -226,6 +274,26 @@ class BCRECGroqStream(llm.LLMStream):
 
         logger.info(f"LLM Query: '{query[:100]}...' History: {len(history)} turns")
 
+        # First user turn only: the greeting asked for a language preference.
+        # If the caller answered it, set the session default language and reply
+        # with a short acknowledgment in that language (skip the LLM).
+        if len(history) <= 2:
+            pref = _parse_lang_preference(query)
+            if pref:
+                logger.info(f"Language preference chosen: {pref}")
+                self._service.set_session_language(self._session_id, pref, default=True)
+                ack = _LANG_ACK_TEXT[pref]
+                for word in ack.split():
+                    self._event_ch.send_nowait(
+                        llm.ChatChunk(
+                            id=self._id,
+                            delta=llm.ChoiceDelta(role="assistant", content=word + " "),
+                        )
+                    )
+                    await asyncio.sleep(0.02)
+                self._event_ch.close()
+                return
+
         first_chunk = True
         async for chunk in self._service.stream_response(
             query, session_id=self._session_id, conversation_history=history[:-1],
@@ -253,6 +321,8 @@ _STT_ACRONYM_FIXES = [
     (r"\bcs e[\s-]?aml\b", "CSE-AIML"),
     (r"\bcciml\b", "AIML"),
     (r"\ba[\s-]?i[\s-]?ml\b", "AIML"),
+    (r"\bai\s*te\b", "AI subject"),
+    (r"\bai\s+subject\b", "AI subject"),
     (r"\bcsd\b", "CSD"),
     (r"\bdata sci\b", "Data Science"),
     (r"\bcyber sec\b", "Cyber Security"),
@@ -319,26 +389,159 @@ class SarvamSTT(stt.STT):
             return stt.SpeechEvent(type=stt.SpeechEventType.FINAL_TRANSCRIPT, alternatives=[])
 
 
-class SarvamTTS(tts.TTS):
+_HI_BN_CLASSIFIER_PROMPT = (
+    """You are a language classifier for a Bengali college voice assistant.
+The user's speech was transcribed by an automatic speech recognizer (Whisper).
+The transcript may be in Devanagari (Hindi script) or Latin (English script).
+
+The ACTUAL spoken language is one of:
+- hi  : real Hindi (in Devanagari script)
+- bn  : Bengali — either written in Bengali script, transliterated into Devanagari,
+         or romanized into Latin text
+- en  : real English
+
+Bengali markers (any script): "taka" (money), "chai" (want), "koto/kouto" (how much),
+"ache" (there is), "jante chai" (want to know), "holo" (happened), "kamon" (how),
+"alada" (separate), "ami" (I), "ekta" (one), "ki" (what/how).
+
+Real English text will read like natural English sentences.
+Return ONLY the two-letter code: hi, bn, or en"""
+)
+
+
+class GroqSTT(stt.STT):
+    def __init__(self):
+        super().__init__(
+            capabilities=stt.STTCapabilities(
+                streaming=False, interim_results=False, diarization=False, offline_recognize=True
+            )
+        )
+        self.client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+        self._model = os.getenv("GROQ_STT_MODEL", "whisper-large-v3-turbo")
+        self._lang = os.getenv("GROQ_STT_LANGUAGE", "auto").strip().lower()
+
+    def _transcribe(self, audio_data: bytes, *, lang: str | None = None):
+        kwargs = {"model": self._model, "response_format": "verbose_json"}
+        if lang:
+            kwargs["language"] = lang
+        return self.client.audio.transcriptions.create(
+            file=("speech.wav", audio_data, "audio/wav"), **kwargs
+        )
+
+    def _classify_lang(self, text: str) -> str:
+        """Whisper auto-detect is unreliable for Bengali (labels it Hindi or English).
+        Use the LLM to decide the actual spoken language: hi, bn, or en."""
+        try:
+            cls_kwargs = {
+                "model": os.getenv("GROQ_MODEL", "qwen/qwen3.6-27b"),
+                "messages": [
+                    {"role": "system", "content": _HI_BN_CLASSIFIER_PROMPT},
+                    {"role": "user", "content": text},
+                ],
+                "temperature": 0,
+                "max_tokens": 5,
+            }
+            if cls_kwargs["model"].startswith("qwen"):
+                cls_kwargs["reasoning_effort"] = "none"
+            r = self.client.chat.completions.create(**cls_kwargs)
+            out = (r.choices[0].message.content or "").strip().lower()
+            return out if out in ("hi", "bn", "en") else "en"
+        except Exception:
+            return "en"
+
+    async def _recognize_impl(
+        self,
+        buffer: utils.AudioBuffer,
+        *,
+        language: str | None = None,
+        conn_options: llm.APIConnectOptions,
+    ) -> stt.SpeechEvent:
+        _stt_t0 = time.perf_counter()
+        try:
+            frame = buffer if isinstance(buffer, rtc.AudioFrame) else utils.merge_frames(buffer)
+            audio_data = frame.to_wav_bytes()
+
+            # Groq client is sync; run in a thread to avoid blocking the event loop.
+            if self._lang and self._lang != "auto":
+                result = await asyncio.to_thread(self._transcribe, audio_data, lang=self._lang)
+            else:
+                result = await asyncio.to_thread(self._transcribe, audio_data)
+            _stt_ms = (time.perf_counter() - _stt_t0) * 1000
+
+            detected_lang = getattr(result, "language", None)
+            text = (getattr(result, "text", "") or "").strip()
+
+            # Gate: Whisper auto-detect sometimes hallucinates non-target languages
+            # (e.g. Spanish "¿Cómo ir a la hora...?") on noise/silence. Whisper
+            # reports full language names ("english", "hindi"), so normalize to codes.
+            if self._lang == "auto" and detected_lang:
+                _norm = {"hindi": "hi", "bengali": "bn", "english": "en"}.get(
+                    str(detected_lang).strip().lower()
+                )
+                if _norm is None:
+                    logger.info(f"[PERF] STT discarded: detected_lang={detected_lang} (non-target language)")
+                    return stt.SpeechEvent(type=stt.SpeechEventType.FINAL_TRANSCRIPT, alternatives=[])
+
+            # Auto mode: Bengali speech is often auto-labeled Hindi (Devanagari) or
+            # English (Latin). Classify and re-run with bn to get proper Bengali script.
+            if (self._lang == "auto") and text and not re.search(r"[\u0980-\u09FF]", text):
+                cls = await asyncio.to_thread(self._classify_lang, text)
+                if cls == "bn":
+                    t2 = time.perf_counter()
+                    result2 = await asyncio.to_thread(self._transcribe, audio_data, lang="bn")
+                    text = (getattr(result2, "text", "") or "").strip()
+                    detected_lang = getattr(result2, "language", None)
+                    logger.info(
+                        f"[PERF] STT -> bn re-run {((time.perf_counter() - t2) * 1000):.0f}ms "
+                        f"(classifier={cls})"
+                    )
+                else:
+                    logger.info(f"[PERF] STT classifier={cls} (kept auto transcript)")
+
+            logger.info(
+                f"[PERF] STT ............. {_stt_ms:>7.1f} ms  detected_lang={detected_lang}"
+            )
+            text = _fix_stt_acronyms(text)
+            if text:
+                logger.info(f"[PERF] STT ............. {_stt_ms:>7.1f} ms  transcript='{text[:60]}'")
+                return stt.SpeechEvent(
+                    type=stt.SpeechEventType.FINAL_TRANSCRIPT,
+                    alternatives=[
+                        stt.SpeechData(
+                            text=text, confidence=0.95, language=language or "en-IN"
+                        )
+                    ],
+                )
+            logger.info(f"[PERF] STT ............. {_stt_ms:>7.1f} ms  (no result)")
+            return stt.SpeechEvent(type=stt.SpeechEventType.FINAL_TRANSCRIPT, alternatives=[])
+        except Exception as e:
+            _stt_ms = (time.perf_counter() - _stt_t0) * 1000
+            logger.error(f"[PERF] STT ............. {_stt_ms:>7.1f} ms  ERROR: {e}")
+            return stt.SpeechEvent(type=stt.SpeechEventType.FINAL_TRANSCRIPT, alternatives=[])
+
+
+class EdgeTTS(tts.TTS):
+    _VOICES = {
+        "en-IN": os.getenv("EDGE_TTS_VOICE_EN", "en-IN-NeerjaNeural"),
+        "hi-IN": os.getenv("EDGE_TTS_VOICE_HI", "hi-IN-SwaraNeural"),
+        "bn-IN": os.getenv("EDGE_TTS_VOICE_BN", "bn-IN-TanishaaNeural"),
+    }
+
     def __init__(self):
         super().__init__(
             capabilities=tts.TTSCapabilities(streaming=False), sample_rate=24000, num_channels=1
         )
-        self.service = get_sarvam_service(os.getenv("SARVAM_API_KEY"))
 
     def synthesize(
         self, text: str, *, conn_options: llm.APIConnectOptions = agents.DEFAULT_API_CONNECT_OPTIONS
     ) -> tts.ChunkedStream:
-        logger.info(f"SarvamTTS.synthesize called for: {text[:50]}...")
-        return SarvamChunkedStream(
-            tts=self, input_text=text, conn_options=conn_options, service=self.service
-        )
+        logger.info(f"EdgeTTS.synthesize called for: {text[:50]}...")
+        return EdgeChunkedStream(tts=self, input_text=text, conn_options=conn_options)
 
 
-class SarvamChunkedStream(tts.ChunkedStream):
-    def __init__(self, *, tts, input_text, conn_options, service):
+class EdgeChunkedStream(tts.ChunkedStream):
+    def __init__(self, *, tts, input_text, conn_options):
         super().__init__(tts=tts, input_text=input_text, conn_options=conn_options)
-        self.service = service
 
     async def _run(self, emitter: tts.AudioEmitter):
         _tts_t0 = time.perf_counter()
@@ -359,16 +562,12 @@ class SarvamChunkedStream(tts.ChunkedStream):
         # Apply entity_dict TTS normalization, then lexicon and phone formatting before TTS
         text = normalize_for_tts(text.strip())
         text = apply_lexicon(text, lang)
+        voice = EdgeTTS._VOICES.get(lang, "en-IN-NeerjaNeural")
 
-        # Pick speaker from shared map
-        from app.utils.voice_utils import LANG_SPEAKER_MAP
-
-        speaker = LANG_SPEAKER_MAP.get(lang, "shubh")
-
-        logger.info(f"Synthesizing: {text[:60]}... (lang={lang}, speaker={speaker})")
+        logger.info(f"Synthesizing: {text[:60]}... (lang={lang}, voice={voice})")
 
         # Initialize emitter BEFORE the API call so the audio pipeline is
-        # ready as soon as the response arrives â€” reduces perceived stall.
+        # ready as soon as the response arrives — reduces perceived stall.
         emitter.initialize(
             request_id=utils.shortuuid(),
             sample_rate=24000,
@@ -376,27 +575,29 @@ class SarvamChunkedStream(tts.ChunkedStream):
             mime_type="audio/pcm",
         )
 
-        res = await self.service.text_to_speech(
-            text, speaker=speaker, language=lang, normalize=False
-        )
+        try:
+            import edge_tts
 
-        if res.get("success"):
-            data = res["audio_bytes"]
+            communicate = edge_tts.Communicate(text, voice=voice)
+            mp3 = bytearray()
+            async for chunk in communicate.stream():
+                if chunk["type"] == "audio":
+                    mp3.extend(chunk["data"])
+            data = bytes(mp3)
 
-            # Find the actual audio data chunk in WAV (don't hardcode 44-byte header)
-            if data.startswith(b"RIFF"):
-                # Skip "RIFF" + size + "WAVE" = 12 bytes, then iterate chunks
-                i = 12
-                while i < len(data) - 8:
-                    chunk_id = data[i : i + 4]
-                    chunk_size = int.from_bytes(data[i + 4 : i + 8], "little")
-                    if chunk_id == b"data":
-                        data = data[i + 8 : i + 8 + chunk_size]
-                        break
-                    i += 8 + chunk_size
-                else:
-                    # Fallback: strip first 44 bytes (standard PCM header)
-                    data = data[44:]
+            # edge-tts returns MP3; decode to 24kHz 16-bit mono PCM via PyAV.
+            import av
+            import io as _io
+
+            resampler = av.AudioResampler(format="s16", layout="mono", rate=24000)
+            container = av.open(_io.BytesIO(data))
+            pcm = bytearray()
+            for frame in container.decode(audio=0):
+                for out in resampler.resample(frame):
+                    pcm.extend(out.to_ndarray().tobytes())
+            for out in resampler.resample(None):
+                pcm.extend(out.to_ndarray().tobytes())
+            data = bytes(pcm)
 
             _tts_ms = (time.perf_counter() - _tts_t0) * 1000
             logger.info(f"[PERF] TTS ............. {_tts_ms:>7.1f} ms  text={text[:40]}")
@@ -414,9 +615,9 @@ class SarvamChunkedStream(tts.ChunkedStream):
             logger.info(
                 f"[PERF] Playback ........ {_play_ms:>7.1f} ms  ({len(data) // 24000 // 2}s audio)"
             )
-        else:
+        except Exception as e:
             _tts_ms = (time.perf_counter() - _tts_t0) * 1000
-            logger.error(f"[PERF] TTS ............. {_tts_ms:>7.1f} ms  FAILED: {res.get('error')}")
+            logger.error(f"[PERF] TTS ............. {_tts_ms:>7.1f} ms  FAILED: {e}")
 
         emitter.end_input()
 
@@ -428,14 +629,9 @@ class SarvamChunkedStream(tts.ChunkedStream):
 def prewarm(proc: agents.JobProcess):
     logger.info("Prewarming agent components (VAD, STT, LLM, TTS)...")
     proc.userdata["vad"] = silero.VAD.load(min_speech_duration=0.3, min_silence_duration=1.5)
-    proc.userdata["stt"] = deepgram.STT(
-        model="nova-3",
-        language="hi",
-        interim_results=True,
-        keyterm=["BCREC", "BC Roy", "WBJEE", "MAKAUT", "JELET", "CSE", "ECE", "AIML"],
-    )
+    proc.userdata["stt"] = GroqSTT()
     proc.userdata["llm"] = BCRECGroqLLM()
-    proc.userdata["tts"] = SarvamTTS()
+    proc.userdata["tts"] = EdgeTTS()
     logger.info("Prewarm complete â€” agent is ready to accept jobs.")
 
 
@@ -459,6 +655,10 @@ async def entrypoint(ctx: agents.JobContext):
 3. No explanations, no placement comparisons, no follow-up questions.
 4. Use the user's language (Hindi/English/Bengali).
 5. If user asks for more detail, answer in 1 sentence only.
+6. OUTPUT SCRIPT (overrides the college prompt's romanization rule): write your answer
+   in the NATIVE script of the user's language. Hindi answers MUST be in Devanagari
+   (Hindi) script, Bengali answers MUST be in Bengali script, English in English.
+   NEVER write Hindi or Bengali in Roman/Latin letters.
 """
         + SYSTEM_PROMPT
     )
@@ -500,8 +700,13 @@ async def entrypoint(ctx: agents.JobContext):
 
     await asyncio.sleep(0.5)
     logger.info("Sending greeting...")
-    # Greeting: interruptible, concise, language-preserving (defaults to English on first visit)
-    greeting = "Hello! BCREC AI assistant here. How can I help you today?"
+    # Greeting asks for the caller's preferred language so it becomes the
+    # session default. Auto-detect can switch mid-conversation; confusion
+    # falls back to this default.
+    greeting = (
+        "Hello! BCREC AI assistant here. "
+        "Which language would you prefer — English, Hindi, or Bengali?"
+    )
     try:
         from app.services.llm.safe_point import DEMO_SAFEPOINT, get_greeting
 

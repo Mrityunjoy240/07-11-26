@@ -4,7 +4,7 @@ BCREC provides on-campus hostel facilities for both boys and girls. Hostel is op
 
 ## General Information
 
-- **Total Capacity**: 1500 students
+- **Total Capacity**: 1270 students (818 boys, 452 girls; AICTE disclosure 2026-27)
 - **Total Hostels**: 5 (3 Boys, 2 Girls)
 - **Caution Money**: Rs. 2000 (one-time, refundable)
 
@@ -18,7 +18,7 @@ BCREC provides on-campus hostel facilities for both boys and girls. Hostel is op
 
 ## Mess & Food
 
-- **Monthly Charge**: Rs. 5000 per month (11 months/year)
+- **Monthly Charge**: Rs. 5500 per month (11 months/year)
 - **Meals Per Day**: 4
 - **Vegetarian**: Yes
 - **Non-Veg**: Available 3-4 days/week (Chicken/Fish/Egg)

@@ -9,16 +9,41 @@
     "schema_version": "2.0.0"
   },
   "groups": {
-    "group_a": { "branches": ["CSE", "IT", "ECE"] },
-    "group_b": { "branches": ["EE", "AIML", "DS", "CY", "CSD"] },
-    "group_c": { "branches": ["ME", "CE"] }
+    "group_a": {
+      "branches": [
+        "CSE",
+        "IT",
+        "ECE"
+      ]
+    },
+    "group_b": {
+      "branches": [
+        "EE",
+        "AIML",
+        "DS",
+        "CY",
+        "CSD"
+      ]
+    },
+    "group_c": {
+      "branches": [
+        "ME",
+        "CE"
+      ]
+    }
   },
   "structures": [
     {
       "version_id": "v2026",
       "status": "active",
       "label": "2026-2030 Fee Structure",
-      "admission_batches": ["2026-27", "2027-28", "2028-29", "2029-30", "2030-31"],
+      "admission_batches": [
+        "2026-27",
+        "2027-28",
+        "2028-29",
+        "2029-30",
+        "2030-31"
+      ],
       "effective_date": "2026-07-01",
       "published_date": "2026-06-15",
       "source": "BCREC Fee Structure PDF 2026-30, verified against FEE_GROUP_MAP and combined_kb.json",
@@ -50,7 +75,16 @@
               "type": "per_semester",
               "category": "compulsory",
               "amount": 60500,
-              "applicable_semesters": [1, 2, 3, 4, 5, 6, 7, 8],
+              "applicable_semesters": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8
+              ],
               "notes": "Covers academic instruction"
             },
             {
@@ -59,7 +93,16 @@
               "type": "per_semester",
               "category": "compulsory",
               "amount": 9075,
-              "applicable_semesters": [1, 2, 3, 4, 5, 6, 7, 8],
+              "applicable_semesters": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8
+              ],
               "notes": "Infrastructure and campus development"
             },
             {
@@ -68,7 +111,16 @@
               "type": "per_semester",
               "category": "compulsory",
               "amount": 4350,
-              "applicable_semesters": [1, 2, 3, 4, 5, 6, 7, 8],
+              "applicable_semesters": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8
+              ],
               "notes": "Includes library fee, examination fee, student welfare fee, and university charges"
             },
             {
@@ -78,7 +130,7 @@
               "category": "compulsory",
               "amount": 10300,
               "charged_in_semester": 1,
-              "notes": "Covers registration, prospectus, and other first-time charges"
+              "notes": "Covers MAKAUT Student Dev Fund (Rs. 2,200), MAKAUT registration (Rs. 500), prospectus+form (Rs. 1,000), dress kit (Rs. 6,600)"
             }
           ],
           "semester_overrides": {
@@ -102,7 +154,8 @@
               "type": "one_time",
               "category": "compulsory",
               "amount": 10000,
-              "charged_in_semester": 1
+              "charged_in_semester": 1,
+              "notes": "Admission fee row as per fee table (Rs. 10,000), first semester only"
             },
             {
               "id": "caution_money",
@@ -119,7 +172,16 @@
               "type": "per_semester",
               "category": "compulsory",
               "amount": 55000,
-              "applicable_semesters": [1, 2, 3, 4, 5, 6, 7, 8]
+              "applicable_semesters": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8
+              ]
             },
             {
               "id": "development_fee",
@@ -127,7 +189,16 @@
               "type": "per_semester",
               "category": "compulsory",
               "amount": 8250,
-              "applicable_semesters": [1, 2, 3, 4, 5, 6, 7, 8]
+              "applicable_semesters": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8
+              ]
             },
             {
               "id": "other_semester_charges",
@@ -135,7 +206,16 @@
               "type": "per_semester",
               "category": "compulsory",
               "amount": 4350,
-              "applicable_semesters": [1, 2, 3, 4, 5, 6, 7, 8]
+              "applicable_semesters": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8
+              ]
             },
             {
               "id": "first_semester_additional",
@@ -143,7 +223,8 @@
               "type": "one_time",
               "category": "compulsory",
               "amount": 10300,
-              "charged_in_semester": 1
+              "charged_in_semester": 1,
+              "notes": "Covers MAKAUT Student Dev Fund (Rs. 2,200), MAKAUT registration (Rs. 500), prospectus+form (Rs. 1,000), dress kit (Rs. 6,600)"
             }
           ],
           "semester_overrides": {
@@ -167,7 +248,8 @@
               "type": "one_time",
               "category": "compulsory",
               "amount": 10000,
-              "charged_in_semester": 1
+              "charged_in_semester": 1,
+              "notes": "Admission fee row as per fee table (Rs. 10,000), first semester only"
             },
             {
               "id": "caution_money",
@@ -183,16 +265,34 @@
               "label": "Tuition Fee",
               "type": "per_semester",
               "category": "compulsory",
-              "amount": 40000,
-              "applicable_semesters": [1, 2, 3, 4, 5, 6, 7, 8]
+              "amount": 41250,
+              "applicable_semesters": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8
+              ]
             },
             {
               "id": "development_fee",
               "label": "Development Fee",
               "type": "per_semester",
               "category": "compulsory",
-              "amount": 6000,
-              "applicable_semesters": [1, 2, 3, 4, 5, 6, 7, 8]
+              "amount": 8250,
+              "applicable_semesters": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8
+              ]
             },
             {
               "id": "other_semester_charges",
@@ -200,7 +300,16 @@
               "type": "per_semester",
               "category": "compulsory",
               "amount": 4350,
-              "applicable_semesters": [1, 2, 3, 4, 5, 6, 7, 8]
+              "applicable_semesters": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8
+              ]
             },
             {
               "id": "first_semester_additional",
@@ -208,20 +317,21 @@
               "type": "one_time",
               "category": "compulsory",
               "amount": 10300,
-              "charged_in_semester": 1
+              "charged_in_semester": 1,
+              "notes": "Covers MAKAUT Student Dev Fund (Rs. 2,200), MAKAUT registration (Rs. 500), prospectus+form (Rs. 1,000), dress kit (Rs. 6,600)"
             }
           ],
           "semester_overrides": {
             "8": {
-              "tuition_fee": 41000,
-              "notes": "Eighth semester tuition adjusted"
+              "tuition_fee": 42250,
+              "notes": "Eighth semester tuition includes degree certificate fee (Rs. 1,000)"
             }
           },
           "computed": {
-            "total_course_fee": 429100,
-            "first_semester_payable": 75650,
-            "regular_semester_fee": 50350,
-            "eighth_semester_fee": 51350
+            "total_course_fee": 457100,
+            "first_semester_payable": 79150,
+            "regular_semester_fee": 53850,
+            "eighth_semester_fee": 54850
           }
         }
       }

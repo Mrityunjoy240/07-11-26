@@ -127,6 +127,8 @@ class ConversationState:
     preferred_branch: str | None = None
     board: str | None = None
     state: str | None = None
+    year: str | None = None
+    semester: str | None = None
     # Short-follow-up resolution — what the last substantive query was about
     last_domain: str | None = None
     last_attr: str | None = None
@@ -733,7 +735,7 @@ CLARIFY_REPEAT_BN = "দুঃখিত, আমি স্পষ্টভাব�
 # Structured arithmetic — fee group definitions per department
 # Maps department code -> (total_fees, admission_fee, per_semester)
 FEE_GROUP_MAP: Dict[str, tuple[int, int, int]] = {
-    # Values verified from BCREC fee structure PDF 2026-30
+    # Values verified from BCREC fee structure PDF 2026-30 (2026-08-15 verification pass)
     "CSE": (617700, 99225, 73925),
     "IT": (617700, 99225, 73925),
     "ECE": (617700, 99225, 73925),
@@ -742,10 +744,12 @@ FEE_GROUP_MAP: Dict[str, tuple[int, int, int]] = {
     "DS": (567100, 92900, 67600),
     "CY": (567100, 92900, 67600),
     "CSD": (567100, 92900, 67600),
-    "ME": (429100, 75650, 50350),
-    "CE": (429100, 75650, 50350),
-    "MBA": (419200, 121400, 0),
-    "MCA": (214600, 67800, 48600),
+    "ME": (457100, 79150, 53850),
+    "CE": (457100, 79150, 53850),
+    # MBA total printed 4,22,000 (per-sem printed values sum 4,26,400 - PENDING CONFIRMATION)
+    "MBA": (422000, 121400, 0),
+    # MCA total 2,16,600 = 67,800 + 48,600 + 50,600 + 49,600 (sems 3/4 non-uniform)
+    "MCA": (216600, 67800, 48600),
 }
 
 # FeeEngine feature flag — see _handle_fee_query()
@@ -903,8 +907,25 @@ TTS STYLE:
 - No markdown, bullet lists, tables, or emoji. Plain sentences.
 - Use abbreviations: CSE, IT, ECE, EE, ME, CE, CSD, AIML.
 
+PLAIN SPEECH (many callers are first-time, rural users):
+- Use short sentences: one idea per sentence. No long clauses.
+- Use simple, everyday words. If you must use an English word (fee, branch,
+  admission), say it exactly as it is commonly spoken by villagers.
+- Never use jargon or abbreviations beyond the branch codes.
+- If the caller seems unsure or hesitates ("haan", "mmm", "ek minute",
+  silence), acknowledge warmly and repeat the key point once, in different
+  words. Never sound impatient and never repeat the same sentence verbatim.
+- Keep each reply to 2-3 short sentences unless the question truly has many
+  parts; end with ONE simple follow-up only if it genuinely helps.
+- Speak like a patient, friendly senior counselor, not a salesperson.
+
 OUT-OF-SCOPE:
 - Only answer BCREC questions. Politely decline others.
+
+ANSWER DIRECTLY:
+- Never output thinking, reasoning, analysis, steps, plans, or any
+  scratchpad text. Your entire reply IS the spoken answer to the caller.
+- Answer in one shot, finished: no intros like "here is" or outros.
 
 HONESTY:
 - If you don't know, say so. Never make up facts.
@@ -1066,10 +1087,11 @@ CIRCUIT_BREAKER_BACKOFF = int(os.getenv("GROQ_CIRCUIT_BACKOFF", "30"))
 MAX_BACKOFF_SEC = 10.0
 
 # Model fallback list — tried in order on rate limit
-# Primary: llama-3.1-8b-instant (fast, good quality)
-# Fallback: groq/compound-mini (lighter, different backend = separate rate limit pool)
-# Fallback: qwen/qwen3.6-27b (good multilingual, may have separate rate limits)
-FALLBACK_MODELS = ["llama-3.1-8b-instant", "groq/compound-mini", "qwen/qwen3.6-27b"]
+# Primary (GROQ_MODEL env, default): qwen/qwen3.6-27b (fast, excellent multilingual)
+# Fallback: groq/compound-mini (fast, different backend = separate rate limit pool)
+# Fallback: llama-3.1-8b-instant (quality backup, slow when llama pool is loaded)
+# Fallback: llama-3.3-70b-versatile (best quality, most rate-limited)
+FALLBACK_MODELS = ["groq/compound-mini", "llama-3.1-8b-instant", "qwen/qwen3.6-27b"]
 
 
 @dataclass
@@ -1294,7 +1316,7 @@ class GroqService:
     """
 
     def __init__(self):
-        self.model = "llama-3.1-8b-instant"
+        self.model = os.getenv("GROQ_MODEL", "qwen/qwen3.6-27b")
         self.max_tokens = 384
         self.client = settings.groq_client
         self.async_client = getattr(settings, "async_groq_client", None)
@@ -1307,13 +1329,55 @@ class GroqService:
         # Language is NOT redetected on every message; short follow-ups inherit.
         self._session_langs: Dict[str, str] = {}
 
-        # Sessions that should skip ambiguous-word validation this turn
-        # (used by yes/no continuation to avoid re-clarifying the same word)
-        self._skip_ambiguous_validation_sessions: Set[str] = set()
+        # User-confirmed default language (chosen at greeting). On weak/confusing
+        # mid-conversation detection, we fall back to this instead of guessing.
+        self._session_default_langs: Dict[str, str] = {}
 
         # Structured conversation state — per-domain slots with visit_order deque
         # for cross-domain follow-up resolution. Updated when _structured_lookup hits.
+        # Initialized before rehydration so profile slots can be restored below.
         self._session_states: Dict[str, ConversationState] = {}
+
+        # Rehydrate memory from SQLite so returning callers keep their context
+        # across restarts. Best-effort: a DB problem must not block startup.
+        try:
+            from app.services.session_store import load_recent
+
+            for sid, data in load_recent().items():
+                if data["turns"]:
+                    self._sessions[sid] = data["turns"][-12:]
+                if data.get("lang"):
+                    self._session_langs[sid] = data["lang"]
+                if data.get("default_lang"):
+                    self._session_default_langs[sid] = data["default_lang"]
+                # Rehydrate the caller's profile slots (branch/year/rank/etc.).
+                prof = data.get("profile")
+                if prof:
+                    state = self._get_or_create_state(sid)
+                    for key in (
+                        "rank",
+                        "pcm_percent",
+                        "interest",
+                        "preferred_branch",
+                        "board",
+                        "state",
+                        "year",
+                        "semester",
+                    ):
+                        val = prof.get(key)
+                        if val is not None:
+                            setattr(state, key, val)
+            if self._sessions:
+                logger.info(
+                    f"[SESSION_STORE] rehydrated {len(self._sessions)} sessions "
+                    f"from disk"
+                )
+        except Exception as e:  # noqa: BLE001
+            logger.warning(f"[SESSION_STORE] rehydration skipped: {e}")
+
+        # Sessions that should skip ambiguous-word validation this turn
+        # (used by yes/no continuation to avoid re-clarifying the same word)
+        self._skip_ambiguous_validation_sessions: Set[str] = set()
 
         # Follow-up turn counter — resets when a structured lookup hits or clear intent is detected.
         # After 3+ follow-ups without a clear new intent, the bot re-asks what the user wants.
@@ -1372,13 +1436,18 @@ class GroqService:
                 if wait > 0:
                     await asyncio.sleep(wait)
                 try:
+                    call_kwargs = {
+                        "model": current_model,
+                        "messages": messages,
+                        "temperature": 0.3,
+                        "max_tokens": self.max_tokens,
+                    }
+                    if current_model.startswith("qwen"):
+                        call_kwargs["reasoning_effort"] = "none"
                     completion = await asyncio.wait_for(
                         asyncio.to_thread(
                             self.client.chat.completions.create,
-                            model=current_model,
-                            messages=messages,
-                            temperature=0.3,
-                            max_tokens=self.max_tokens,
+                            **call_kwargs,
                         ),
                         timeout=LLM_TIMEOUT,
                     )
@@ -1406,6 +1475,15 @@ class GroqService:
                     error_str = str(e)
                     elapsed = time.time() - t_start
                     is_rate_limit = "429" in error_str or "rate" in error_str.lower() or "too many" in error_str.lower()
+                    is_model_missing = "404" in error_str and (
+                        "does not exist" in error_str or "model_not_found" in error_str or "not found" in error_str.lower()
+                    )
+                    if is_model_missing:
+                        logger.warning(
+                            f"LLM model {current_model} not available (404) — skipping "
+                            f"(elapsed={elapsed:.1f}s): {error_str[:80]}"
+                        )
+                        break  # skip to next model, no retries/backoff
                     if is_rate_limit and attempt == 0:
                         self._rate_limiter.record_429()
                         backoff = min(1.0, MAX_BACKOFF_SEC)
@@ -1812,6 +1890,19 @@ class GroqService:
             r"milta hai kya|available hai kya|milta kya)\s*\??$",
             re.IGNORECASE,
         ),
+        # "<entity> kya hai / kya hota hai" at the end — Hindi detail form like
+        # "playground timings kya hai?" or "hostel fee kya hota hai?".
+        re.compile(
+            r"^(.+?)\s+(?:kya hai|kya hota hai)\s*\??$",
+            re.IGNORECASE,
+        ),
+        # "<entity> hai kya <context>" — mid-sentence existence form like
+        # "swimming pool hai kya college mein?" (marker NOT at end of query)
+        re.compile(
+            r"^(.+?)\s+(?:hai kya|nahi hai|hai na|ache ki|ache na|"
+            r"milta hai kya|available hai kya|milta kya)\s+(?:\S.*)?$",
+            re.IGNORECASE,
+        ),
         # "<entity> 24x7/24 hours/khula/open ... (hai)?"
         re.compile(
             r"^(.+?)\s+(?:24x7|24/7|24 hours|24 hour|round the clock|khula|khuli|"
@@ -1883,7 +1974,15 @@ class GroqService:
         return corpus
 
     def _existence_mentions(self, entity: str) -> bool:
-        """True if the entity (or all of its significant tokens) appears in the KB."""
+        """True if the entity's significant tokens ALL appear in the KB.
+
+        Strict all() is safe here because conversational modifiers are excluded
+        as function-word stopwords ("scholarship milti hai kya" reduces to the
+        single content word "scholarship"). The KB list is finite, so a
+        genuinely unlisted entity always has distinctive tokens missing
+        ("swimming pool", "marine engineering", "robotics") — zero corpus hits —
+        while every listed entity keeps its core content word present.
+        """
         corpus = self._existence_corpus()
         if entity in corpus:
             return True
@@ -2015,7 +2114,47 @@ class GroqService:
         "to", "a", "an", "bcrec", "college", "have", "has", "does", "did",
         "are", "is", "was", "were", "will", "can", "koto", "kore", "kon",
         "kis", "kiski", "kiska", "apna", "mere", "liye",
+        # Conversational fillers (Hindi + Banglish) that must never drive
+        # KB-coverage or existence decisions — they are not content words.
+        "acha", "achha", "bhai", "kuch", "zyada", "jada", "thoda", "thodi",
+        "milti", "milta", "milte", "raha", "rahi", "rahe", "wala", "wali",
+        "walo", "sakta", "sakti", "sakte", "chahiye", "madad", "baare",
+        "baat", "batana", "batao", "bataiye", "jaanna", "janna", "theek",
+        "thik", "haan", "nahi", "toh", "ji", "bolo", "bolen", "kemon",
+        "kivabe", "bhalo", "naki", "ache", "acche", "thake", "obostha",
+        "kono", "keno", "jante", "chai", "chahie", "hoye", "hobe", "korte",
+        "korbo", "amar", "amr", "tumi", "tomar", "apnar",
+        # Hindi/Banglish verb morphology and particles (function words only).
+        "hoon", "hoga", "hogi", "honge", "hota", "hoti", "hote", "hona",
+        "hone", "tha", "thi", "the",
+        "chahta", "chahti", "chahate", "chahenge", "chaho", "chahe",
+        "lena", "lijiye", "liya", "lekar",
+        "karna", "karta", "karti", "karte", "karne", "kiya", "kiye",
+        "deta", "deti", "dete", "dena", "dijiye", "diya", "diye",
+        "jaana", "jaata", "jaati", "jaate", "gaya", "gayi", "gaye",
+        "sakt", "sakti", "saken",
+        "uski", "unki", "unki", "iname", "unki",
+        "phir", "abhi", "yahan", "wahan", "wahin", "kidhar",
+        "koro", "kora", "thakbe", "thakte", "hokbe", "hoyete", "gache",
     })
+
+    def _looks_like_cot(self, text: str) -> bool:
+        """True when the model leaked its internal reasoning into the reply.
+
+        A general detector for the known failure mode of the thinking-capable
+        model — it occasionally answers with chain-of-thought instead of the
+        caller-facing answer. The markers are structural, not content lists.
+        """
+        t = text.lower()
+        markers = (
+            "thinking process", "chain of thought", "reasoning process",
+            "analyze user input", "analyze the user input", "here's my thinking",
+            "here is my thinking", "**analysis**", "let me think step by step",
+            "let's think step by step", "scratchpad",
+        )
+        if any(m in t for m in markers):
+            return True
+        return False
 
     def _looks_like_factual_ask(self, query: str) -> bool:
         """True if the query demands specific factual info (not chit-chat)."""
@@ -2046,6 +2185,12 @@ class GroqService:
         tokens = set(re.findall(r"[a-z0-9]+", query.lower()))
         tokens.difference_update(self._STOPWORDS)
         tokens = {t for t in tokens if len(t) >= 3}
+        # Nothing significant left to verify (pure conversational query) — we
+        # can't positively say the topic is unlisted, so don't refuse. The
+        # other guards (existence, grounded-refusal) still protect real no-data
+        # topics.
+        if not tokens:
+            return True
         for tok in tokens:
             if tok in verified:
                 return True
@@ -2075,6 +2220,15 @@ class GroqService:
         dom, _ = self._classify_domain_and_attr(query)
         if dom:
             return None
+        # Romanized Hindi/Bengali (Latin script) cannot be judged by an
+        # English-trained corpus, so the ONLY sound deterministic refusals here
+        # are script-agnostic existence forms ("swimming pool ache ki?",
+        # "playground timings kya hai?") where the entity is absent from the KB.
+        # Everything else defers to the fully-grounded LLM (full KB + history
+        # in context), which is what answers Banglish money questions like
+        # "taka koto porbe?" that carry no English content word.
+        if lang != "en":
+            return self._existence_refusal_guard(query, lang)
         if self._kb_covers_query(query, retrieval_context):
             return None
         logger.info(
@@ -2398,6 +2552,42 @@ class GroqService:
             return expanded
 
         return None
+
+    def _resolve_branch_attribute_followup(self, query: str, session_id: str) -> str | None:
+        """Generalize attribute-only follow-ups to the most recent branch the
+        caller mentioned, e.g. after ``"aiml"`` a bare ``"fee"`` becomes
+        ``"aiml fee"`` so the pipeline answers the right branch's data instead
+        of asking a redundant clarification.
+
+        Deliberately reuses the existing structured-intent detector and the
+        branch-from-history extractor instead of maintaining per-word lists:
+        any attribute the pipeline already understands is inherited, and new
+        phrasings the detector maps to an attribute work automatically.
+        Conversational words (greetings, exits, thanks) and queries that
+        already name a department are never rewritten.
+        """
+        q = query.strip()
+        if not q or len(q.split()) > 2:
+            return None
+        q_lower = q.lower()
+        if (
+            self._detect_exit_intent(q_lower, "en")
+            or self._detect_thanks_intent(q_lower, "en")
+            or self._detect_ack_intent(q_lower, "en")
+            or self._extract_dept_code(q) is not None
+        ):
+            return None
+        # Only rewrite genuine attribute queries (fee, placement, scholarship,
+        # hostel, ...) — as decided by the existing structured-intent detector.
+        if self._detect_structured_intent(q) is None:
+            return None
+        branches = self._extract_branches_from_history(session_id)
+        if not branches:
+            return None
+        branch = branches[-1]
+        expanded = f"{branch} {q}"
+        logger.info(f"[{session_id}] Branch-inherit follow-up '{q}' -> '{expanded}'")
+        return expanded
 
     # -----------------------------------------------------------------------
     # Conversation policy — graceful exits and thanks
@@ -2803,6 +2993,37 @@ class GroqService:
             state.preferred_branch = code
             break
 
+        # year / semester — only from first-person statements.
+        if self_ref:
+            year_map = {
+                "1st": "1st", "first": "1st", "one": "1st",
+                "2nd": "2nd", "second": "2nd", "two": "2nd",
+                "3rd": "3rd", "third": "3rd", "three": "3rd",
+                "4th": "4th", "fourth": "4th", "four": "4th",
+                "final": "4th", "last": "4th",
+            }
+            yr_m = re.search(
+                r"\b(1st|2nd|3rd|4th|first|second|third|fourth|final|last|"
+                r"one|two|three|four)\s*(?:yr\.?|year|sem(?:ester)?|or)\b",
+                q,
+            )
+            if yr_m:
+                label = yr_m.group(1).lower()
+                target = "semester" if re.search(r"sem", yr_m.group(0)) else "year"
+                value = year_map.get(label, label)
+                # "3rd or" (Banglish for "3rd year") → year, not semester.
+                if yr_m.group(0).endswith("or"):
+                    target = "year"
+                if target == "semester":
+                    state.semester = value
+                else:
+                    state.year = value
+            else:
+                yr_m2 = re.search(r"\byear\s*(\d+)\b|(\d+)(?:st|nd|rd|th)?\s*(?:yr|year)\b", q)
+                if yr_m2:
+                    n = yr_m2.group(1) or yr_m2.group(2)
+                    state.year = f"{int(n)}{'st' if int(n) == 1 else 'nd' if int(n) == 2 else 'rd' if int(n) == 3 else 'th'}"
+
     def _format_profile_context(self, session_id: str) -> str:
         """Format stored user profile as a context string for LLM injection."""
         state = self._get_or_create_state(session_id)
@@ -2815,6 +3036,10 @@ class GroqService:
             parts.append(f"User interest: {state.interest}")
         if state.preferred_branch is not None:
             parts.append(f"User preferred branch: {state.preferred_branch}")
+        if getattr(state, "year", None) is not None:
+            parts.append(f"User year: {state.year} year")
+        if getattr(state, "semester", None) is not None:
+            parts.append(f"User semester: {state.semester} semester")
         if state.board is not None:
             parts.append(f"User board: {state.board}")
         if state.state is not None:
@@ -2894,6 +3119,18 @@ USER QUESTION: {query}
                 if t in q or q == t:
                     return True, lang
         return False, None
+
+    def set_session_language(self, session_id: str, lang: str, default: bool = True) -> None:
+        """Set the session language. With default=True this is the user-confirmed
+        preference (chosen at greeting) that weak mid-conversation detection falls back to."""
+        if lang not in ("en", "hi", "bn"):
+            return
+        self._session_langs[session_id] = lang
+        if default:
+            self._session_default_langs[session_id] = lang
+            logger.info(f"[{session_id}] Language default set by user: {lang}")
+        else:
+            logger.info(f"[{session_id}] Language set (auto): {lang}")
 
     def _resolve_language(self, session_id: str, query: str) -> str:
         """
@@ -2987,6 +3224,17 @@ USER QUESTION: {query}
         # a lone marker is not enough to flip an explicitly-set language.
         kw_count = bn_kw if detected == "bn" else hi_kw
 
+        # 5a. Clean English with zero bn/hi markers = caller switched to English
+        # mid-conversation (English has no keyword markers, so it never got a
+        # "strong evidence" switch before).
+        if detected == "en" and bn_kw == 0 and hi_kw == 0:
+            logger.info(
+                f"[{session_id}] Language change: {current_lang} → en "
+                f"(reason: clean English query with zero bn/hi markers)"
+            )
+            self._session_langs[session_id] = "en"
+            return "en"
+
         if kw_count >= 2:
             logger.info(
                 f"[{session_id}] Language change: {current_lang} → {detected} "
@@ -2996,11 +3244,133 @@ USER QUESTION: {query}
             self._session_langs[session_id] = detected
             return detected
 
+        # 5b. Weak/confusing detection — fall back to the user-confirmed default
+        # language (chosen at greeting) instead of guessing.
+        default_lang = self._session_default_langs.get(session_id)
+        if default_lang and default_lang != current_lang:
+            logger.info(
+                f"[{session_id}] Language: detected={detected} weak (bn={bn_kw} hi={hi_kw}), "
+                f"falling back to user default {default_lang}"
+            )
+            self._session_langs[session_id] = default_lang
+            return default_lang
+
         logger.info(
             f"[{session_id}] Language: detected={detected}, keeping {current_lang} "
             f"(reason: weak evidence, kw markers bn={bn_kw} hi={hi_kw})"
         )
         return current_lang
+
+    # -----------------------------------------------------------------------
+    # LLM-assisted language resolution (weak-signal fallback)
+    # -----------------------------------------------------------------------
+    def _lang_signal_strong(self, query: str) -> bool:
+        """True if deterministic evidence for this query is decisive.
+
+        Native script, an explicit switch phrase, or >=2 keyword markers are
+        strong enough that an LLM verdict adds nothing.
+        """
+        if re.search(r"[\u0980-\u09FF]", query) or re.search(r"[\u0900-\u097F]", query):
+            return True
+        switch, forced = self._is_lang_switch(query)
+        if switch and forced:
+            return True
+        text_words = set(re.sub(r"[^\w\s]", " ", query.lower()).split())
+        from app.utils.language_detect import (
+            BANGLA_ROMAN_WORDS,
+            HINDI_ROMAN_WORDS,
+            count_markers,
+        )
+
+        bn_kw = count_markers(text_words, BANGLA_ROMAN_WORDS)
+        hi_kw = count_markers(text_words, HINDI_ROMAN_WORDS)
+        return bn_kw >= 2 or hi_kw >= 2
+
+    async def _llm_language_verdict(self, query: str) -> tuple[str | None, bool, str | None]:
+        """Ask the LLM to classify a query's language + language-switch intent.
+
+        Returns (lang, is_switch, switch_to). Consulted only when the
+        deterministic detector is weak/ambiguous. Cached per query so the
+        switch re-run logic and answer path share one verdict.
+        """
+        if not hasattr(self, "_lang_verdict_cache"):
+            self._lang_verdict_cache: dict[str, tuple[str | None, bool, str | None]] = {}
+        if query in self._lang_verdict_cache:
+            return self._lang_verdict_cache[query]
+
+        prompt = (
+            "You classify the language of an informal romanized Indian query for a college chatbot.\n"
+            'Reply with ONLY a JSON object: {"lang": "en|hi|bn", "switch": true/false, '
+            '"switch_to": "en|hi|bn" or null}\n'
+            '"switch" is true only when the user is asking to change the response language '
+            '(e.g. "bangla te bol", "hindi me bolo", "speak in bengali").\n'
+            f"Query: {query}"
+        )
+        verdict: tuple[str | None, bool, str | None] = (None, False, None)
+        try:
+            verdict_kwargs = {
+                "model": self.model,
+                "messages": [{"role": "user", "content": prompt}],
+                "temperature": 0.0,
+                "max_tokens": 50,
+            }
+            if self.model.startswith("qwen"):
+                verdict_kwargs["reasoning_effort"] = "none"
+            completion = await asyncio.wait_for(
+                asyncio.to_thread(
+                    self.client.chat.completions.create,
+                    **verdict_kwargs,
+                ),
+                timeout=4.0,
+            )
+            text = (completion.choices[0].message.content or "").strip()
+            match = re.search(r"\{.*\}", text, re.DOTALL)
+            data = json.loads(match.group(0)) if match else {}
+            lang = data.get("lang")
+            lang = lang if lang in ("en", "hi", "bn") else None
+            switch = bool(data.get("switch"))
+            switch_to = data.get("switch_to")
+            switch_to = switch_to if switch_to in ("en", "hi", "bn") else None
+            verdict = (lang, switch, switch_to)
+        except Exception as e:
+            logger.warning(f"LLM language verdict failed (query={query[:40]!r}): {e}")
+        if len(self._lang_verdict_cache) > 1024:
+            self._lang_verdict_cache.clear()
+        self._lang_verdict_cache[query] = verdict
+        return verdict
+
+    async def _resolve_language_llm(
+        self, session_id: str, query: str
+    ) -> tuple[str, bool, str | None]:
+        """Language resolution with LLM verdict on weak/ambiguous signals.
+
+        Deterministic rules run first (native script, switch phrases, keyword
+        markers). Only when those are inconclusive do we consult the LLM, so
+        obvious queries stay fast and free. Returns (lang, is_switch, switch_to).
+        """
+        lang = self._resolve_language(session_id, query)
+        is_switch, forced_lang = self._is_lang_switch(query)
+        if self._lang_signal_strong(query) or self._is_greeting(query):
+            return lang, is_switch, forced_lang
+
+        v_lang, v_switch, v_switch_to = await self._llm_language_verdict(query)
+        if v_switch and v_switch_to:
+            if self._session_langs.get(session_id, "en") != v_switch_to:
+                logger.info(
+                    f"[{session_id}] Language change: "
+                    f"{self._session_langs.get(session_id, 'en')} → {v_switch_to} "
+                    f"(reason: LLM verdict, explicit switch)"
+                )
+                self._session_langs[session_id] = v_switch_to
+            return v_switch_to, True, v_switch_to
+        if v_lang and v_lang in ("hi", "bn") and v_lang != lang:
+            logger.info(
+                f"[{session_id}] Language change: {lang} → {v_lang} "
+                f"(reason: LLM verdict, weak deterministic signal)"
+            )
+            self._session_langs[session_id] = v_lang
+            return v_lang, False, None
+        return lang, is_switch, forced_lang
 
     def _validate_transcript(self, query: str, session_id: str) -> str | None:
         """Validate transcript quality before RAG+LLM call.
@@ -3822,7 +4192,7 @@ USER QUESTION: {query}
         if re.search(r"\b(fee structure|fee|fees)\b", q):
             fee_cse = self._format_inr(617700, lang)
             fee_other = self._format_inr(567100, lang)
-            fee_me_ce = self._format_inr(429100, lang)
+            fee_me_ce = self._format_inr(457100, lang)
             if lang == "hi":
                 return (
                     "BCREC mein B.Tech fees branch ke hisaab se alag hai. "
@@ -3843,7 +4213,7 @@ USER QUESTION: {query}
                 "BCREC B.Tech fees vary by branch. "
                 f"CSE, IT, ECE: {self._format_inr(617700, 'en')} total. "
                 f"EE, AIML, DS, CY, CSD: {self._format_inr(567100, 'en')} total. "
-                f"ME, CE: {self._format_inr(429100, 'en')} total. "
+                f"ME, CE: {self._format_inr(457100, 'en')} total. "
                 "Would you like fees for a specific branch?"
             )
         return None
@@ -3984,22 +4354,29 @@ USER QUESTION: {query}
         tt = self._format_inr(tuition, lang)
         dt = self._format_inr(development, lang)
         ot = self._format_inr(other, lang)
+        has_breakdown = tuition > 0 or development > 0 or other > 0
 
         if lang == "hi":
-            return (
-                f"{dept_name} ({dept_code}) का सेमेस्टर {sem_num} शुल्क {ts} है। "
-                f"इसमें ट्यूशन फीस {tt}, डेवलपमेंट फीस {dt}, और अन्य सेमेस्टर शुल्क {ot} शामिल हैं।"
-            )
+            if has_breakdown:
+                return (
+                    f"{dept_name} ({dept_code}) का सेमेस्टर {sem_num} शुल्क {ts} है। "
+                    f"इसमें ट्यूशन फीस {tt}, डेवलपमेंट फीस {dt}, और अन्य सेमेस्टर शुल्क {ot} शामिल हैं।"
+                )
+            return f"{dept_name} ({dept_code}) का सेमेस्टर {sem_num} शुल्क {ts} है।"
         if lang == "bn":
+            if has_breakdown:
+                return (
+                    f"{dept_name} ({dept_code}) এর সেমিস্টার {sem_num} ফি {ts}। "
+                    f"এতে টিউশন ফি {tt}, ডেভেলপমেন্ট ফি {dt}, এবং অন্যান্য সেমিস্টার চার্জ {ot} অন্তর্ভুক্ত।"
+                )
+            return f"{dept_name} ({dept_code}) এর সেমিস্টার {sem_num} ফি {ts}।"
+        if has_breakdown:
             return (
-                f"{dept_name} ({dept_code}) এর সেমিস্টার {sem_num} ফি {ts}। "
-                f"এতে টিউশন ফি {tt}, ডেভেলপমেন্ট ফি {dt}, এবং অন্যান্য সেমিস্টার চার্জ {ot} অন্তর্ভুক্ত।"
+                f"The semester {sem_num} fee for {dept_name} ({dept_code}) is {ts}. "
+                f"This covers tuition fee of {tt}, development fee of {dt}, "
+                f"and other semester charges of {ot}."
             )
-        return (
-            f"The semester {sem_num} fee for {dept_name} ({dept_code}) is {ts}. "
-            f"This covers tuition fee of {tt}, development fee of {dt}, "
-            f"and other semester charges of {ot}."
-        )
+        return f"The semester {sem_num} fee for {dept_name} ({dept_code}) is {ts}."
 
     def _format_fee_response(
         self, resp_type: str, dept_code: str, dept_name: str, lang: str,
@@ -4068,7 +4445,7 @@ USER QUESTION: {query}
         """Generate a general fee overview without 'alag se' phrasing."""
         fee_cse_str = self._format_inr(617700, lang)
         fee_ee_str = self._format_inr(567100, lang)
-        fee_me_str = self._format_inr(429100, lang)
+        fee_me_str = self._format_inr(457100, lang)
         try:
             cse_t = engine.get_total_fee("CSE")
             ee_t = engine.get_total_fee("EE")
@@ -4159,9 +4536,18 @@ USER QUESTION: {query}
         # 4. Generic semester / per-semester (use sem 2 as regular)
         if re.search(r"\bsemester\s*fee\b|\bper\s*semester\b|\bsem\s*fee\b", q):
             sr = engine.get_semester_fee(dept_code, 2)
-            if not sr.error and sr.semester_fee and sr.semester_fee > 0:
+            rsf = None
+            if sr is not None and not sr.error and sr.group_data is not None:
+                rsf = sr.group_data.computed.regular_semester_fee
+            if (
+                sr is not None
+                and not sr.error
+                and sr.semester_fee
+                and sr.semester_fee > 0
+                and rsf
+            ):
                 return self._format_fee_response("semester", dept_code, dept_name, lang, sr)
-            # Fallback to total (MBA has no per-semester)
+            # Fallback to total (programs without a uniform per-semester fee)
             tr = engine.get_total_fee(dept_code)
             if tr.total_fee:
                 return self._format_fee_response("total", dept_code, dept_name, lang, tr)
@@ -4177,7 +4563,19 @@ USER QUESTION: {query}
         """Route fee queries to old or new engine based on feature flag.
 
         Logs which engine served the response for debugging.
+
+        Precedence rule: if the query clearly targets a DIFFERENT topic that
+        merely mentions money ("fees zyada hai, scholarship milti hai kya?"),
+        yield to the other topic instead of answering with fee data. The list
+        below is intentionally small — just "topics with their own domain" —
+        and generalizes to any phrasing of those topics.
         """
+        ql = q.lower()
+        other_topic = re.search(
+            r"\b(scholarship|scolarship|stipend|financial\s*aid|borshok)\b", ql
+        )
+        if other_topic:
+            return None
         if _USE_NEW_FEE_ENGINE:
             result = self._handle_fee_query_new(q, lang, kb)
             if result is not None:
@@ -4196,6 +4594,15 @@ USER QUESTION: {query}
             return None
 
         q = query.strip().lower()
+
+        # Existence-form questions ("swimming pool hai kya college mein?")
+        # are answered against the KB FIRST, before the generic handlers run.
+        # Otherwise an unlisted facility is greeted by a generic "describe the
+        # college" answer instead of an honest refusal. Facilities that ARE in
+        # the KB pass through (guard returns None) so their normal answer flows.
+        refusal = self._existence_refusal_guard(query, lang)
+        if refusal is not None:
+            return refusal
 
         # --- Combined principal + vice principal lookup ---
         # Handle queries asking about BOTH with a conjunction:
@@ -4688,10 +5095,10 @@ USER QUESTION: {query}
         if re.search(r"\blibrary\s*(timing|hours?)|reading\s*room\b", q):
             logger.info(f"HANDLER: library matched for query='{q[:60]}'")
             if lang == "hi":
-                return "Library Monday to Friday 10:00 AM se 5:30 PM tak khuli rehti hai. 80,000 se zyada books hain."
+                return "Library Monday to Friday 10:00 AM se 5:30 PM tak khuli rehti hai. 1 lakh se zyada books hain."
             if lang == "bn":
-                return "লাইব্রেরি সোমবার থেকে শুক্রবার সকাল ১০:০০ থেকে বিকাল ৫:৩০ পর্যন্ত খোলা থাকে। ৮০,০০০ এর বেশি বই আছে।"
-            return "The library is open Monday to Friday, 10:00 AM to 5:30 PM. It has over 80,000 books."
+                return "লাইব্রেরি সোমবার থেকে শুক্রবার সকাল ১০:০০ থেকে বিকাল ৫:৩০ পর্যন্ত খোলা থাকে। ১ লক্ষের বেশি বই আছে।"
+            return "The library is open Monday to Friday, 10:00 AM to 5:30 PM. It has over 100,000 books."
 
         # --- College timings ---
         if re.search(
@@ -4962,10 +5369,10 @@ USER QUESTION: {query}
         if re.search(r"\b(nba|naac|grade|accredit|accreditation|certif)\b", q):
             logger.info(f"HANDLER: accreditation matched for query='{q[:60]}'")
             if lang == "hi":
-                return "BCREC NAAC B+ grade (CGPA 2.83) hai aur CSE, ECE, IT, EE, ME NBA accredited hain."
+                return "BCREC NAAC B+ grade (CGPA 2.72) hai aur CSE, ECE, IT, EE, ME NBA accredited hain."
             if lang == "bn":
-                return "BCRECT NAAC B+ গ্রেড (CGPA ২.৮৩) এবং CSE, ECE, IT, EE, ME NBA স্বীকৃত।"
-            return "BCREC is NAAC B+ grade (CGPA 2.83) and has NBA accreditation for CSE, ECE, IT, EE, ME."
+                return "BCRECT NAAC B+ গ্রেড (CGPA ২.৭২) এবং CSE, ECE, IT, EE, ME NBA স্বীকৃত।"
+            return "BCREC is NAAC B+ grade (CGPA 2.72) and has NBA accreditation for CSE, ECE, IT, EE, ME."
 
         # --- Admission last date / deadline ---
         if re.search(r"\b(last\s*date|deadline|closing\s*date|admission\s*till|last\s*day|kab\s*tak|f.or\s*tak|last\s*chance)\b", q):
@@ -5468,6 +5875,32 @@ USER QUESTION: {query}
         # Keep last 12 turns to prevent unbounded growth
         if len(self._sessions[session_id]) > 12:
             self._sessions[session_id] = self._sessions[session_id][-12:]
+        # Persist the turn + language so memory survives server restarts.
+        try:
+            from app.services.session_store import save_turn
+
+            state = self._get_or_create_state(session_id)
+            profile = {
+                "rank": state.rank,
+                "pcm_percent": state.pcm_percent,
+                "interest": state.interest,
+                "preferred_branch": state.preferred_branch,
+                "board": state.board,
+                "state": state.state,
+                "year": getattr(state, "year", None),
+                "semester": getattr(state, "semester", None),
+            }
+            profile = {k: v for k, v in profile.items() if v is not None}
+            save_turn(
+                session_id,
+                user_msg,
+                assistant_msg,
+                lang=self._session_langs.get(session_id, "en"),
+                default_lang=self._session_default_langs.get(session_id),
+                profile=json.dumps(profile) if profile else None,
+            )
+        except Exception:  # noqa: BLE001
+            pass
 
     # -----------------------------------------------------------------------
     # ConversationState helpers — cross-domain follow-up resolution
@@ -5505,7 +5938,15 @@ USER QUESTION: {query}
         """Clear a session's memory and language state. Called when session ends."""
         self._sessions.pop(session_id, None)
         self._session_langs.pop(session_id, None)
+        self._session_default_langs.pop(session_id, None)
         self._session_states.pop(session_id, None)
+        # Also drop the persisted copy (privacy / end-of-call hygiene).
+        try:
+            from app.services.session_store import delete_session
+
+            delete_session(session_id)
+        except Exception:  # noqa: BLE001
+            pass
 
     # -----------------------------------------------------------------------
     # Phase 0 — Hallucination guard
@@ -5744,7 +6185,11 @@ USER QUESTION: {query}
         if re.search(
             r"\b(policy|rules|rule|clear|clearance|how|what|when|why|where|"
             r"kya|kya\s+hai|kaise|kese|kivabe|kivay|kemone|kemon|kitna|kitne|"
-            r"kitni|details?|info|semester|subject|exam|scheme|seats?)\b",
+            r"kitni|details?|info|semester|subject|exam|scheme|seats?"
+            r"|scolarship|scholarship|schorlership|stipend|छात्रवृत्ति|স্কলারশিপ|"
+            r"hobe|hoga|pabona|pabogi|pabo|pabon|paba|milbe|milabe|milega|langbe|jabe|asbe|"
+            r"will\s+i|will\s+we|kya\s+hoga|ki\s+hobe|hobe\s+ki|hoga\s+ki|"
+            r"consequence|consequences|effect|effects|impact)\b",
             q,
         ):
             return None
@@ -5950,6 +6395,8 @@ USER QUESTION: {query}
             # "36 lpa?") are expanded into full questions instead of being rejected
             # as too-short STT noise.
             resolved_query = self._resolve_short_followup(query, session_id)
+            if not resolved_query:
+                resolved_query = self._resolve_branch_attribute_followup(query, session_id)
             if resolved_query:
                 telemetry.log_special_event(
                     session_id,
@@ -6010,7 +6457,7 @@ USER QUESTION: {query}
                 }
 
             # 1. Resolve language using persistent session state
-            lang = self._resolve_language(session_id, query)
+            lang, is_switch, forced_lang = await self._resolve_language_llm(session_id, query)
             _profiler.mark("lang_detect")
 
             # Extract user profile from query (rank, PCM, interest)
@@ -6037,7 +6484,6 @@ USER QUESTION: {query}
                 )
 
             # If user explicitly switched language, re-run the previous question
-            is_switch, forced_lang = self._is_lang_switch(query)
             if is_switch and forced_lang and history:
                 prev_question = self._get_last_user_question(history[:-1] if history else [])
                 if prev_question:
@@ -6249,6 +6695,38 @@ USER QUESTION: {query}
 
             # 2.85 Shadow routing — silent signal detection (emotion+grievance ≥0.8)
             record_shadow(query, session_id=session_id, turn_number=turn_number)
+            # 2.87 Deterministic structured lookup - exact figures (fees,
+            # principal, hostel, HOD, seats, cutoff, placement...) are answered
+            # from canonical KB data BEFORE any refusal guard or LLM call.
+            # Language-aware and ~0ms: fee numbers must never be left to the
+            # LLM (they get garbled), and known facts must never be refused.
+            structured_answer = None
+            try:
+                structured_answer = self._structured_lookup(query, lang)
+            except Exception as e:  # noqa: BLE001 - lookup must never break chat
+                logger.warning(f"STRUCTURED LOOKUP error: {e}")
+            if structured_answer:
+                logger.info(
+                    f"STRUCTURED HIT ({lang}): '{query[:60]}' -> {structured_answer[:60]}"
+                )
+                telemetry.log_turn_input(
+                    session_id,
+                    turn_number=turn_number,
+                    raw_transcript=query,
+                    detected_language=lang,
+                    detected_intent="structured_lookup",
+                )
+                self._append_session_turn(session_id, query, structured_answer)
+                return {
+                    "answer": structured_answer,
+                    "voice_text": structured_answer,
+                    "source": "structured_lookup",
+                    "model": "none",
+                    "latency_ms": round((time.time() - start) * 1000),
+                    "hallucination_validated": True,
+                    "tokens": {"prompt": 0, "completion": 0},
+                    "cache_hit": False,
+                }
 
             # 2.88 Grounding — record topic, retrieve verified context, refuse no-data domains
             self._record_topic(query, session_id)
@@ -6300,7 +6778,7 @@ USER QUESTION: {query}
                 "bn": "CRITICAL LANGUAGE RULE: The user is writing in Banglish (Roman Bengali). You MUST reply in Banglish. Never use Hindi. If unsure, default to Banglish.\n\n",
                 "hi": "CRITICAL LANGUAGE RULE: The user is writing in Hindi. You MUST reply in Roman Hindi (NOT Devanagari script). Never use Bengali or English words.\n\n",
                 "en": "CRITICAL LANGUAGE RULE: The user is writing in English. Reply in English.\n\n",
-            }.get(lang, "")
+            }.get(lang, "") + "ANSWER ONLY: Reply with ONLY the final answer text to the caller. Never include thinking, reasoning, analysis, or any explanation of your process.\n\n"
             lang_hint = {
                 "bn": " The user's language is Banglish (Roman Bengali). Reply ONLY in Banglish. Do NOT use Hindi words.",
                 "hi": " The user's language is Hindi. Reply ONLY in Roman Hindi (NOT Devanagari script). Do NOT use Bengali words.",
@@ -6347,6 +6825,20 @@ USER QUESTION: {query}
 
             # Call LLM with tools — let it decide whether to use tools or answer directly
             answer = await self._call_llm_with_tools(messages, session_id, query, start, lang)
+            for _attempt in range(3):
+                if not self._looks_like_cot(answer):
+                    break
+                logger.warning(f"COT LEAK retry {_attempt + 1}/3 for '{query[:60]}'")
+                messages.append({
+                    "role": "system",
+                    "content": (
+                        "CORRECTION: You just output internal reasoning instead of "
+                        "an answer, and it was sent to the caller. Output ONLY the "
+                        "final answer to the caller now, with no thinking, analysis, "
+                        "or explanation. Omit any thinking-process section entirely."
+                    ),
+                })
+                answer = await self._call_llm_with_tools(messages, session_id, query, start, lang)
             _profiler.mark("llm_response")
 
             # Cap response length for TTS — summarize intelligently
@@ -6442,6 +6934,8 @@ USER QUESTION: {query}
             # Runs BEFORE transcript validation so elliptical follow-ups are expanded
             # into full questions instead of being rejected as too-short STT noise.
             resolved_query = self._resolve_short_followup(query, session_id)
+            if not resolved_query:
+                resolved_query = self._resolve_branch_attribute_followup(query, session_id)
             if resolved_query:
                 telemetry.log_special_event(
                     session_id,
@@ -6625,6 +7119,21 @@ USER QUESTION: {query}
 
             # Shadow routing — silent signal detection (emotion+grievance ≥0.8)
             record_shadow(query, session_id=session_id, turn_number=turn_number)
+            # 2.87 Deterministic structured lookup (stream) - same engine as the
+            # non-stream path: exact figures first, LLM only for what's left.
+            structured_answer = None
+            try:
+                structured_answer = self._structured_lookup(query, lang)
+            except Exception as e:  # noqa: BLE001 - lookup must never break chat
+                logger.warning(f"STRUCTURED LOOKUP error (stream): {e}")
+            if structured_answer:
+                logger.info(
+                    f"STRUCTURED HIT (stream, {lang}): '{query[:60]}' -> {structured_answer[:60]}"
+                )
+                for word in structured_answer.split():
+                    yield word + " "
+                    await asyncio.sleep(0.02)
+                return
 
             # 2.88 Grounding — record topic, retrieve verified context, refuse no-data domains
             self._record_topic(query, session_id)
@@ -6664,14 +7173,31 @@ USER QUESTION: {query}
             # LLM (stream path) — single path for ALL queries
             # Structured lookup removed. LLM gets full context.
             # Build messages: system prompt + history + current query
+            is_voice = bool(voice_system_prompt)
             lang_prefix = {
-                "bn": "CRITICAL LANGUAGE RULE: The user is writing in Banglish (Roman Bengali). You MUST reply in Banglish. Never use Hindi. If unsure, default to Banglish.\n\n",
-                "hi": "CRITICAL LANGUAGE RULE: The user is writing in Hindi. You MUST reply in Roman Hindi (NOT Devanagari script). Never use Bengali or English words.\n\n",
+                "bn": (
+                    "CRITICAL LANGUAGE RULE: The user is speaking Bengali. You MUST reply in Bengali written in Bengali script (Bangla lipi). Never use Hindi.\n\n"
+                    if is_voice
+                    else "CRITICAL LANGUAGE RULE: The user is writing in Banglish (Roman Bengali). You MUST reply in Banglish. Never use Hindi. If unsure, default to Banglish.\n\n"
+                ),
+                "hi": (
+                    "CRITICAL LANGUAGE RULE: The user is speaking Hindi. You MUST reply in Hindi written in Devanagari script. Never use Bengali or English words.\n\n"
+                    if is_voice
+                    else "CRITICAL LANGUAGE RULE: The user is writing in Hindi. You MUST reply in Roman Hindi (NOT Devanagari script). Never use Bengali or English words.\n\n"
+                ),
                 "en": "CRITICAL LANGUAGE RULE: The user is writing in English. Reply in English.\n\n",
-            }.get(lang, "")
+            }.get(lang, "") + "ANSWER ONLY: Reply with ONLY the final answer text to the caller. Never include thinking, reasoning, analysis, or any explanation of your process.\n\n"
             lang_hint = {
-                "bn": " The user's language is Banglish (Roman Bengali). Reply ONLY in Banglish. Do NOT use Hindi words.",
-                "hi": " The user's language is Hindi. Reply ONLY in Roman Hindi (NOT Devanagari script). Do NOT use Bengali words.",
+                "bn": (
+                    " The user's language is Bengali. Reply ONLY in Bengali script (Bangla lipi). Do NOT use Hindi words."
+                    if is_voice
+                    else " The user's language is Banglish (Roman Bengali). Reply ONLY in Banglish. Do NOT use Hindi words."
+                ),
+                "hi": (
+                    " The user's language is Hindi. Reply ONLY in Hindi in Devanagari script. Do NOT use Bengali words."
+                    if is_voice
+                    else " The user's language is Hindi. Reply ONLY in Roman Hindi (NOT Devanagari script). Do NOT use Bengali words."
+                ),
                 "en": " Reply in English.",
             }.get(lang, "")
             effective_system = voice_system_prompt if voice_system_prompt else SYSTEM_PROMPT

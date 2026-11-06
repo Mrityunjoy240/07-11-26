@@ -18,6 +18,7 @@
 - `G-006`: "namaste" → src=transcript_clarification, ans="I didn't quite catch that. Could you please repeat your question?"  
 - `G-007`: "नमस्ते" → src=transcript_clarification, ans="I didn't quite catch that. Could you please repeat your question?"  
 - `FF-008`: "CSE er fees koto" → src=safe_point_bengali, ans="আমি পুরোটা বুঝতে পারিনি। আরেকবার একটু ধীরে বলবেন?"  
+  **FIXED (vocabulary gate removed):** The old `_bengali_confidence_ok()` rejected Banglish queries whose romanized words weren't in its hardcoded `_BANGLISH_WORDS` / college-keyword lists. Replaced with `_is_structural_junk()` — a language-agnostic noise filter that trusts the upstream LLM language detector (`lang`) and only blocks real garbage. Any natural-language romanized query now reaches the generalizing `IntentClassifier` + RAG/LLM. Verified live: `b tech ar sub gulo bol` and unseen queries now answer instead of being deflected.
 - `AD-005`: "admission last date" → src=llm_tools, ans="Aapko pata hai ki BCREC ka admission process WBJEE ke through hota hai. Last dat"  
 
 

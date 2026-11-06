@@ -39,10 +39,10 @@ FEE_VALUES = {
     "DS": (567100, 92900, 67600),
     "CY": (567100, 92900, 67600),
     "CSD": (567100, 92900, 67600),
-    "ME": (429100, 75650, 50350),
-    "CE": (429100, 75650, 50350),
-    "MBA": (419200, 121400, 0),
-    "MCA": (214600, 67800, 48600),
+    "ME": (457100, 79150, 53850),
+    "CE": (457100, 79150, 53850),
+    "MBA": (422000, 121400, 0),
+    "MCA": (216600, 67800, 48600),
 }
 
 BANNED_PATTERNS = [
@@ -243,13 +243,13 @@ SCENARIO_EE_DEEP = ConversationSpec(
 SCENARIO_ME = ConversationSpec(
     name="ME (no alias in DEPT_CODE_MAP → general fee)",
     turns=[
-        TurnSpec("ME fee", expect_values=[429100, 567100, 617700],
+        TurnSpec("ME fee", expect_values=[457100, 567100, 617700],
                  description="no 'me' alias in DEPT_CODE_MAP → general fee"),
-        TurnSpec("ME admission fee", expect_values=[429100, 567100, 617700],
+        TurnSpec("ME admission fee", expect_values=[457100, 567100, 617700],
                  description="ME → general fee"),
-        TurnSpec("ME first semester fee", expect_values=[429100, 567100, 617700],
+        TurnSpec("ME first semester fee", expect_values=[457100, 567100, 617700],
                  description="ME → general fee"),
-        TurnSpec("ME semester fee", expect_values=[429100, 567100, 617700],
+        TurnSpec("ME semester fee", expect_values=[457100, 567100, 617700],
                  description="ME → general fee"),
     ],
 )
@@ -258,10 +258,10 @@ SCENARIO_ME = ConversationSpec(
 SCENARIO_MBA = ConversationSpec(
     name="MBA (no per-semester breakdown)",
     turns=[
-        TurnSpec("MBA fee", expect_values=[419200]),
+        TurnSpec("MBA fee", expect_values=[422000]),
         TurnSpec("MBA admission fee", expect_values=[121400]),
         TurnSpec("MBA first semester fee", expect_values=[121400]),
-        TurnSpec("MBA semester fee", expect_values=[419200],
+        TurnSpec("MBA semester fee", expect_values=[422000],
                  description="semester falls back to total (no per-sem data)"),
     ],
 )
@@ -270,11 +270,11 @@ SCENARIO_MBA = ConversationSpec(
 SCENARIO_MCA = ConversationSpec(
     name="MCA",
     turns=[
-        TurnSpec("MCA fee", expect_values=[214600]),
+        TurnSpec("MCA fee", expect_values=[216600]),
         TurnSpec("MCA admission fee", expect_values=[67800]),
         TurnSpec("MCA first semester fee", expect_values=[67800]),
         TurnSpec("MCA semester fee", expect_values=[48600]),
-        TurnSpec("MCA semester 3 fee", expect_values=[48600]),
+        TurnSpec("MCA semester 3 fee", expect_values=[50600]),
     ],
 )
 
@@ -299,9 +299,9 @@ SCENARIO_LANG_SWITCH = ConversationSpec(
 SCENARIO_GENERAL_SPECIFIC = ConversationSpec(
     name="General info → specific branch",
     turns=[
-        TurnSpec("fees", expect_values=[429100, 567100, 617700],
+        TurnSpec("fees", expect_values=[457100, 567100, 617700],
                  description="general fee overview"),
-        TurnSpec("fee structure", expect_values=[429100, 567100, 617700],
+        TurnSpec("fee structure", expect_values=[457100, 567100, 617700],
                  description="fee structure overview"),
         TurnSpec("CSE fee", expect_values=[617700]),
     ],
@@ -365,7 +365,7 @@ def _make_all_semester_scenario() -> ConversationSpec:
     for branch in ["CSE", "IT", "ECE", "EE", "AIML", "DS", "CY", "CSD", "CE"]:
         total, fsp, rsf = FEE_VALUES[branch]
         turns.append(TurnSpec(f"{branch} semester fee", expect_values=[rsf]))
-    turns.append(TurnSpec("MBA semester fee", expect_values=[419200],
+    turns.append(TurnSpec("MBA semester fee", expect_values=[422000],
                           description="MBA falls back to total"))
     turns.append(TurnSpec("MCA semester fee", expect_values=[48600]))
     return ConversationSpec(name="All branches semester fee", turns=turns)
@@ -382,7 +382,7 @@ SCENARIO_MIXED = ConversationSpec(
                  description="switch to ECE (same group as CSE)"),
         TurnSpec("AIML fee", expect_values=[567100],
                  description="switch to AIML (group_b)"),
-        TurnSpec("CE fee", expect_values=[429100],
+        TurnSpec("CE fee", expect_values=[457100],
                  description="switch to CE (group_c)"),
     ],
 )
@@ -395,7 +395,7 @@ SCENARIO_FIRST_SEM = ConversationSpec(
         TurnSpec("EE first semester fee", expect_values=[92900]),
         TurnSpec("MBA first semester fee", expect_values=[121400]),
         TurnSpec("MCA first semester fee", expect_values=[67800]),
-        TurnSpec("CE first semester fee", expect_values=[75650]),
+        TurnSpec("CE first semester fee", expect_values=[79150]),
     ],
 )
 
@@ -409,7 +409,7 @@ SCENARIO_HINDI = ConversationSpec(
                  expect_keywords=["प्रवेश"]),
         TurnSpec("CSE semester fee", lang="hi", expect_values=[73925],
                  expect_keywords=["सेमेस्टर"]),
-        TurnSpec("fees", lang="hi", expect_values=[429100, 567100, 617700],
+        TurnSpec("fees", lang="hi", expect_values=[457100, 567100, 617700],
                  expect_keywords=["कुल कोर्स शुल्क"]),
     ],
 )
@@ -424,7 +424,7 @@ SCENARIO_BENGALI = ConversationSpec(
                  expect_keywords=["ভর্তি"]),
         TurnSpec("CSE semester fee", lang="bn", expect_values=[73925],
                  expect_keywords=["সেমিস্টার"]),
-        TurnSpec("fees", lang="bn", expect_values=[429100, 567100, 617700],
+        TurnSpec("fees", lang="bn", expect_values=[457100, 567100, 617700],
                  expect_keywords=["মোট কোর্স ফি"]),
     ],
 )
@@ -450,8 +450,8 @@ SCENARIO_FULL_NAMES = ConversationSpec(
         TurnSpec("information technology fee", expect_values=[617700]),
         TurnSpec("electronics and communication fee", expect_values=[617700]),
         TurnSpec("electrical engineering fee", expect_values=[567100]),
-        TurnSpec("mechanical engineering fee", expect_values=[429100]),
-        TurnSpec("civil engineering fee", expect_values=[429100]),
+        TurnSpec("mechanical engineering fee", expect_values=[457100]),
+        TurnSpec("civil engineering fee", expect_values=[457100]),
     ],
 )
 
@@ -459,13 +459,13 @@ SCENARIO_FULL_NAMES = ConversationSpec(
 SCENARIO_PG_FULL = ConversationSpec(
     name="PG programs full coverage",
     turns=[
-        TurnSpec("MBA fee", expect_values=[419200]),
-        TurnSpec("MBA total fee", expect_values=[419200]),
+        TurnSpec("MBA fee", expect_values=[422000]),
+        TurnSpec("MBA total fee", expect_values=[422000]),
         TurnSpec("MBA admission fee", expect_values=[121400]),
         TurnSpec("MBA first semester fee", expect_values=[121400]),
-        TurnSpec("MBA semester fee", expect_values=[419200],
+        TurnSpec("MBA semester fee", expect_values=[422000],
                  description="MBA per_sem=0 → total response"),
-        TurnSpec("MCA fee", expect_values=[214600]),
+        TurnSpec("MCA fee", expect_values=[216600]),
         TurnSpec("MCA admission fee", expect_values=[67800]),
         TurnSpec("MCA first semester fee", expect_values=[67800]),
         TurnSpec("MCA semester fee", expect_values=[48600]),
@@ -480,7 +480,7 @@ SCENARIO_ABBREV = ConversationSpec(
     turns=[
         TurnSpec("CSE sem fee", expect_values=[73925]),
         TurnSpec("EE sem fee", expect_values=[67600]),
-        TurnSpec("ME sem fee", expect_values=[429100, 567100, 617700],
+        TurnSpec("ME sem fee", expect_values=[457100, 567100, 617700],
                  description="ME → general (no 'me' alias)"),
         TurnSpec("MCA sem fee", expect_values=[48600]),
     ],
@@ -503,7 +503,7 @@ SCENARIO_MIXED_CASE = ConversationSpec(
         TurnSpec("cse fee", expect_values=[617700]),
         TurnSpec("Cse Fee", expect_values=[617700]),
         TurnSpec("CSE FEE", expect_values=[617700]),
-        TurnSpec("mba total fee", expect_values=[419200]),
+        TurnSpec("mba total fee", expect_values=[422000]),
         TurnSpec("Mca semester fee", expect_values=[48600]),
     ],
 )
@@ -514,8 +514,8 @@ SCENARIO_COURSE_FEE = ConversationSpec(
     turns=[
         TurnSpec("CSE course fee", expect_values=[617700]),
         TurnSpec("EE course fee", expect_values=[567100]),
-        TurnSpec("MBA course fee", expect_values=[419200]),
-        TurnSpec("MCA course fee", expect_values=[214600]),
+        TurnSpec("MBA course fee", expect_values=[422000]),
+        TurnSpec("MCA course fee", expect_values=[216600]),
     ],
 )
 
@@ -527,9 +527,9 @@ SCENARIO_HINDI_MULTI = ConversationSpec(
                  expect_keywords=["कुल कोर्स शुल्क"]),
         TurnSpec("EE fee", lang="hi", expect_values=[567100],
                  expect_keywords=["कुल कोर्स शुल्क"]),
-        TurnSpec("MBA fee", lang="hi", expect_values=[419200],
+        TurnSpec("MBA fee", lang="hi", expect_values=[422000],
                  expect_keywords=["कुल कोर्स शुल्क"]),
-        TurnSpec("fees", lang="hi", expect_values=[429100, 567100, 617700]),
+        TurnSpec("fees", lang="hi", expect_values=[457100, 567100, 617700]),
     ],
 )
 

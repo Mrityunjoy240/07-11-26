@@ -7,22 +7,6 @@ import re
 import time
 from typing import Optional
 
-# Banglish (Roman-script Bengali) word markers used when Bengali Unicode ratio is low.
-# Kept local to avoid import coupling — these match the words used in language_detect.py.
-_BANGLISH_WORDS = frozenset({
-    "ami", "amar", "amake", "amra", "tumi", "tomake", "amader",
-    "kotha", "bolte", "ache", "korte", "hobe", "thik", "bhalo",
-    "kothay", "ekhane", "apnar", "jabe", "asbe", "dite", "nite",
-    "niye", "kemon", "dekho", "bole", "jano", "koto", "theke",
-    "diye", "jonno", "moddhe", "lagbe", "lage", "laga", "chai",
-    "chay", "ki", "keno", "karon", "jani", "jana", "bolun",
-    "bolben", "bishoy", "kaj", "help", "kintu", "tobe", "tahole",
-    "hoye", "hoy", "mone", "motto", "somporke", "songe", "bar",
-    "achen", "achena", "achhen", "achhena", "tar", "take", "na",
-    "ar", "ebong", "ba", "jodi", "thake", "thakena",
-    "thakle", "pare", "pari", "hote", "hocche", "hoyechhe",
-})
-
 logger = logging.getLogger(__name__)
 
 
@@ -161,7 +145,13 @@ async def safe_generate_response(service, query: str, session_id: str, lang: str
         return result
 
     if lang == "bn":
-        if not _bengali_confidence_ok(query):
+        # The language has already been resolved upstream by the LLM-backed
+        # detector (``lang`` is authoritative and generalizes to any romanized
+        # text). We only deflect clear *structural* garbage here — never a
+        # vocabulary test, because a word list cannot generalize to unseen
+        # romanized words ("sub", "bol", "tech", ...). Anything that is real
+        # natural language must reach the understanding/LLM pipeline.
+        if _is_structural_junk(query):
             _demo_logger.log(
                 session_id,
                 {
@@ -184,32 +174,29 @@ async def safe_generate_response(service, query: str, session_id: str, lang: str
     return None
 
 
-def _bengali_confidence_ok(query: str) -> bool:
-    """Check if query is legitimately Bengali (script or Banglish).
-    Passes if ≥30% Bengali Unicode chars OR ≥30% of words are Banglish markers.
-    Also passes if query contains college-related keywords (legitimate query, not noise)."""
-    bengali_chars = sum(1 for c in query if "\u0980" <= c <= "\u09ff")
-    total_chars = len(query.strip())
-    if total_chars == 0:
-        return False
-    # Native Bengali script check
-    if bengali_chars / total_chars >= 0.3:
+def _is_structural_junk(query: str) -> bool:
+    """Language-agnostic noise filter.
+
+    Returns ``True`` only for input that is not plausible natural language:
+    empty, punctuation/digit-only, or obvious keyboard-mashing. It deliberately
+    knows nothing about vocabulary or script, so it generalizes to every
+    language and to romanized text with never-before-seen words.
+
+    The decision of *which* language a real query is in is the job of the
+    LLM-backed language detector, not this gate.
+    """
+    s = query.strip()
+    if not s:
         return True
-    # Banglish (Roman-script Bengali) check — ≥25% of words are Banglish markers
-    words = re.sub(r"[^\w]", " ", query.lower()).split()
-    if not words:
-        return False
-    banglish_matches = sum(1 for w in words if w in _BANGLISH_WORDS)
-    if banglish_matches / len(words) >= 0.25:
+    letters = [c for c in s if c.isalpha()]
+    # No alphabetic content at all (pure digits / punctuation / symbols).
+    if not letters:
         return True
-    # College keyword check — if query mentions known college terms, it's legitimate
-    _college_kw = {
-        "cse", "ece", "ee", "me", "ce", "it", "csd", "ds", "cy", "aiml",
-        "fee", "fees", "admission", "placement", "hostel", "faculty",
-        "bcrec", "principal", "hod", "department", "library", "lab",
-        "sports", "scholarship", "cutoff", "seat", "seats",
-    }
-    if any(w in _college_kw for w in words):
+    # A single repeated letter ("aaaaaa") is not a real word.
+    if len(letters) >= 6 and len(set(letters)) <= 1:
+        return True
+    # Extremely low character diversity over a longer string → keyboard mash.
+    if len(letters) >= 12 and len(set(letters)) / len(letters) < 0.25:
         return True
     return False
 

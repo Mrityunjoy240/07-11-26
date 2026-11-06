@@ -57,10 +57,10 @@ FEE_VALUES = {
     "DS": (567100, 92900, 67600),
     "CY": (567100, 92900, 67600),
     "CSD": (567100, 92900, 67600),
-    "ME": (429100, 75650, 50350),
-    "CE": (429100, 75650, 50350),
-    "MBA": (419200, 121400, 0),
-    "MCA": (214600, 67800, 48600),
+    "ME": (457100, 79150, 53850),
+    "CE": (457100, 79150, 53850),
+    "MBA": (422000, 121400, 0),
+    "MCA": (216600, 67800, 48600),
 }
 
 # For multi-digit Indian number verification
@@ -211,7 +211,7 @@ class TestNewEngineValues:
     def test_mba_semester_fallsback_total(self, service: GroqService):
         r = _run_abs(service, "MBA semester fee")
         assert r is not None
-        assert _has_amount(r, 419200)
+        assert _has_amount(r, 422000)
 
     def test_unknown_branch_general_fee(self, service: GroqService):
         r = _run_abs(service, "xyz fee")

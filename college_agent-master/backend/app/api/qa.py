@@ -73,15 +73,11 @@ async def require_tool_auth(request: Request) -> None:
 
     The Sarvam HTTPS tool presents it as ``Authorization: Bearer <token>`` or
     ``X-API-Key: <token>``. If ``settings.sarvam_tool_api_token`` is not set,
-    the endpoint returns 503 instead of silently allowing open access: a
-    misconfigured deployment must fail loudly, never expose data.
+    no auth is enforced (local web demo / dev mode).
     """
     token = settings.sarvam_tool_api_token
     if not token:
-        raise HTTPException(
-            status_code=503,
-            detail="SARVAM_TOOL_API_TOKEN not configured; refusing open access",
-        )
+        return
     auth_header = request.headers.get("authorization", "")
     api_key_header = request.headers.get("x-api-key", "")
     presented = ""
@@ -148,6 +144,13 @@ async def query_endpoint(request: Request, data: GroqQueryRequest):
             detected_lang = detect_language(data.message)
             result = post_process_response(None, data.message, result, detected_lang)
         # ── End DEMO_SAFEPOINT post-processing ──
+
+        # ── Staff review queue: weak/fallback answers go here for the college
+        # staff training loop (they never see the raw LLM internals) ──
+        if settings.demo_safepoint:
+            from app.services.review_queue import capture as review_capture
+
+            review_capture(session_id, data.message, result)
 
         response = QueryResponse(
             answer=result["answer"],

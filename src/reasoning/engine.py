@@ -37,6 +37,11 @@ _CLOSING_NOT_RE = re.compile(
     re.IGNORECASE,
 )
 
+# A bare request for help ("i need help") means "offer me your topics", not
+# "start collecting my admission profile". Routed on the understanding intent
+# name (``help_request``) produced by the conversational fallback.
+
+
 
 def _is_closing_turn(text: str) -> bool:
     """True when the turn is a pure closing/gratitude (not a follow-up question)."""
@@ -59,6 +64,7 @@ ANSWERABLE_GENERALLY = {
     "grievance", "lateral_entry", "sports", "sports_quota",
     "nri", "nri_admission", "counseling_info",
     "career_confusion", "program", "faculty", "timings",
+    "greeting", "backlog",
 }
 
 # Minimum fields that truly block routing for non-answerable intents.
@@ -118,6 +124,13 @@ class ReasoningEngine:
             blocking = BLOCKING_MINIMUM_FIELDS.get(intent, readiness.missing_critical)
             readiness.blocked = any(m in readiness.missing_critical for m in blocking)
         else:
+            readiness.blocked = False
+        # LLM-first turns answer directly: the LLM read the student's question
+        # as an explicit informational request, so an incomplete profile must
+        # not block routing (the planner still collects missing fields as a
+        # follow-up). Deterministic turns never set this flag, so the
+        # benchmarked readiness behavior is unchanged.
+        if getattr(understanding.intent, "llm_override", False):
             readiness.blocked = False
         eligibility = self._estimate_eligibility(ctx, understanding, state, college_brain)
         problem = self._identify_problem(ctx, understanding, readiness, state)
@@ -473,6 +486,21 @@ class ReasoningEngine:
         if signal_score > 0.5 and dominant_signal == "frustration":
             return "needs_clarification"
 
+        # Conversation policy: a greeting, a bare help request, a question
+        # about the assistant itself, or a social return is answered directly —
+        # never routed into admission-profile collection. Profile collection is
+        # a follow-up mechanism for explicit admission intents, not the default
+        # entry behavior for every college conversation. The help/intro/return
+        # intents are resolved by the optional LLM conversational fallback.
+        if intent in ("greeting", "social_return"):
+            return "needs_greeting"
+        if intent == "help_request":
+            return "needs_help_request"
+        if intent == "self_introduction":
+            return "needs_self_introduction"
+        if intent == "backlog":
+            return "needs_backlog_information"
+
         # Meta-intents short-circuit the domain readiness gate.
         # Only for non-empty utterances: a blank/no-op turn (e.g. a session
         # starter with no content) should fall through to profile collection
@@ -660,6 +688,7 @@ class ReasoningEngine:
             ("safety", "needs_safety_info"),
             ("career_confusion", "needs_career_guidance"),
             ("faculty/timings", "needs_institution_info"),
+            ("backlog", "needs_backlog_information"),
         ]
         intent_match_map = {
             "fee": "fee", "admission": "admission", "placement": "placement",
@@ -674,6 +703,7 @@ class ReasoningEngine:
             "repeat": "repeat", "loan": "loan", "document": "document",
             "safety": "safety", "career_confusion": "career_confusion",
             "program": "program", "faculty/timings": ("faculty", "timings"),
+            "backlog": "backlog",
         }
         for rule_key, rule_result in INTENT_RULES:
             targets = intent_match_map[rule_key]

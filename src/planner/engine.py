@@ -650,10 +650,46 @@ _CONTENT_MAP: dict[str, str] = {
 
     "provide_scholarship_info_inform": "As an SC category student you are eligible for tuition fee waiver and post-matric scholarships.",
     "provide_scholarship_info_ask": "What is your family budget? Let me know your financial need for additional aid.",
+
+    "provide_backlog_info_inform": "Backlog or arrear exams are held for subjects you failed in a semester. You clear the backlog by appearing for the supplementary exam, usually conducted every semester. A cleared backlog does not affect your degree as long as you complete it within the college's timeframe.",
+    "provide_backlog_info_ask": "Would you like to know how a backlog affects admission or seat allocation?",
 }
 
 def _beh_clarify(decision: DecisionOutput, brain: object | None, kb_answer: str | None = None) -> list[Turn]:
     return [Turn(action="clarify", content="I'm not sure I understood that. Could you rephrase your question?", expected_input="clarification")]
+
+
+def _beh_greet(decision: DecisionOutput, brain: object | None, kb_answer: str | None = None) -> list[Turn]:
+    """A plain greeting is answered with a welcome + offer of help — no
+    admission-profile collection before the student asks for it."""
+    return [Turn(
+        action="inform",
+        content="Hi! I can help with courses, admission, fees, hostel, placements "
+                "and other college information. What would you like to know?",
+        expected_input="topic",
+    )]
+
+
+def _beh_offer_help(decision: DecisionOutput, brain: object | None, kb_answer: str | None = None) -> list[Turn]:
+    """A bare 'i need help' request offers the available topics instead of
+    assuming the student wants admission guidance."""
+    return [Turn(
+        action="inform",
+        content="Sure. What would you like help with—courses, admission, fees, "
+                "hostel, placements, or something else?",
+        expected_input="topic",
+    )]
+
+
+def _beh_introduce(decision: DecisionOutput, brain: object | None, kb_answer: str | None = None) -> list[Turn]:
+    """'who are you?' gets a self-introduction with the available topics."""
+    return [Turn(
+        action="inform",
+        content="I'm the college's AI assistant. I can answer questions about "
+                "courses, admission, fees, hostel, placements and other college "
+                "information. What would you like to know?",
+        expected_input="topic",
+    )]
 
 
 _ACTION_BEHAVIOR: dict[str, object] = {
@@ -662,6 +698,9 @@ _ACTION_BEHAVIOR: dict[str, object] = {
     "provide_admission_guidance": _beh_inform_ask,
     "provide_cutoff_info": _beh_inform_ask,
     "provide_guidance": _beh_inform_ask,
+    "greet": _beh_greet,
+    "offer_help": _beh_offer_help,
+    "introduce": _beh_introduce,
     "clarify": _beh_clarify,
     "provide_lateral_info": _beh_inform_ask,
     "confirm_lateral_eligibility": _beh_inform_ask,
@@ -681,6 +720,7 @@ _ACTION_BEHAVIOR: dict[str, object] = {
     "investigate_scholarship_renewal": _beh_empathy_triple,
     "encourage_and_collect_profile": _beh_empathy_triple,
     "reassure": _beh_empathy_reassure,
+    "provide_backlog_info": _beh_inform_ask,
 }
 
 _TURN_ACTIONS: dict[str, str] = {

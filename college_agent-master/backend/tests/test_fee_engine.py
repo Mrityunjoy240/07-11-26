@@ -306,10 +306,10 @@ class TestTotalFeeCalculation:
         ("DS", 567100),
         ("CY", 567100),
         ("CSD", 567100),
-        ("ME", 429100),
-        ("CE", 429100),
-        ("MBA", 419200),
-        ("MCA", 214600),
+        ("ME", 457100),
+        ("CE", 457100),
+        ("MBA", 422000),
+        ("MCA", 216600),
     ])
     def test_total_fee_matches_production(self, engine: FeeEngine, branch: str, expected: int):
         result = engine.get_total_fee(branch)
@@ -368,17 +368,17 @@ class TestSemesterFeeCalculation:
     def test_first_semester_me(self, engine: FeeEngine):
         result = engine.get_semester_fee("ME", 1)
         assert result.error is None
-        assert result.semester_fee == 75650
+        assert result.semester_fee == 79150
 
     def test_regular_semester_me(self, engine: FeeEngine):
         result = engine.get_semester_fee("ME", 2)
         assert result.error is None
-        assert result.semester_fee == 50350
+        assert result.semester_fee == 53850
 
     def test_eighth_semester_me(self, engine: FeeEngine):
         result = engine.get_semester_fee("ME", 8)
         assert result.error is None
-        assert result.semester_fee == 51350
+        assert result.semester_fee == 54850
 
     def test_mba_first_semester(self, engine: FeeEngine):
         result = engine.get_semester_fee("MBA", 1)
@@ -424,7 +424,7 @@ class TestBatchSelection:
     def test_mba_batch(self, engine: FeeEngine):
         result = engine.get_total_fee("MBA", batch="2026-27")
         assert result.error is None
-        assert result.total_fee == 419200
+        assert result.total_fee == 422000
 
 
 class TestOptionalCharges:
@@ -464,7 +464,7 @@ class TestFirstSemesterPayable:
     def test_me_first_semester_payable(self, engine: FeeEngine):
         result = engine.get_first_semester_payable("ME")
         assert result.error is None
-        assert result.semester_fee == 75650
+        assert result.semester_fee == 79150
 
     def test_mba_first_semester_payable(self, engine: FeeEngine):
         result = engine.get_first_semester_payable("MBA")
@@ -501,10 +501,10 @@ class TestMigrationVerification:
             "DS": (567100, 92900, 67600),
             "CY": (567100, 92900, 67600),
             "CSD": (567100, 92900, 67600),
-            "ME": (429100, 75650, 50350),
-            "CE": (429100, 75650, 50350),
-            "MBA": (419200, 121400, 0),
-            "MCA": (214600, 67800, 48600),
+            "ME": (457100, 79150, 53850),
+            "CE": (457100, 79150, 53850),
+            "MBA": (422000, 121400, 0),
+            "MCA": (216600, 67800, 48600),
         }
 
         result = engine.verify_against_production(production_map)
@@ -535,10 +535,10 @@ class TestMigrationVerification:
             )
 
     def test_mca_total_matches(self, engine: FeeEngine):
-        """MCA: 67800 + 48600*3 = 214600."""
+        """MCA: 67800 + 48600 + 50600 + 49600 = 216600."""
         expected = 67800 + 3 * 48600  # = 214800
         result = engine.get_total_fee("MCA")
-        # MCA has a 4th-sem adjustment of 1000, so total is 67800 + 48600*3 - 200 = 214600
+        # MCA sems: 1st 67,800; 2nd 48,600; 3rd 50,600 (incl. training 2,000); 4th 49,600 (incl. degree 1,000)
         sem1 = engine.get_semester_fee("MCA", 1)
         sem2 = engine.get_semester_fee("MCA", 2)
         sem3 = engine.get_semester_fee("MCA", 3)
@@ -589,7 +589,7 @@ class TestEdgeCases:
         """MBA should still return a total, even without semester breakdown."""
         result = engine.get_total_fee("MBA")
         assert result.error is None
-        assert result.total_fee == 419200
+        assert result.total_fee == 422000
 
     def test_mtech_range_values(self, engine: FeeEngine):
         """M.Tech returns range values (not exact)."""
@@ -705,24 +705,24 @@ class TestDataIntegrity:
         sem2 = engine.get_semester_fee("ME", 2)
         sem8 = engine.get_semester_fee("ME", 8)
 
-        assert sem1.semester_fee == 75650
-        assert sem2.semester_fee == 50350
-        assert sem8.semester_fee == 51350
+        assert sem1.semester_fee == 79150
+        assert sem2.semester_fee == 53850
+        assert sem8.semester_fee == 54850
 
         total = engine.get_total_fee("ME")
-        expected = 75650 + 50350 * 6 + 51350
+        expected = 79150 + 53850 * 6 + 54850
         assert total.total_fee == expected
 
     def test_mba_computed_values(self, engine: FeeEngine):
         total = engine.get_total_fee("MBA")
-        assert total.total_fee == 419200
+        assert total.total_fee == 422000
 
         sem1 = engine.get_semester_fee("MBA", 1)
         assert sem1.semester_fee == 121400
 
     def test_mca_computed_values(self, engine: FeeEngine):
         total = engine.get_total_fee("MCA")
-        assert total.total_fee == 214600
+        assert total.total_fee == 216600
 
         sem1 = engine.get_semester_fee("MCA", 1)
         assert sem1.semester_fee == 67800

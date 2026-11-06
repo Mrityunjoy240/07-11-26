@@ -47,6 +47,12 @@ _DECISION_RULES: dict[str, tuple[str, str, str]] = {
                             "Student confused — clarify question"),
     "needs_personalized_guidance": ("provide_guidance", "normal",
                                     "General personalized guidance"),
+    "needs_greeting": ("greet", "normal",
+                       "Student greeted the assistant — greet and offer help"),
+    "needs_help_request": ("offer_help", "normal",
+                           "Student asked for general help — offer topics"),
+    "needs_self_introduction": ("introduce", "normal",
+                                "Student asked about the assistant — introduce and offer help"),
     "needs_institution_info": ("provide_program_info", "normal",
                                "Student asking about institution details"),
     "needs_seat_info": ("provide_program_info", "normal",
@@ -59,6 +65,8 @@ _DECISION_RULES: dict[str, tuple[str, str, str]] = {
                           "Student asking about campus safety"),
     "needs_career_guidance": ("provide_career_guidance", "normal",
                               "Student confused about career options"),
+    "needs_backlog_information": ("provide_backlog_info", "normal",
+                                  "Student asking about backlog/arrear subjects"),
 }
 
 # knowledge_needed hint → action for when reasoning outputs a generic problem
@@ -204,7 +212,7 @@ class DecisionEngine:
             "needs_safety_info", "needs_institution_info",
             "needs_seat_info", "needs_loan_info", "needs_document_info",
             "needs_career_guidance", "needs_grievance_resolution",
-            "needs_program_information",
+            "needs_program_information", "needs_backlog_information",
         )
         _student_text = (input.metadata or {}).get("student_text", "").lower()
         _has_empathy_context = any(w in _student_text for w in [

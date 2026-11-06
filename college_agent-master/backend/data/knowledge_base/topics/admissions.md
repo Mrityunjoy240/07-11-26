@@ -2,7 +2,7 @@
 
 ## Eligibility
 
-- **B.Tech**: 10+2 with PCM, minimum 50% marks for general category
+- **B.Tech**: 10+2 with PCM (Physics & Maths + one of Chem/Bio/Biotech/CS/Comp.App/Tech Voc), minimum 45% marks for general (40% SC/ST/OBC/PwD), English in 12th >=30%
 - **Entrance Exams**: WBJEE or JEE Main
 
 ## Seat Distribution

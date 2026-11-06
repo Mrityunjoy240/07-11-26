@@ -320,6 +320,115 @@ ENGLISH_LOANWORDS = frozenset(
 )
 
 
+# ---------------------------------------------------------------------------
+# Tiny character n-gram Naive Bayes — a small NLP for romanized
+# Banglish/Hinglish that generic detectors (langdetect, lingua) get wrong.
+# Trained lazily at runtime from the keyword vocabularies above plus a small
+# baked college-domain corpus. Pure Python (no numpy), works on any Python.
+# ---------------------------------------------------------------------------
+import math
+from collections import Counter
+
+_TINY_MODEL = None
+
+_TINY_EXAMPLES = {
+    "en": [
+        "what is the fee structure",
+        "tell me about placements",
+        "how is the hostel",
+        "which branch is best",
+        "what is the admission process",
+        "when does the semester start",
+        "give me the contact details",
+        "what is the cutoff",
+        "is there any scholarship",
+        "how many students got placed",
+        "what is the campus like",
+        "where is the college",
+    ],
+    "hi": [
+        "mera backlog hai kya hoga",
+        "fees kitna hai bhai",
+        "mujhe admission lena hai",
+        "placement kitne percentage hai",
+        "hostel ka khana kaisa hai",
+        "branch kaunsi acchi hai",
+        "cutoff kya hai",
+        "scholarship milegi kya",
+        "college kahan hai",
+        "physics me pass ho gaya",
+    ],
+    "bn": [
+        "amar back aseche ki hobe",
+        "fees koto ami jante chai",
+        "placement kemon ase",
+        "ami admission nite chai",
+        "hostel er khawa kemon",
+        "konta branch bhalo",
+        "scholarship pabona ki",
+        "college kothay",
+        "ami 3rd year er student",
+        "back lagle ki hobe",
+        "amar mone hoy back lagbe",
+        "bhi back chole asbe to ki hobe",
+    ],
+}
+
+
+def _ngrams_3(word: str) -> list:
+    w = " " + "".join(ch for ch in word if ch.isalnum()) + " "
+    return [w[i : i + 3] for i in range(len(w) - 2)]
+
+
+def _build_tiny_model():
+    global _TINY_MODEL
+    counts = {c: Counter() for c in ("en", "hi", "bn")}
+    for c, sents in _TINY_EXAMPLES.items():
+        for sent in sents:
+            for word in sent.split():
+                counts[c].update(_ngrams_3(word))
+    for w in BANGLA_ROMAN_WORDS:
+        counts["bn"].update(_ngrams_3(w))
+    for w in HINDI_ROMAN_WORDS:
+        counts["hi"].update(_ngrams_3(w))
+    vocab = set()
+    for c in counts:
+        vocab |= set(counts[c])
+    _TINY_MODEL = {"counts": counts, "vocab": vocab}
+
+
+def tiny_nlp_detect(text: str) -> Literal["en", "hi", "bn"] | None:
+    """Char-3-gram Naive Bayes over the baked multilingual model.
+
+    Returns None when evidence is too weak/ambiguous so callers can fall
+    back to their own default instead of guessing.
+    """
+    global _TINY_MODEL
+    if _TINY_MODEL is None:
+        _build_tiny_model()
+    words = re.sub(r"[^\w\s]", " ", text.lower()).split()
+    if not words:
+        return None
+    counts, vocab = _TINY_MODEL["counts"], _TINY_MODEL["vocab"]
+    n_words = sum(len(_ngrams_3(w)) for w in words)
+    if n_words == 0:
+        return None
+    V = len(vocab)
+    scores = {}
+    for c in ("en", "hi", "bn"):
+        total = sum(counts[c].values())
+        logp = 0.0
+        for word in words:
+            for ng in _ngrams_3(word):
+                cnt = counts[c].get(ng, 0)
+                logp += math.log((cnt + 1) / (total + V + 1))
+        scores[c] = logp / n_words
+    ranked = sorted(scores.items(), key=lambda kv: kv[1], reverse=True)
+    if ranked[0][1] - ranked[1][1] < 0.03:
+        return None
+    return ranked[0][0]
+
+
 def count_markers(words: set, markers: frozenset) -> int:
     """Count roman-script keyword markers, ignoring a lone English loanword.
 
@@ -393,6 +502,11 @@ def detect_language(text: str) -> Literal["en", "hi", "bn"]:
     model = _load_model()
 
     if model is None:
+        # FastText unavailable (e.g. Python 3.14 has no wheels) — use the
+        # tiny char n-gram Naive Bayes instead; else default to English.
+        tiny = tiny_nlp_detect(text)
+        if tiny is not None:
+            return tiny
         return "en"
 
     try:

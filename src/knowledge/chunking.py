@@ -7,9 +7,10 @@ from src.knowledge.models import KnowledgeChunk, KnowledgeDocument
 _WORD_RE = re.compile(r"[A-Za-z0-9]+(?:['\u2019][A-Za-z0-9]+)*")
 _SENTENCE_RE = re.compile(r"(?<=[.!?])\s+")
 _ABBREV_RE = re.compile(
-    r"\b(?:Rs|Dr|No|Mr|Mrs|Ms|vs|etc|approx|Sr|Jr|St|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\.(?=\s|$)",
+    r"\b(Rs|Dr|No|Mr|Mrs|Ms|vs|etc|approx|Sr|Jr|St|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\.(?=\s|$)",
     re.IGNORECASE,
 )
+_ABBR_PLACEHOLDER = "@@ABBR_DOT@@"
 
 
 def tokenize(text: str) -> list[str]:
@@ -26,21 +27,20 @@ def _split_units(text: str) -> list[str]:
 
     Line-oriented first (structured fact sheets like a college KB are line
     based), then within each line split on sentence punctuation so prose
-    paragraphs also yield bounded units. Lines containing an abbreviation
-    (e.g. ``Rs.`` in fee tables, ``Dr.`` in names) are kept whole so numbers
-    and names are not cut mid-way.
+    paragraphs also yield bounded units. Abbreviation periods (``Rs.`` in fee
+    tables, ``Dr.`` in names) are temporarily hidden so the splitter never
+    cuts a number or a name right after the abbreviation, while long lines
+    that merely *contain* an abbreviation are still split into sentences.
     """
     units: list[str] = []
     for line in text.splitlines():
         line = re.sub(r"[ \t]+", " ", line).strip()
         if not line:
             continue
-        if _ABBREV_RE.search(line):
-            units.append(line)
-            continue
-        pieces = _SENTENCE_RE.split(line)
+        protected = _ABBREV_RE.sub(lambda m: f"{m.group(1)}{_ABBR_PLACEHOLDER}", line)
+        pieces = _SENTENCE_RE.split(protected)
         for piece in pieces:
-            piece = piece.strip()
+            piece = piece.strip().replace(_ABBR_PLACEHOLDER, ".")
             if piece:
                 units.append(piece)
     return units

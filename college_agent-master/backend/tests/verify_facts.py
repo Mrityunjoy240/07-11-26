@@ -25,7 +25,7 @@ print("-" * 40)
 expected_fees = {
     "CSE/IT/ECE total": 617700,
     "EE/AIML/DS/CY/CSD total": 567100,
-    "ME/CE total": 429100,
+    "ME/CE total": 457100,
     "CSE first semester": 99225,
     "Hostel mess/month": 5500,
 }
@@ -123,7 +123,7 @@ print("\n5. DEPARTMENT VERIFICATION")
 print("-" * 40)
 
 dept_checks = [
-    ("CSE intake", FACTS["departments"]["CSE"]["intake"], 180),
+    ("CSE intake", FACTS["departments"]["CSE"]["intake"], 240),
     ("CSE HOD", FACTS["departments"]["CSE"]["hod"]["name"], "Dr. Pabitra Kumar Dey"),
     ("AIML intake", FACTS["departments"]["AIML"]["intake"], 60),
 ]
@@ -140,7 +140,7 @@ print("-" * 40)
 
 hostel_checks = [
     ("Total hostels", FACTS["hostel"]["total_hostels"], 5),
-    ("Total capacity", FACTS["hostel"]["total_capacity"], 1500),
+    ("Total capacity", FACTS["hostel"]["total_capacity"], 1270),
     ("Boys hostels", FACTS["hostel"]["boys_hostels"], 3),
     ("Girls hostels", FACTS["hostel"]["girls_hostels"], 2),
 ]

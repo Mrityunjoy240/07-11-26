@@ -63,7 +63,7 @@
     },
     "naac": {
       "grade": "B+",
-      "cgpa": "2.83",
+      "cgpa": "2.72",
       "valid_from": "13/09/2021"
     },
     "affiliation": "MAKAUT",
@@ -78,7 +78,7 @@
     "nirf": "Ranked 201-250 in the Engineering category (2025)",
     "aicte_idea_lab_rank": "#1 in India among 106 AICTE-IDEA LABS (2022-23)",
     "e_govt_campus": "Recognized as e-Govt Campus by Engineering Watch and NIC",
-    "campus_size_acres": 17,
+    "campus_size_acres": 14,
     "why_bcrec": {
       "en": "NBA accredited (CSE, ECE, IT, EE, ME), NAAC B+ grade. Established in 2000, modern infrastructure, dedicated Training & Placement cell, GATE Forum, and active industry linkages.",
       "hi": "NBA मान्यता प्राप्त (CSE, ECE, IT, EE, ME), NAAC B+ ग्रेड। 2000 में स्थापित, आधुनिक बुनियादी ढांचा, समर्पित प्रशिक्षण और प्लेसमेंट सेल, GATE फोरम, और सक्रिय उद्योग संपर्क।",
@@ -113,26 +113,86 @@
       "designation": "Associate Professor & HOD"
     },
     "faculty": [
-      {"name": "Dr. Saurav Ranjan Das (Chem)", "designation": "Associate Professor"},
-      {"name": "Dr. Jayanta Pal (Phys)", "designation": "Associate Professor"},
-      {"name": "Dr. Santanu Patra (Phys)", "designation": "Assistant Professor"},
-      {"name": "Dr. Sourav Bhattacharya (Chem)", "designation": "Assistant Professor"},
-      {"name": "SOHINI GHOSH (Eco)", "designation": "Assistant Professor"},
-      {"name": "SUKARNA DEY MONDAL (Math)", "designation": "Assistant Professor"},
-      {"name": "SREEJATA SEN SARMA (Math)", "designation": "Assistant Professor"},
-      {"name": "DR. AVIJIT DE (Math)", "designation": "Assistant Professor"},
-      {"name": "SUDIP KUMAR GOREY (Math)", "designation": "Assistant Professor"},
-      {"name": "Dr. Taniya Chakraborty (Eng)", "designation": "Assistant Professor"},
-      {"name": "Dr. Subhashish Pal (Phys)", "designation": "Associate Professor"},
-      {"name": "Dr. Arnab Bandyopadhyay (Math) (HOD)", "designation": "Associate Professor"},
-      {"name": "DR. KUSHAL ROY (Math)", "designation": "Assistant Professor"},
-      {"name": "Dr. Abhik Mukherjee (Eng)", "designation": "Assistant Professor"},
-      {"name": "MADHURIMA RAY BARMAN (Bio)", "designation": "Assistant Professor"},
-      {"name": "DR GOURISANKAR PANDA", "designation": "Professor"},
-      {"name": "DR PALLABI MAJI", "designation": "Assistant Professor"},
-      {"name": "DIBYENDU SAHANA", "designation": "Assistant Professor"},
-      {"name": "Dharmadas Mardanya", "designation": "Assistant Professor"},
-      {"name": "Sandipan Gupta", "designation": "Professor"}
+      {
+        "name": "Dr. Saurav Ranjan Das (Chem)",
+        "designation": "Associate Professor"
+      },
+      {
+        "name": "Dr. Jayanta Pal (Phys)",
+        "designation": "Associate Professor"
+      },
+      {
+        "name": "Dr. Santanu Patra (Phys)",
+        "designation": "Assistant Professor"
+      },
+      {
+        "name": "Dr. Sourav Bhattacharya (Chem)",
+        "designation": "Assistant Professor"
+      },
+      {
+        "name": "SOHINI GHOSH (Eco)",
+        "designation": "Assistant Professor"
+      },
+      {
+        "name": "SUKARNA DEY MONDAL (Math)",
+        "designation": "Assistant Professor"
+      },
+      {
+        "name": "SREEJATA SEN SARMA (Math)",
+        "designation": "Assistant Professor"
+      },
+      {
+        "name": "DR. AVIJIT DE (Math)",
+        "designation": "Assistant Professor"
+      },
+      {
+        "name": "SUDIP KUMAR GOREY (Math)",
+        "designation": "Assistant Professor"
+      },
+      {
+        "name": "Dr. Taniya Chakraborty (Eng)",
+        "designation": "Assistant Professor"
+      },
+      {
+        "name": "Dr. Subhashish Pal (Phys)",
+        "designation": "Associate Professor"
+      },
+      {
+        "name": "Dr. Arnab Bandyopadhyay (Math) (HOD)",
+        "designation": "Associate Professor"
+      },
+      {
+        "name": "DR. KUSHAL ROY (Math)",
+        "designation": "Assistant Professor"
+      },
+      {
+        "name": "Dr. Abhik Mukherjee (Eng)",
+        "designation": "Assistant Professor"
+      },
+      {
+        "name": "MADHURIMA RAY BARMAN (Bio)",
+        "designation": "Assistant Professor"
+      },
+      {
+        "name": "DR GOURISANKAR PANDA",
+        "designation": "Professor"
+      },
+      {
+        "name": "DR PALLABI MAJI",
+        "designation": "Assistant Professor"
+      },
+      {
+        "name": "DIBYENDU SAHANA",
+        "designation": "Assistant Professor"
+      },
+      {
+        "name": "Dharmadas Mardanya",
+        "designation": "Assistant Professor"
+      },
+      {
+        "name": "Sandipan Gupta",
+        "designation": "Professor"
+      }
     ]
   },
   "departments": {
@@ -142,35 +202,122 @@
         "designation": "Professor & HOD"
       },
       "faculty": [
-        {"name": "Rajib Kumar Mondal", "designation": "Assistant Professor"},
-        {"name": "Dr. Anirban Bose", "designation": "Assistant Professor"},
-        {"name": "Dr. Chandan Das", "designation": "Assistant Professor"},
-        {"name": "Biswajit Mondal", "designation": "Assistant Professor"},
-        {"name": "Joyjit Patra", "designation": "Assistant Professor"},
-        {"name": "Saindhab Chattaraj", "designation": "Assistant Professor"},
-        {"name": "Amitabha Mandal", "designation": "Assistant Professor"},
-        {"name": "Dr. Sanjib Saha", "designation": "Assistant Professor"},
-        {"name": "Prof. (Dr.) Raj Kumar Samanta (HoD)", "designation": "Professor"},
-        {"name": "Biswadev Goswami", "designation": "Assistant Professor"},
-        {"name": "Ruma Ghosh", "designation": "Assistant Professor"},
-        {"name": "Dr. Deepa Naik", "designation": "Assistant Professor"},
-        {"name": "Dr. Anandaprova Majumder", "designation": "Assistant Professor"},
-        {"name": "Syed Zahir Hasan", "designation": "Assistant Professor"},
-        {"name": "Sabbir Reza Tarafdar", "designation": "Assistant Professor"},
-        {"name": "Hiranmay Samaddar", "designation": "Assistant Professor"},
-        {"name": "Sayan De", "designation": "Assistant Professor"},
-        {"name": "Priyankar Sarkar", "designation": "Assistant Professor"},
-        {"name": "Kuntal Sarkar", "designation": "Assistant Professor"},
-        {"name": "RAVI SINGH", "designation": "Assistant Professor"},
-        {"name": "SUDIPTA KUMAR BISWAS", "designation": "Assistant Professor"},
-        {"name": "Pranab Kumar Sinha", "designation": "Technical Staff"},
-        {"name": "BAPPADITYA CHANDRA", "designation": "Technical Staff"},
-        {"name": "INDRANIL BHATTACHARYYA", "designation": "Technical Staff"},
-        {"name": "SAIKAT DEY", "designation": "Technical Staff"},
-        {"name": "NAYAN KONAR", "designation": "Technical Staff"},
-        {"name": "PRAVASH KUMAR DAS", "designation": "Technical Staff"},
-        {"name": "Kallol Chatterjee", "designation": "Technical Staff"},
-        {"name": "PANKAJ DAS", "designation": "Technical Staff"}
+        {
+          "name": "Rajib Kumar Mondal",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dr. Anirban Bose",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dr. Chandan Das",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Biswajit Mondal",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Joyjit Patra",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Saindhab Chattaraj",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Amitabha Mandal",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dr. Sanjib Saha",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Prof. (Dr.) Raj Kumar Samanta (HoD)",
+          "designation": "Professor"
+        },
+        {
+          "name": "Biswadev Goswami",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Ruma Ghosh",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dr. Deepa Naik",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dr. Anandaprova Majumder",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Syed Zahir Hasan",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Sabbir Reza Tarafdar",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Hiranmay Samaddar",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Sayan De",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Priyankar Sarkar",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Kuntal Sarkar",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "RAVI SINGH",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "SUDIPTA KUMAR BISWAS",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Pranab Kumar Sinha",
+          "designation": "Technical Staff"
+        },
+        {
+          "name": "BAPPADITYA CHANDRA",
+          "designation": "Technical Staff"
+        },
+        {
+          "name": "INDRANIL BHATTACHARYYA",
+          "designation": "Technical Staff"
+        },
+        {
+          "name": "SAIKAT DEY",
+          "designation": "Technical Staff"
+        },
+        {
+          "name": "NAYAN KONAR",
+          "designation": "Technical Staff"
+        },
+        {
+          "name": "PRAVASH KUMAR DAS",
+          "designation": "Technical Staff"
+        },
+        {
+          "name": "Kallol Chatterjee",
+          "designation": "Technical Staff"
+        },
+        {
+          "name": "PANKAJ DAS",
+          "designation": "Technical Staff"
+        }
       ]
     },
     "IT": {
@@ -181,14 +328,38 @@
         "designation": "Associate Professor & HOD"
       },
       "faculty": [
-        {"name": "Suman Dasgupta", "designation": "Assistant Professor"},
-        {"name": "DR. MOUMITA PRADHAN", "designation": "Assistant Professor"},
-        {"name": "PRABAL KUMAR SAHU", "designation": "Assistant Professor"},
-        {"name": "Dr. Suchandra Banerjee", "designation": "Assistant Professor"},
-        {"name": "KINSHUK BANERJEE", "designation": "Assistant Professor"},
-        {"name": "SIDDHARTHA GHOSH", "designation": "Assistant Professor"},
-        {"name": "Shubhranshu Gorai", "designation": "Technical Staff"},
-        {"name": "SOUMYA BHATTACHARYA", "designation": "Technical Staff"}
+        {
+          "name": "Suman Dasgupta",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "DR. MOUMITA PRADHAN",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "PRABAL KUMAR SAHU",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dr. Suchandra Banerjee",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "KINSHUK BANERJEE",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "SIDDHARTHA GHOSH",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Shubhranshu Gorai",
+          "designation": "Technical Staff"
+        },
+        {
+          "name": "SOUMYA BHATTACHARYA",
+          "designation": "Technical Staff"
+        }
       ]
     },
     "ECE": {
@@ -199,20 +370,62 @@
         "designation": "Associate Professor & HOD"
       },
       "faculty": [
-        {"name": "DR. BIJOY LAXMI KOLEY", "designation": "Assistant Professor"},
-        {"name": "Dr. Anup Kumar Das", "designation": "Assistant Professor"},
-        {"name": "Moutusi Mondal", "designation": "Assistant Professor"},
-        {"name": "Dr. SNEHA SULTANA", "designation": "Assistant Professor"},
-        {"name": "Dr. Debipriya Dutta", "designation": "Assistant Professor"},
-        {"name": "Dr. Rajdeep Ray", "designation": "Assistant Professor"},
-        {"name": "Dr. Narendra Nath Pathak", "designation": "Professor"},
-        {"name": "DR. KAMALIKA TIWARI", "designation": "Assistant Professor"},
-        {"name": "Dr. Sourav Paul", "designation": "Assistant Professor"},
-        {"name": "Dr. Mrinmoy Chakraborty (HOD)", "designation": "Associate Professor"},
-        {"name": "Dr. Ankita Mitra", "designation": "Assistant Professor"},
-        {"name": "Dr. Bijoy Gupta", "designation": "Assistant Professor"},
-        {"name": "Dr. Surjadeep Dutta", "designation": "Assistant Professor"},
-        {"name": "Dr. Arunava Mookherjee", "designation": "HOD"}
+        {
+          "name": "DR. BIJOY LAXMI KOLEY",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dr. Anup Kumar Das",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Moutusi Mondal",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dr. SNEHA SULTANA",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dr. Debipriya Dutta",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dr. Rajdeep Ray",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dr. Narendra Nath Pathak",
+          "designation": "Professor"
+        },
+        {
+          "name": "DR. KAMALIKA TIWARI",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dr. Sourav Paul",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dr. Mrinmoy Chakraborty (HOD)",
+          "designation": "Associate Professor"
+        },
+        {
+          "name": "Dr. Ankita Mitra",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dr. Bijoy Gupta",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dr. Surjadeep Dutta",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dr. Arunava Mookherjee",
+          "designation": "HOD"
+        }
       ]
     },
     "EE": {
@@ -223,41 +436,146 @@
         "designation": "Associate Professor & HOD"
       },
       "faculty": [
-        {"name": "Dr. Mofazzal Hossain Khondekar", "designation": "Professor"},
-        {"name": "Manas Roy", "designation": "Assistant Professor"},
-        {"name": "DR. SUBHAS CHANDRA MOI", "designation": "Assistant Professor"},
-        {"name": "Dr. Suman Bhattacharjee", "designation": "Associate Professor"},
-        {"name": "INDRANIL SENGUPTA", "designation": "Assistant Professor"},
-        {"name": "DR. SNEHASHIS GHOSHAL", "designation": "Assistant Professor"},
-        {"name": "SUNIL CHOUDHARY", "designation": "Assistant Professor"},
-        {"name": "Tapas Roy", "designation": "Assistant Professor"},
-        {"name": "SARADINDU MONDAL", "designation": "Assistant Professor"},
-        {"name": "Dr. Abhijit Banerjee", "designation": "Assistant Professor"},
-        {"name": "NILOY BHATTACHERJEE", "designation": "Assistant Professor"},
-        {"name": "NILKAMAL BHUNIA", "designation": "Assistant Professor"},
-        {"name": "BASUDEB MONDAL", "designation": "Assistant Professor"},
-        {"name": "INDRANI SENGUPTA", "designation": "Assistant Professor"},
-        {"name": "Sandip Mukherjee", "designation": "Associate Professor"},
-        {"name": "BANASHREE CHATTERJEE", "designation": "Assistant Professor"},
-        {"name": "Keka Hajra", "designation": "Assistant Professor"},
-        {"name": "Dipak Dhak", "designation": "Assistant Professor"},
-        {"name": "PRIYANKA ROY", "designation": "Assistant Professor"},
-        {"name": "Dr.Tribeni Prasad Banerjee", "designation": "Associate Professor"},
-        {"name": "Dr. Chaity Sarkar", "designation": "Assistant Professor"},
-        {"name": "DR. DOLA SINHA", "designation": "Associate Professor"},
-        {"name": "MOU DAS MAHAPATRA", "designation": "Assistant Professor"},
-        {"name": "Dr. Saibal Majumder", "designation": "Assistant Professor"},
-        {"name": "PRADIPTA SARKAR", "designation": "Assistant Professor"},
-        {"name": "Dr. Pabitra Kumar Mandal", "designation": "Assistant Professor"},
-        {"name": "SUBHADRA DEB ROY", "designation": "Assistant Professor"},
-        {"name": "SURAJIT BATABYAL", "designation": "Assistant Professor"},
-        {"name": "SAMUJJWAL RAY", "designation": "Assistant Professor"},
-        {"name": "Dr. Ritu Rani De Maity", "designation": "Assistant Professor"},
-        {"name": "Dr. Tapas Mondal", "designation": "Associate Professor"},
-        {"name": "DR. SUSANTA DUTTA", "designation": "Professor"},
-        {"name": "Dr. Arindam Mondal", "designation": "Professor"},
-        {"name": "DR. SOHAM BANDYOPADHYAY", "designation": "Assistant Professor"},
-        {"name": "Prof.(Dr.) Anindya Sen (ex Dean IIM Calcutta)", "designation": "Chairman"}
+        {
+          "name": "Dr. Mofazzal Hossain Khondekar",
+          "designation": "Professor"
+        },
+        {
+          "name": "Manas Roy",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "DR. SUBHAS CHANDRA MOI",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dr. Suman Bhattacharjee",
+          "designation": "Associate Professor"
+        },
+        {
+          "name": "INDRANIL SENGUPTA",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "DR. SNEHASHIS GHOSHAL",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "SUNIL CHOUDHARY",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Tapas Roy",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "SARADINDU MONDAL",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dr. Abhijit Banerjee",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "NILOY BHATTACHERJEE",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "NILKAMAL BHUNIA",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "BASUDEB MONDAL",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "INDRANI SENGUPTA",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Sandip Mukherjee",
+          "designation": "Associate Professor"
+        },
+        {
+          "name": "BANASHREE CHATTERJEE",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Keka Hajra",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dipak Dhak",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "PRIYANKA ROY",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dr.Tribeni Prasad Banerjee",
+          "designation": "Associate Professor"
+        },
+        {
+          "name": "Dr. Chaity Sarkar",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "DR. DOLA SINHA",
+          "designation": "Associate Professor"
+        },
+        {
+          "name": "MOU DAS MAHAPATRA",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dr. Saibal Majumder",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "PRADIPTA SARKAR",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dr. Pabitra Kumar Mandal",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "SUBHADRA DEB ROY",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "SURAJIT BATABYAL",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "SAMUJJWAL RAY",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dr. Ritu Rani De Maity",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dr. Tapas Mondal",
+          "designation": "Associate Professor"
+        },
+        {
+          "name": "DR. SUSANTA DUTTA",
+          "designation": "Professor"
+        },
+        {
+          "name": "Dr. Arindam Mondal",
+          "designation": "Professor"
+        },
+        {
+          "name": "DR. SOHAM BANDYOPADHYAY",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Prof.(Dr.) Anindya Sen (ex Dean IIM Calcutta)",
+          "designation": "Chairman"
+        }
       ]
     },
     "ME": {
@@ -268,37 +586,130 @@
         "designation": "Professor & HOD"
       },
       "faculty": [
-        {"name": "Subhajit Bhattacharya", "designation": "Assistant Professor"},
-        {"name": "Dr. Chandan Chattoraj (HOD)", "designation": "Professor"},
-        {"name": "Dr Rajeev Ranjan", "designation": "Assistant Professor"},
-        {"name": "DR KANCHAN CHATTERJEE", "designation": "Professor"},
-        {"name": "DR. SUBHAS CHANDRA MOI", "designation": "Assistant Professor"},
-        {"name": "Arka Banerjee", "designation": "Assistant Professor"},
-        {"name": "DR SUBRATA SAMANTA", "designation": "Associate Professor"},
-        {"name": "Chitta Sahana", "designation": "Assistant Professor"},
-        {"name": "DR. SUMAN KARMAKAR", "designation": "Assistant Professor"},
-        {"name": "Dr Manoj Kundu", "designation": "Assistant Professor"},
-        {"name": "DR ARIJIT BANERJEE", "designation": "Associate Professor"},
-        {"name": "Siddhartha Bhowmick", "designation": "Assistant Professor"},
-        {"name": "RAKESH BISWAS", "designation": "Assistant Professor"},
-        {"name": "Deepak Kumar", "designation": "Assistant Professor"},
-        {"name": "Dr. Pabitra Kumar Mandal", "designation": "Assistant Professor"},
-        {"name": "KOUSHIK CHATTERJEE", "designation": "Assistant Professor"},
-        {"name": "DR RUPALI", "designation": "Assistant Professor"},
-        {"name": "ALOK KUMAR DAS", "designation": "Technical Staff"},
-        {"name": "SURAJIT BANERJEE", "designation": "Technical Staff"},
-        {"name": "ANUPAM CHAKRABORTY", "designation": "Technical Staff"},
-        {"name": "SAMIR SAHA", "designation": "Technical Staff"},
-        {"name": "SAGAR DUTTA", "designation": "Technical Staff"},
-        {"name": "SATYAJIT DAS", "designation": "Technical Staff"},
-        {"name": "Debabrata Sarkar", "designation": "Technical Staff"},
-        {"name": "PARTHA SARATHI LAKSHMAN", "designation": "Technical Staff"},
-        {"name": "SUBHANKAR DEY", "designation": "Technical Staff"},
-        {"name": "SHIBDAS GHOSH", "designation": "Technical Staff"},
-        {"name": "ASHOK RAM TARBEY", "designation": "Technical Staff"},
-        {"name": "ARUP GHOSH", "designation": "Technical Staff"},
-        {"name": "LAKSHMI KANTA PAUL", "designation": "Technical Staff"},
-        {"name": "SUVENDU BISWAS", "designation": "Technical Staff"}
+        {
+          "name": "Subhajit Bhattacharya",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dr. Chandan Chattoraj (HOD)",
+          "designation": "Professor"
+        },
+        {
+          "name": "Dr Rajeev Ranjan",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "DR KANCHAN CHATTERJEE",
+          "designation": "Professor"
+        },
+        {
+          "name": "DR. SUBHAS CHANDRA MOI",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Arka Banerjee",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "DR SUBRATA SAMANTA",
+          "designation": "Associate Professor"
+        },
+        {
+          "name": "Chitta Sahana",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "DR. SUMAN KARMAKAR",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dr Manoj Kundu",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "DR ARIJIT BANERJEE",
+          "designation": "Associate Professor"
+        },
+        {
+          "name": "Siddhartha Bhowmick",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "RAKESH BISWAS",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Deepak Kumar",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dr. Pabitra Kumar Mandal",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "KOUSHIK CHATTERJEE",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "DR RUPALI",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "ALOK KUMAR DAS",
+          "designation": "Technical Staff"
+        },
+        {
+          "name": "SURAJIT BANERJEE",
+          "designation": "Technical Staff"
+        },
+        {
+          "name": "ANUPAM CHAKRABORTY",
+          "designation": "Technical Staff"
+        },
+        {
+          "name": "SAMIR SAHA",
+          "designation": "Technical Staff"
+        },
+        {
+          "name": "SAGAR DUTTA",
+          "designation": "Technical Staff"
+        },
+        {
+          "name": "SATYAJIT DAS",
+          "designation": "Technical Staff"
+        },
+        {
+          "name": "Debabrata Sarkar",
+          "designation": "Technical Staff"
+        },
+        {
+          "name": "PARTHA SARATHI LAKSHMAN",
+          "designation": "Technical Staff"
+        },
+        {
+          "name": "SUBHANKAR DEY",
+          "designation": "Technical Staff"
+        },
+        {
+          "name": "SHIBDAS GHOSH",
+          "designation": "Technical Staff"
+        },
+        {
+          "name": "ASHOK RAM TARBEY",
+          "designation": "Technical Staff"
+        },
+        {
+          "name": "ARUP GHOSH",
+          "designation": "Technical Staff"
+        },
+        {
+          "name": "LAKSHMI KANTA PAUL",
+          "designation": "Technical Staff"
+        },
+        {
+          "name": "SUVENDU BISWAS",
+          "designation": "Technical Staff"
+        }
       ]
     },
     "CE": {
@@ -309,22 +720,70 @@
         "designation": "Professor & HOD"
       },
       "faculty": [
-        {"name": "Dr. Shovan Roy", "designation": "Assistant Professor"},
-        {"name": "Dr. Sayantan Dutta", "designation": "Assistant Professor"},
-        {"name": "Dr. Anupam Kumar Biswas", "designation": "Assistant Professor"},
-        {"name": "Pranoy Roy", "designation": "Assistant Professor"},
-        {"name": "Amit Kotal", "designation": "Assistant Professor"},
-        {"name": "Koyndrik Bhattacharjee", "designation": "Assistant Professor"},
-        {"name": "Dr. Soumyadip Das", "designation": "Assistant Professor"},
-        {"name": "Md. Hamjala Alam", "designation": "Assistant Professor"},
-        {"name": "Chanchal Das", "designation": "Assistant Professor"},
-        {"name": "Dr. Sanjay Sengupta (HoD)", "designation": "Professor"},
-        {"name": "Dr. ARIJIT KUMAR BANERJI", "designation": "Assistant Professor"},
-        {"name": "Ajitesh Bhattacharjee", "designation": "Technical Staff"},
-        {"name": "Barnali Pandit", "designation": "Technical Staff"},
-        {"name": "Anindita Sengupta", "designation": "Technical Staff"},
-        {"name": "Surajit Sen", "designation": "Technical Staff"},
-        {"name": "Aditya Prasad Roy", "designation": "Technical Staff"}
+        {
+          "name": "Dr. Shovan Roy",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dr. Sayantan Dutta",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dr. Anupam Kumar Biswas",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Pranoy Roy",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Amit Kotal",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Koyndrik Bhattacharjee",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dr. Soumyadip Das",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Md. Hamjala Alam",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Chanchal Das",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dr. Sanjay Sengupta (HoD)",
+          "designation": "Professor"
+        },
+        {
+          "name": "Dr. ARIJIT KUMAR BANERJI",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Ajitesh Bhattacharjee",
+          "designation": "Technical Staff"
+        },
+        {
+          "name": "Barnali Pandit",
+          "designation": "Technical Staff"
+        },
+        {
+          "name": "Anindita Sengupta",
+          "designation": "Technical Staff"
+        },
+        {
+          "name": "Surajit Sen",
+          "designation": "Technical Staff"
+        },
+        {
+          "name": "Aditya Prasad Roy",
+          "designation": "Technical Staff"
+        }
       ]
     },
     "CSD": {
@@ -334,16 +793,46 @@
         "designation": "Assistant Professor & HOD"
       },
       "faculty": [
-        {"name": "Swadhin Kumar Mondal", "designation": "Assistant Professor"},
-        {"name": "Koustav Roy", "designation": "Assistant Professor"},
-        {"name": "Nasim anjum Hoque", "designation": "Assistant Professor"},
-        {"name": "Monalisa Chakraborty", "designation": "Assistant Professor"},
-        {"name": "Dr. ARDHENDU SEKHAR CHATTOPADHYAY", "designation": "Assistant Professor"},
-        {"name": "Prasenjit Maji", "designation": "Assistant Professor"},
-        {"name": "Bipul Chanda", "designation": "Assistant Professor"},
-        {"name": "Dr. Poulomi Mukherjee Tewari", "designation": "Assistant Professor"},
-        {"name": "Suman Banerjee", "designation": "Technical Staff"},
-        {"name": "ANUSRUTI MITRA", "designation": "Assistant Professor"}
+        {
+          "name": "Swadhin Kumar Mondal",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Koustav Roy",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Nasim anjum Hoque",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Monalisa Chakraborty",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dr. ARDHENDU SEKHAR CHATTOPADHYAY",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Prasenjit Maji",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Bipul Chanda",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dr. Poulomi Mukherjee Tewari",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Suman Banerjee",
+          "designation": "Technical Staff"
+        },
+        {
+          "name": "ANUSRUTI MITRA",
+          "designation": "Assistant Professor"
+        }
       ]
     },
     "AIML": {
@@ -353,13 +842,34 @@
         "designation": "Professor & HOD"
       },
       "faculty": [
-        {"name": "Suman Dasgupta", "designation": "Assistant Professor"},
-        {"name": "Biswajit Saha", "designation": "Assistant Professor"},
-        {"name": "Dr. Gour Sundar Mitra Thakur", "designation": "Professor & HOD"},
-        {"name": "Dr. Arnab Banerjee", "designation": "Assistant Professor"},
-        {"name": "Arya Manikya Sinha", "designation": "Assistant Professor"},
-        {"name": "Raja Dey", "designation": "Assistant Professor"},
-        {"name": "Devlina Karmakar", "designation": "Assistant Professor"}
+        {
+          "name": "Suman Dasgupta",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Biswajit Saha",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dr. Gour Sundar Mitra Thakur",
+          "designation": "Professor & HOD"
+        },
+        {
+          "name": "Dr. Arnab Banerjee",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Arya Manikya Sinha",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Raja Dey",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Devlina Karmakar",
+          "designation": "Assistant Professor"
+        }
       ]
     },
     "DS": {
@@ -369,8 +879,14 @@
         "designation": "Associate Professor & HOD"
       },
       "faculty": [
-        {"name": "Sudipta Samanta", "designation": "Assistant Professor"},
-        {"name": "Amit Mondal", "designation": "Assistant Professor"}
+        {
+          "name": "Sudipta Samanta",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Amit Mondal",
+          "designation": "Assistant Professor"
+        }
       ]
     },
     "CY": {
@@ -380,8 +896,14 @@
         "designation": "Professor & HOD"
       },
       "faculty": [
-        {"name": "Sudipta Samanta", "designation": "Assistant Professor"},
-        {"name": "Amit Mondal", "designation": "Assistant Professor"}
+        {
+          "name": "Sudipta Samanta",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Amit Mondal",
+          "designation": "Assistant Professor"
+        }
       ]
     },
     "MBA": {
@@ -392,22 +914,70 @@
         "designation": "HOD"
       },
       "faculty": [
-        {"name": "RAM PRASAD CHAKRABORTY", "designation": "Assistant Professor"},
-        {"name": "DR. TAPAN KUMAR CHATTOPADHYAY", "designation": "Assistant Professor"},
-        {"name": "MD KERAMOT HOSSAIN MONDAL", "designation": "Assistant Professor"},
-        {"name": "ADHIT ROY", "designation": "Assistant Professor"},
-        {"name": "MOLOY MUKHERJEE", "designation": "Assistant Professor"},
-        {"name": "Sayanti Samanta", "designation": "Assistant Professor"},
-        {"name": "Dr. Anirban Chattopadhyay", "designation": "Assistant Professor"},
-        {"name": "DR. SOHAM DEY", "designation": "Assistant Professor"},
-        {"name": "DIPTA CHAUDHURI", "designation": "Assistant Professor"},
-        {"name": "SUBHASIS DATTA", "designation": "Assistant Professor"},
-        {"name": "DR.RAJIB BANERJEE", "designation": "Assistant Professor"},
-        {"name": "DR. CHANDAN PAUL", "designation": "Assistant Professor"},
-        {"name": "DR SOURAV MOITRA", "designation": "Assistant Professor"},
-        {"name": "Purba Mukhopadhyay", "designation": "Assistant Professor"},
-        {"name": "Dr, Subir Panja", "designation": "Associate Professor"},
-        {"name": "SK MOFIZUL HAQUE", "designation": "Assistant Professor"}
+        {
+          "name": "RAM PRASAD CHAKRABORTY",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "DR. TAPAN KUMAR CHATTOPADHYAY",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "MD KERAMOT HOSSAIN MONDAL",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "ADHIT ROY",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "MOLOY MUKHERJEE",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Sayanti Samanta",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dr. Anirban Chattopadhyay",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "DR. SOHAM DEY",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "DIPTA CHAUDHURI",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "SUBHASIS DATTA",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "DR.RAJIB BANERJEE",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "DR. CHANDAN PAUL",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "DR SOURAV MOITRA",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Purba Mukhopadhyay",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dr, Subir Panja",
+          "designation": "Associate Professor"
+        },
+        {
+          "name": "SK MOFIZUL HAQUE",
+          "designation": "Assistant Professor"
+        }
       ]
     },
     "MCA": {
@@ -418,25 +988,67 @@
         "designation": "Professor & HOD"
       },
       "faculty": [
-        {"name": "Dr. Pabitra Kumar Dey (HOD)", "designation": "Professor"},
-        {"name": "ANUPAM BAIDYA", "designation": "Assistant Professor"},
-        {"name": "Uday Kumar Banerjee", "designation": "Assistant Professor"},
-        {"name": "Debasis Guha", "designation": "Assistant Professor"},
-        {"name": "Pradipta Pal", "designation": "Assistant Professor"},
-        {"name": "Dr. Falguni Chakraborty", "designation": "Associate Professor"},
-        {"name": "Subhrangsu Chandra", "designation": "Assistant Professor"},
-        {"name": "Ansuman Mahanty", "designation": "Assistant Professor"},
-        {"name": "MONALISHA KAR", "designation": "Technical Staff"},
-        {"name": "Biswesar Ghosh", "designation": "Assistant Professor"}
+        {
+          "name": "Dr. Pabitra Kumar Dey (HOD)",
+          "designation": "Professor"
+        },
+        {
+          "name": "ANUPAM BAIDYA",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Uday Kumar Banerjee",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Debasis Guha",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Pradipta Pal",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dr. Falguni Chakraborty",
+          "designation": "Associate Professor"
+        },
+        {
+          "name": "Subhrangsu Chandra",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Ansuman Mahanty",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "MONALISHA KAR",
+          "designation": "Technical Staff"
+        },
+        {
+          "name": "Biswesar Ghosh",
+          "designation": "Assistant Professor"
+        }
       ]
     },
     "mtech_ctm": {
       "full_name": "M.Tech (Construction Technology and Management)",
       "faculty": [
-        {"name": "Dr. Saibal Majumder", "designation": "Assistant Professor"},
-        {"name": "Dr. Sanjay Sengupta", "designation": "Professor"},
-        {"name": "Barnali Pandit", "designation": "Technical Staff"},
-        {"name": "Anindita Sengupta", "designation": "Technical Staff"}
+        {
+          "name": "Dr. Saibal Majumder",
+          "designation": "Assistant Professor"
+        },
+        {
+          "name": "Dr. Sanjay Sengupta",
+          "designation": "Professor"
+        },
+        {
+          "name": "Barnali Pandit",
+          "designation": "Technical Staff"
+        },
+        {
+          "name": "Anindita Sengupta",
+          "designation": "Technical Staff"
+        }
       ]
     }
   },
@@ -444,7 +1056,7 @@
     "btech": {
       "CSE": {
         "full_name": "Computer Science and Engineering",
-        "intake": 180,
+        "intake": 240,
         "duration": "4 years",
         "established": 2000,
         "nba_accredited": true,
@@ -472,7 +1084,7 @@
       },
       "IT": {
         "full_name": "Information Technology",
-        "intake": 60,
+        "intake": 30,
         "duration": "4 years",
         "established": 2000,
         "nba_accredited": true,
@@ -528,8 +1140,8 @@
       },
       "EE": {
         "full_name": "Electrical Engineering",
-        "intake": 120,
-        "intake_note": "Intake reducing to 60 from AY 2026-27",
+        "intake": 60,
+        "intake_note": "Intake 60 per AICTE EOA 2026-27 (was 120)",
         "duration": "4 years",
         "established": 2000,
         "nba_accredited": true,
@@ -562,9 +1174,9 @@
         "established": 2003,
         "nba_accredited": true,
         "fees": {
-          "total": 429100,
+          "total": 457100,
           "admission": 10000,
-          "per_semester": 50350,
+          "per_semester": 53850,
           "tuition_per_sem": 40000,
           "development_fee_per_sem": 6000,
           "caution_money_refundable": 5000
@@ -590,9 +1202,9 @@
         "established": 2010,
         "nba_accredited": false,
         "fees": {
-          "total": 429100,
+          "total": 457100,
           "admission": 10000,
-          "per_semester": 50350,
+          "per_semester": 53850,
           "tuition_per_sem": 40000,
           "development_fee_per_sem": 6000,
           "caution_money_refundable": 5000
@@ -613,7 +1225,7 @@
       },
       "CSD": {
         "full_name": "Computer Science and Design",
-        "intake": 60,
+        "intake": 0,
         "duration": "4 years",
         "established": 2021,
         "nba_accredited": false,
@@ -637,7 +1249,8 @@
           "2024": "N/A",
           "2025": "N/A",
           "2026_est": "~95000"
-        }
+        },
+        "intake_note": "AICTE EOA 2026-27: CSD intake 0 (closure applied, NOC pending). Existing students unaffected."
       },
       "AIML": {
         "full_name": "CSE (Artificial Intelligence and Machine Learning)",
@@ -697,7 +1310,7 @@
       },
       "CY": {
         "full_name": "CSE (Cyber Security)",
-        "intake": 60,
+        "intake": 30,
         "duration": "4 years",
         "established": 2024,
         "nba_accredited": false,
@@ -728,17 +1341,17 @@
       "intake": 90,
       "duration": "2 years",
       "fees": {
-        "total": 419200,
+        "total": 422000,
         "admission": 121400
       },
       "scholarship": "10% tuition fee scholarship for eligible candidates"
     },
     "mba_hosp_management": {
       "full_name": "MBA (Hospital Management)",
-      "intake": 30,
+      "intake": 60,
       "duration": "2 years",
       "fees": {
-        "total": 419200,
+        "total": 420000,
         "admission": 121400
       },
       "note": "Fee structure PDF available on bcrec.ac.in"
@@ -747,7 +1360,7 @@
       "intake": 120,
       "duration": "2 years",
       "fees": {
-        "total": 214600,
+        "total": 216600,
         "admission": 67800,
         "per_semester": 48600
       },
@@ -764,8 +1377,8 @@
       "intake": 18,
       "duration": "2 years",
       "fees": {
-        "total": 120400,
-        "admission": 40800
+        "total": 128000,
+        "admission": 41200
       },
       "stipend": "Rs. 3000/month for eligible students"
     },
@@ -787,25 +1400,25 @@
       "per_semester": "Rs. 67,600"
     },
     "btech_me_ce": {
-      "total": "Rs. 429,100",
-      "admission": "Rs. 75,650",
-      "per_semester": "Rs. 50,350"
+      "total": "Rs. 457,100",
+      "admission": "Rs. 79,150",
+      "per_semester": "Rs. 53,850"
     },
     "mba": {
-      "total": "Rs. 4,19,200",
+      "total": "Rs. 4,22,000",
       "admission": "Rs. 1,21,400"
     },
     "mba_hosp_management": {
-      "total": "Rs. 4,19,200",
-      "admission": "Rs. 1,21,400"
+      "total": "Rs. 4,20,000",
+      "admission": "Rs. 1,22,700"
     },
     "mca": {
-      "total": "Rs. 2,14,600",
+      "total": "Rs. 2,16,600",
       "admission": "Rs. 67,800"
     },
     "mtech": {
-      "total": "Rs. 1,28,000 to 2,27,000",
-      "admission": "Rs. 41,200 (CSE) / Rs. 66,200 (ECE/ME/PS/CE)"
+      "total": "Rs. 1,28,000 to 2,28,000",
+      "admission": "Rs. 66,200 (CSE) / Rs. 41,200 (others)"
     },
     "payment_modes": [
       "Demand Draft",
@@ -832,11 +1445,11 @@
       "total_description": "Rs. 5,67,100 for 4-year B.Tech EE/AIML/DS/CY/CSD"
     },
     "semester_wise_me_ce": {
-      "first": 75650,
-      "per_semester": 50350,
-      "eighth": 51350,
-      "total_btech": 429100,
-      "total_description": "Rs. 4,29,100 for 4-year B.Tech ME/CE"
+      "first": 79150,
+      "per_semester": 53850,
+      "eighth": 54850,
+      "total_btech": 457100,
+      "total_description": "Rs. 457,100 for 4-year B.Tech ME/CE"
     },
     "hidden_charges": "No hidden charges. All fees are transparently listed in the official fee brochure.",
     "refund_policy": {
@@ -849,7 +1462,7 @@
   },
   "admission": {
     "eligibility": {
-      "btech": "10+2 with PCM, minimum 50% marks for general category",
+      "btech": "10+2 with PCM, minimum 45% marks for general category (40% for SC/ST/OBC/PwD)",
       "entrance": "WBJEE or JEE Main"
     },
     "seat_distribution": {
@@ -950,7 +1563,7 @@
     ],
     "library": {
       "description": "Multi-floor facility with vast collection of text and reference books",
-      "books": "80,000+",
+      "books": "100,231",
       "journals": "National and International",
       "e_resources": [
         "IEEE",
@@ -1256,7 +1869,7 @@
     "total_hostels": 5,
     "boys_hostels": 3,
     "girls_hostels": 2,
-    "total_capacity": 1500,
+    "total_capacity": 1270,
     "room_types": [
       {
         "type": "Single Bed",
@@ -1328,7 +1941,7 @@
   },
   "academics": {
     "faculty": {
-      "total": "208+",
+      "total": "187",
       "description": "Department-wise faculty roster available under 'departments' and 'first_year' sections. Individual contact info (email/phone) is not publicly listed on the website.",
       "first_year_note": "All B.Tech students spend their 1st year under Basic Science and Humanities (BSH) with common faculty, then move to their respective branch from 2nd year."
     },

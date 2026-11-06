@@ -6,6 +6,8 @@ __pycache__/
 venv/
 *.env
 local.env
+.env.bak
+*.env.bak
 
 # Runtime data
 chroma_db/
@@ -52,6 +54,8 @@ next_gen/frontend/dist/
 # SQLite
 *.db
 *.sqlite
+*.db-shm
+*.db-wal
 
 # Vector store
 chroma_db/

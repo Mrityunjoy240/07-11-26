@@ -14,11 +14,11 @@ Query hits a handler that is an entirely wrong pipeline phase.
 | Test Cases | Query | Actual Source | Expected Source | Root Cause |
 |---|---|---|---|---|
 | G-006, G-007 | `namaste`, `नमस्ते` | `transcript_clarification` | `greeting_deterministic` | `"namaste"` / `"नमस्ते"` not in `GREETING_PATTERNS` at `groq_service.py:284`. Falls through validation → hits transcript ambiguity check |
-| FF-008, LN-002, LN-009 | `CSE er fees koto`, `CSE er fee koto`, `BCREC er placement kemon` | `safe_point_bengali` | `structured_lookup`, `llm_tools` | **Ordering bug**: `DEMO_SAFEPOINT` pre-processing at L4138 fires **before** greeting/structured_lookup/OOD at L4168+. Banglish query gets `lang=bn`, then `_bengali_confidence_ok()` returns False (Unicode chars <30%, Banglish words <30%) → intercepted as low-confidence Bengali |
+| FF-008, LN-002, LN-009 | `CSE er fees koto`, `CSE er fee koto`, `BCREC er placement kemon` | `safe_point_bengali` | `structured_lookup`, `llm_tools` | **Vocabulary gate bug (FIXED)**: `DEMO_SAFEPOINT` pre-processing at L6136 fires after language detection. A Banglish query gets `lang=bn`, then the old `_bengali_confidence_ok()` rejected it because its hardcoded Banglish word list / college-keyword list didn't contain the romanized words (Unicode <30%, Banglish words <30%) → wrongly intercepted as low-confidence Bengali. **Fix:** removed the vocabulary gate and `_BANGLISH_WORDS` entirely; replaced with `_is_structural_junk()` — a language/script-agnostic noise filter that only blocks empty, digit/punctuation-only, or keyboard-mash input. The gate now trusts the already-computed `lang` (from the LLM weak-signal detector) and lets any real natural-language query reach the embedding `IntentClassifier` + RAG/LLM, which generalize. No word lists to maintain. |
 | DP-003 | `departments` | `transcript_clarification` | `llm_tools` | `"departments"` not in `_single_word_college_terms` set at L2020 → treated as ambiguous word |
 | MT-006 | `hello` (multi-turn, 5th turn) | `transcript_clarification` | `greeting_deterministic` | Multi-turn hello not recognized as greeting in later turns; session state lost |
 
-**Responsible files**: `groq_service.py:L284-292`, `groq_service.py:L4138-4146`, `safe_point.py:L176-224`, `groq_service.py:L1950-2048`
+**Responsible files**: `groq_service.py:L284-292`, `groq_service.py:L6136-6142`, `safe_point.py` (`_is_structural_junk`, replaced former `_bengali_confidence_ok` + `_BANGLISH_WORDS`), `groq_service.py:L1950-2048`
 
 ---
 
@@ -164,7 +164,8 @@ Test is actually correct behavior; evaluation criteria too strict or test data w
 | 2 | **G** | Strip trailing follow-up questions from all handler responses | 8 | 13 | 61/91 | **Easy** | `groq_service.py` (post-processing) | +15 |
 | 3 | **K** | Fix eval test expectations (accept `out_of_domain` for OOD, accept generic greetings, accept transcript_clarification for noise) | 11 | 9 | 70/91 | **Easy** | `eval_test_data.json` | +19 |
 | 4 | **D** | Add regex patterns to `_structured_lookup` for: admission_last_date, college_email, college_address, how_to_reach, canteen, sports_facilities, lab_facilities, dean, faculty_list, how_many_students, college_type, website, chairman, affiliation | 2, 3, 6 | 7 | 77/91 | Medium | `groq_service.py:_structured_lookup` | +30 |
-| 5 | **B** | Move `DEMO_SAFEPOINT` check AFTER structured_lookup in handler priority chain, OR improve `_bengali_confidence_ok` to pass Banglish college queries with romanized markers | 1 | 3 | 80/91 | Medium | `groq_service.py:L4138` or `safe_point.py:L227` | +5 |
+| 5 | **B** | ~~Move `DEMO_SAFEPOINT` check AFTER structured_lookup~~ OR improve `_bengali_confidence_ok` to pass Banglish college queries with romanized markers | 1 | 3 | 80/91 | Medium | — | — |
+| 5' | **B (DONE)** | **Remove the vocabulary-based Bengali confidence gate entirely.** Replaced `_bengali_confidence_ok()` + `_BANGLISH_WORDS` with `_is_structural_junk()` (language-agnostic noise filter). Gate now trusts the upstream LLM-backed `lang` and only blocks real garbage; all romanized queries flow to the generalizing `IntentClassifier` + RAG/LLM. This subsumes the "move safepoint ordering" fix and generalizes to any unseen romanized word. | 1 | 3 | 80/91 | Easy | `safe_point.py` | -60 (deleted dead lists) |
 | 6 | **A** | Add `"namaste"` and `"नमस्ते"` to `GREETING_PATTERNS` | 1 | 2 | 82/91 | **Easy** | `groq_service.py:L284` | +1 |
 | 7 | **F** | Add `r'^um+$'` to `FILLER_ONLY_PATTERNS` | 2 | 1 | 83/91 | **Easy** | `groq_service.py:L296` | +1 |
 | 8 | **C** | Add `"departments"` to `_single_word_college_terms` | 1 | 1 | 84/91 | **Easy** | `groq_service.py:L2020` | +1 |

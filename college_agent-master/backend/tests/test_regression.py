@@ -33,8 +33,8 @@ class TestFeeLookup:
         assert FACTS["fees"]["btech"]["group_b"]["total_4yr"] == 567100
 
     def test_me_total_fee(self):
-        """ME total 4-year fee should be 429,100."""
-        assert FACTS["fees"]["btech"]["group_c"]["total_4yr"] == 429100
+        """ME total 4-year fee should be 457,100."""
+        assert FACTS["fees"]["btech"]["group_c"]["total_4yr"] == 457100
 
     def test_cse_first_semester(self):
         """CSE first semester fee should be 99,225."""
@@ -117,8 +117,8 @@ class TestDepartmentData:
     """Verify department data from college_facts.json."""
 
     def test_cse_intake(self):
-        """CSE intake should be 180."""
-        assert FACTS["departments"]["CSE"]["intake"] == 180
+        """CSE intake should be 240 (AICTE EOA 2026-27)."""
+        assert FACTS["departments"]["CSE"]["intake"] == 240
 
     def test_cse_hod(self):
         """CSE HOD should be Dr. Pabitra Kumar Dey."""
@@ -177,8 +177,8 @@ class TestHostelData:
         assert FACTS["hostel"]["total_hostels"] == 5
 
     def test_total_capacity(self):
-        """Total capacity should be 1500."""
-        assert FACTS["hostel"]["total_capacity"] == 1500
+        """Total capacity should be 1270 (AICTE disclosure 2026-27)."""
+        assert FACTS["hostel"]["total_capacity"] == 1270
 
     def test_boys_hostels(self):
         """Boys hostels should be 3."""

@@ -614,7 +614,7 @@ class TestStructuredArithmetic:
         assert FEE_GROUP_MAP["EE"] == (567100, 92900, 67600)
 
     def test_fee_group_map_me(self):
-        assert FEE_GROUP_MAP["ME"] == (429100, 75650, 50350)
+        assert FEE_GROUP_MAP["ME"] == (457100, 79150, 53850)
 
     def test_all_departments_have_fees(self):
         for dept in ["CSE", "IT", "ECE", "EE", "AIML", "DS", "CY", "CSD", "ME", "CE"]:

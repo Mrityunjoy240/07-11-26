@@ -25,7 +25,8 @@ from src.planner.models import Plan
 from src.reasoning.engine import ReasoningEngine
 from src.reasoning.observation import Observer
 from src.registry import CapabilityRegistry
-from src.understanding.engine import UnderstandingEngine
+from src.understanding.engine import NON_TOPIC_INTENTS, UnderstandingEngine
+from src.understanding.semantic_nlu import SemanticNLU
 
 PIPELINE_VERSION = "1.0.0"
 
@@ -68,7 +69,16 @@ class PipelineOrchestrator:
         composer: ResponseComposer | None = None,
         knowledge: Any = None,
     ) -> None:
-        self.understanding = understanding or UnderstandingEngine()
+        self._llm = llm or self._default_llm()
+        # Hybrid semantic NLU is opt-in and attached only when the caller
+        # passes an explicit LLM (live chat / demos). The default pipeline keeps
+        # the deterministic understanding engine byte-identical so offline
+        # benchmarks stay reproducible with MockLLM even when GROQ_API_KEY is
+        # exported in the shell.
+        semantic_nlu = SemanticNLU(self._llm) if llm is not None else None
+        self.understanding = understanding or UnderstandingEngine(
+            semantic_nlu=semantic_nlu,
+        )
         self.reasoning = reasoning or ReasoningEngine()
         self.brain = brain or CollegeBrain()
         self.registry = registry or CapabilityRegistry()
@@ -80,7 +90,6 @@ class PipelineOrchestrator:
         self.planner = planner or MinimalPlanner()
         if self.knowledge is not None and getattr(self.planner, "knowledge", None) is None:
             self.planner.knowledge = self.knowledge
-        self._llm = llm or self._default_llm()
         self.composer = composer or ResponseComposer(self._llm)
 
     @staticmethod
@@ -174,6 +183,7 @@ class PipelineOrchestrator:
                 errors.append(f"Planner failed: {e}")
 
         response = ""
+        llm_prompt = ""
         llm_diagnostics = None
         kb_result = None
         if plan:
@@ -230,9 +240,7 @@ class PipelineOrchestrator:
                 # Conversation topic = first meaningful intent (used to route
                 # closing/gratitude turns back to the subject).
                 if not state.goals.get("topic"):
-                    if understanding.intent.primary not in (
-                        "unknown", "general", "greeting", "repeat"
-                    ):
+                    if understanding.intent.primary not in NON_TOPIC_INTENTS:
                         state.goals["topic"] = understanding.intent.primary
                         state.goals["topic_pre_winner"] = (
                             understanding.intent.pre_conflict_winner

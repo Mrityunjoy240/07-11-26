@@ -316,3 +316,44 @@ async def update_semantic_anchor(
         "status": "success",
         "message": f"Updated anchor for {section}/{subsection or ''}: {new_anchor}",
     }
+
+
+# ---------------------------------------------------------------------------
+# Staff review queue — the training loop. Every fallback / low-confidence
+# answer lands here with the original query, so staff can see what the bot
+# missed, fix the knowledge base, and re-index without touching code.
+# ---------------------------------------------------------------------------
+
+class ReviewResolveRequest(BaseModel):
+    note: str = ""
+
+
+@router.get("/review-queue")
+@limiter.limit("30/minute")
+async def review_queue_list(
+    request: Request,
+    limit: int = Query(100, ge=1, le=500),
+    current_user: str = Depends(get_current_admin),
+):
+    """List open (unhandled) review-queue items, newest first."""
+    from app.services.review_queue import list_open
+
+    items = list_open(limit=limit)
+    return {"count": len(items), "open": items}
+
+
+@router.post("/review-queue/{item_id}/resolve")
+@limiter.limit("30/minute")
+async def review_queue_resolve(
+    request: Request,
+    item_id: str,
+    body: ReviewResolveRequest = None,
+    current_user: str = Depends(get_current_admin),
+):
+    """Mark a review item as handled; optional staff note."""
+    from app.services.review_queue import resolve
+
+    note = body.note if body else ""
+    if not resolve(item_id, note):
+        raise HTTPException(status_code=404, detail="Review item not found")
+    return {"status": "ok", "id": item_id}

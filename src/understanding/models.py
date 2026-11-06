@@ -53,6 +53,7 @@ class UnderstandingIntent:
     confidence: float = 0.0
     all_scores: dict[str, float] = field(default_factory=dict)
     pre_conflict_winner: bool = False
+    llm_override: bool = False
 
 
 @dataclass
@@ -82,6 +83,7 @@ class IntentDiagnostics:
     margin: float = 0.0
     confidence_class: str = "LOW"
     validation: Any = None
+    llm_intent: str | None = None
 
 
 @dataclass

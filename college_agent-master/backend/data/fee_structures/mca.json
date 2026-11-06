@@ -42,17 +42,26 @@
               "notes": "Semester fee for semesters 2, 3, and 4"
             },
             {
+              "id": "third_semester_training",
+              "label": "Third Semester Training Fee",
+              "type": "one_time",
+              "category": "compulsory",
+              "amount": 2000,
+              "charged_in_semester": 3,
+              "notes": "Training fee charged in semester 3 only"
+            },
+            {
               "id": "fourth_semester_adjustment",
               "label": "Fourth Semester Adjustment",
               "type": "one_time",
               "category": "compulsory",
               "amount": 1000,
               "charged_in_semester": 4,
-              "notes": "Additional charge in final semester"
+              "notes": "Degree certificate fee in final semester"
             }
           ],
           "computed": {
-            "total_course_fee": 214600,
+            "total_course_fee": 216600,
             "first_semester_payable": 67800,
             "regular_semester_fee": 48600
           }

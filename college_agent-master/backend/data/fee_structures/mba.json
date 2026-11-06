@@ -3,9 +3,9 @@
     "program": "MBA",
     "display_name": "Master of Business Administration",
     "duration_semesters": 4,
-    "last_updated": "2026-07-10",
-    "updated_by": "System (initial load from verified FEE_GROUP_MAP)",
-    "structure_count": 1,
+    "last_updated": "2026-08-15",
+    "updated_by": "Verification pass (fee PDFs 2026-28, dual-parser + arithmetic check)",
+    "structure_count": 2,
     "schema_version": "2.0.0"
   },
   "groups": {
@@ -20,26 +20,63 @@
       "admission_batches": ["2026-27", "2027-28"],
       "effective_date": "2026-07-01",
       "published_date": "2026-06-15",
-      "source": "BCREC MBA Fee Structure PDF 2026-28",
+      "source": "BCREC MBA / MBA-HM Fee Structure PDFs 2026-28 (verified: token presence + arithmetic)",
       "groups": {
         "mba": {
           "components": [
             {
               "id": "first_semester_payable",
-              "label": "First Semester Payable (includes all one-time and semester 1 charges)",
+              "label": "First Semester Payable (printed; without hostel)",
               "type": "one_time",
               "category": "compulsory",
               "amount": 121400,
               "charged_in_semester": 1,
-              "notes": "Includes admission fee, tuition, and other charges for first semester. Contact accounts for itemized breakdown."
+              "notes": "Printed 1,21,400. Itemized components sum to 1,22,000 (diff 600) - PENDING COLLEGE CONFIRMATION. With hostel: 1,61,500."
             },
             {
-              "id": "remaining_tuition",
-              "label": "Remaining Course Fee (Semesters 2-4)",
-              "type": "one_time",
+              "id": "second_semester",
+              "label": "Second Semester Fee (without hostel)",
+              "type": "per_semester",
               "category": "compulsory",
-              "amount": 297800,
-              "notes": "Aggregate fee for semesters 2-4. Per-semester breakdown not available from source PDF."
+              "amount": 103800,
+              "applicable_semesters": [2],
+              "notes": "With hostel: 1,41,300"
+            },
+            {
+              "id": "third_semester",
+              "label": "Third Semester Fee (without hostel)",
+              "type": "per_semester",
+              "category": "compulsory",
+              "amount": 102600,
+              "applicable_semesters": [3],
+              "notes": "With hostel: 1,45,600"
+            },
+            {
+              "id": "fourth_semester",
+              "label": "Fourth Semester Fee (without hostel)",
+              "type": "per_semester",
+              "category": "compulsory",
+              "amount": 98600,
+              "applicable_semesters": [4],
+              "notes": "With hostel: 1,36,100"
+            },
+            {
+              "id": "one_time_payment_without_hostel",
+              "label": "One-Time Payment Option (entire course, without hostel)",
+              "type": "one_time",
+              "category": "optional",
+              "amount": 384800,
+              "charged_in_semester": 1,
+              "notes": "One-time payment discount option as printed"
+            },
+            {
+              "id": "one_time_payment_with_hostel",
+              "label": "One-Time Payment Option (entire course, with hostel)",
+              "type": "one_time",
+              "category": "optional",
+              "amount": 540300,
+              "charged_in_semester": 1,
+              "notes": "One-time payment discount option as printed"
             },
             {
               "id": "scholarship_note",
@@ -47,35 +84,78 @@
               "type": "one_time",
               "category": "optional",
               "amount": 0,
-              "notes": "10% tuition fee scholarship for eligible candidates. Contact accounts for details."
+              "notes": "10% tuition fee waiver if 60% throughout Std X to graduation. Merit waivers 10%/25%/35% per scholarship policy."
             }
           ],
           "computed": {
-            "total_course_fee": 419200,
-            "first_semester_payable": 121400
+            "total_course_fee": 422000,
+            "total_course_fee_printed": 422000,
+            "total_course_fee_derived": 426400,
+            "first_semester_payable": 121400,
+            "note": "PDF prints entire-course 4,22,000; printed per-semester values sum to 4,26,400 (1,21,400+1,03,800+1,02,600+98,600); itemized 1st sem sums to 1,22,000 - PENDING COLLEGE CONFIRMATION"
           }
         },
         "mba_hm": {
           "components": [
             {
               "id": "first_semester_payable",
-              "label": "First Semester Payable (includes all one-time and semester 1 charges)",
+              "label": "First Semester Payable (printed; without hostel)",
               "type": "one_time",
               "category": "compulsory",
-              "amount": 121400,
+              "amount": 122700,
+              "charged_in_semester": 1,
+              "notes": "With hostel: 1,62,200. Admission fee 10,000 (not 5,000)."
+            },
+            {
+              "id": "second_semester",
+              "label": "Second Semester Fee (without hostel)",
+              "type": "per_semester",
+              "category": "compulsory",
+              "amount": 102900,
+              "applicable_semesters": [2],
+              "notes": "With hostel: 1,40,400"
+            },
+            {
+              "id": "third_semester",
+              "label": "Third Semester Fee (without hostel)",
+              "type": "per_semester",
+              "category": "compulsory",
+              "amount": 101700,
+              "applicable_semesters": [3],
+              "notes": "With hostel: 1,44,700"
+            },
+            {
+              "id": "fourth_semester",
+              "label": "Fourth Semester Fee (without hostel)",
+              "type": "per_semester",
+              "category": "compulsory",
+              "amount": 97700,
+              "applicable_semesters": [4],
+              "notes": "With hostel: 1,35,200"
+            },
+            {
+              "id": "one_time_payment_without_hostel",
+              "label": "One-Time Payment Option (entire course, without hostel)",
+              "type": "one_time",
+              "category": "optional",
+              "amount": 383200,
               "charged_in_semester": 1
             },
             {
-              "id": "remaining_tuition",
-              "label": "Remaining Course Fee (Semesters 2-4)",
+              "id": "one_time_payment_with_hostel",
+              "label": "One-Time Payment Option (entire course, with hostel)",
               "type": "one_time",
-              "category": "compulsory",
-              "amount": 297800
+              "category": "optional",
+              "amount": 538700,
+              "charged_in_semester": 1
             }
           ],
           "computed": {
-            "total_course_fee": 419200,
-            "first_semester_payable": 121400
+            "total_course_fee": 420000,
+            "total_course_fee_printed": 420000,
+            "total_course_fee_derived": 425000,
+            "first_semester_payable": 122700,
+            "note": "PDF prints entire-course 4,20,000; printed per-semester values sum to 4,25,000 - PENDING COLLEGE CONFIRMATION"
           }
         }
       }

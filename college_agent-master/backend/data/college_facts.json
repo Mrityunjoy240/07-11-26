@@ -6,7 +6,6 @@
     "purpose": "Single source of truth for all factual college data",
     "instruction": "ALL factual responses must use data from this file. Never hallucinate numbers."
   },
-
   "college": {
     "name": "Dr. Bidhan Chandra Roy Engineering College",
     "short_name": "BCREC",
@@ -18,23 +17,28 @@
     "address": "Jemua Road, Fuljhore, Durgapur - 713206, West Bengal",
     "website": "https://www.bcrec.ac.in",
     "timings": "Mon-Fri: 10:00 AM - 5:30 PM | Sat-Sun: Closed",
-    "campus_size_acres": 17,
+    "campus_size_acres": 14,
     "student_strength": "4816+",
     "affiliation": "MAKAUT",
     "approved_by": "AICTE"
   },
-
   "accreditation": {
     "naac": {
       "grade": "B+",
-      "cgpa": 2.83,
-      "valid_from": "13/09/2021"
+      "cgpa": 2.72,
+      "valid_from": "13/09/2021",
+      "valid_until": "12/09/2026"
     },
-    "nba_programs": ["CSE", "IT", "ECE", "EE", "ME"],
+    "nba_programs": [
+      "CSE",
+      "IT",
+      "ECE",
+      "EE",
+      "ME"
+    ],
     "nirf_rank": "201-250 in Engineering category (2025)",
     "aicte_idea_lab_rank": "#1 in India among 106 AICTE-IDEA LABS (2022-23)"
   },
-
   "contacts": {
     "primary_phone": "0343-2501353",
     "all_phones": [
@@ -57,7 +61,6 @@
     "accounts_email": "accounts@bcrec.ac.in",
     "women_safety_helpline": "9851006415"
   },
-
   "leadership": {
     "principal": {
       "name": "Dr. Sanjay S. Pawar",
@@ -70,11 +73,10 @@
       "email": "km.hossain@bcrec.ac.in"
     }
   },
-
   "departments": {
     "CSE": {
       "full_name": "Computer Science and Engineering",
-      "intake": 180,
+      "intake": 240,
       "established": 2000,
       "nba_accredited": true,
       "hod": {
@@ -85,7 +87,7 @@
     },
     "IT": {
       "full_name": "Information Technology",
-      "intake": 60,
+      "intake": 30,
       "established": 2000,
       "nba_accredited": true,
       "hod": {
@@ -107,7 +109,7 @@
     },
     "EE": {
       "full_name": "Electrical Engineering",
-      "intake": 120,
+      "intake": 60,
       "established": 2000,
       "nba_accredited": true,
       "hod": {
@@ -140,7 +142,8 @@
     },
     "CSD": {
       "full_name": "Computer Science and Design",
-      "intake": 60,
+      "intake": 0,
+      "intake_note": "AICTE EOA 2026-27: intake 0 (closure applied, NOC pending). Existing students unaffected.",
       "established": 2021,
       "nba_accredited": false,
       "hod": {
@@ -170,7 +173,7 @@
     },
     "CY": {
       "full_name": "CSE (Cyber Security)",
-      "intake": 60,
+      "intake": 30,
       "established": 2024,
       "nba_accredited": false,
       "hod": {
@@ -179,11 +182,14 @@
       }
     }
   },
-
   "fees": {
     "btech": {
       "group_a": {
-        "branches": ["CSE", "IT", "ECE"],
+        "branches": [
+          "CSE",
+          "IT",
+          "ECE"
+        ],
         "total_4yr": 617700,
         "first_semester": 99225,
         "regular_semester": 73925,
@@ -191,7 +197,13 @@
         "caution_money": 5000
       },
       "group_b": {
-        "branches": ["EE", "AIML", "DS", "CY", "CSD"],
+        "branches": [
+          "EE",
+          "AIML",
+          "DS",
+          "CY",
+          "CSD"
+        ],
         "total_4yr": 567100,
         "first_semester": 92900,
         "regular_semester": 67600,
@@ -199,22 +211,26 @@
         "caution_money": 5000
       },
       "group_c": {
-        "branches": ["ME", "CE"],
-        "total_4yr": 429100,
-        "first_semester": 75650,
-        "regular_semester": 50350,
+        "branches": [
+          "ME",
+          "CE"
+        ],
+        "total_4yr": 457100,
+        "first_semester": 79150,
+        "regular_semester": 53850,
         "admission_fee": 10000,
         "caution_money": 5000
       }
     },
     "mba": {
-      "total_2yr": 419200,
+      "total_2yr": 422000,
       "first_semester": 121400,
       "admission_fee": 121400,
+      "note": "PDF prints 4,22,000 total; per-semester printed values sum to 4,26,400 and itemized 1st sem to 1,22,000 - PENDING COLLEGE CONFIRMATION",
       "intake": 90
     },
     "mca": {
-      "total_2yr": 214600,
+      "total_2yr": 216600,
       "first_semester": 67800,
       "regular_semester": 48600,
       "intake": 120
@@ -226,7 +242,6 @@
       "mess_charges_month": 5500
     }
   },
-
   "cutoffs": {
     "2024": {
       "CSE": 16059,
@@ -249,7 +264,6 @@
       "DS": 97669
     }
   },
-
   "placements": {
     "overall_2025": 91,
     "cse_2025": 93.6,
@@ -259,22 +273,74 @@
     "average_package": 3.78,
     "companies_visited_2025": 81,
     "branch_wise": {
-      "CSE": {"rate": 93.6, "avg_lpa": 4.25, "min_lpa": 3.36, "max_lpa": 15},
-      "IT": {"rate": 90, "avg_lpa": 4.0, "min_lpa": 3.0, "max_lpa": 10},
-      "ECE": {"rate": 85, "avg_lpa": 3.8, "min_lpa": 2.4, "max_lpa": 7.5},
-      "EE": {"rate": 75, "avg_lpa": 3.2, "min_lpa": 1.8, "max_lpa": 6.5},
-      "ME": {"rate": 72, "avg_lpa": 3.2, "min_lpa": 1.8, "max_lpa": 6.5},
-      "CE": {"rate": 68, "avg_lpa": 3.2, "min_lpa": 1.8, "max_lpa": 6.5},
-      "CSD": {"rate": 83, "avg_lpa": 4.5, "min_lpa": 4.0, "max_lpa": 7},
-      "AIML": {"rate": 85, "avg_lpa": 4.5, "min_lpa": 4.0, "max_lpa": 7},
-      "DS": {"rate": 84, "avg_lpa": 4.5, "min_lpa": 4.0, "max_lpa": 7},
-      "CY": {"rate": 82, "avg_lpa": 4.5, "min_lpa": 4.0, "max_lpa": 7}
+      "CSE": {
+        "rate": 93.6,
+        "avg_lpa": 4.25,
+        "min_lpa": 3.36,
+        "max_lpa": 15
+      },
+      "IT": {
+        "rate": 90,
+        "avg_lpa": 4.0,
+        "min_lpa": 3.0,
+        "max_lpa": 10
+      },
+      "ECE": {
+        "rate": 85,
+        "avg_lpa": 3.8,
+        "min_lpa": 2.4,
+        "max_lpa": 7.5
+      },
+      "EE": {
+        "rate": 75,
+        "avg_lpa": 3.2,
+        "min_lpa": 1.8,
+        "max_lpa": 6.5
+      },
+      "ME": {
+        "rate": 72,
+        "avg_lpa": 3.2,
+        "min_lpa": 1.8,
+        "max_lpa": 6.5
+      },
+      "CE": {
+        "rate": 68,
+        "avg_lpa": 3.2,
+        "min_lpa": 1.8,
+        "max_lpa": 6.5
+      },
+      "CSD": {
+        "rate": 83,
+        "avg_lpa": 4.5,
+        "min_lpa": 4.0,
+        "max_lpa": 7
+      },
+      "AIML": {
+        "rate": 85,
+        "avg_lpa": 4.5,
+        "min_lpa": 4.0,
+        "max_lpa": 7
+      },
+      "DS": {
+        "rate": 84,
+        "avg_lpa": 4.5,
+        "min_lpa": 4.0,
+        "max_lpa": 7
+      },
+      "CY": {
+        "rate": 82,
+        "avg_lpa": 4.5,
+        "min_lpa": 4.0,
+        "max_lpa": 7
+      }
     }
   },
-
   "admission": {
-    "eligibility": "10+2 with PCM, minimum 50% marks (general)",
-    "entrance": ["WBJEE", "JEE Main"],
+    "eligibility": "10+2 with PCM (Physics & Maths + one of Chem/Bio/Biotech/CS/Comp.App/Tech Voc), aggregate >=45% (40% SC/ST/OBC/PwD), English in 12th >=30%",
+    "entrance": [
+      "WBJEE",
+      "JEE Main"
+    ],
     "seat_distribution": {
       "wbjee": 80,
       "jee_main": 10,
@@ -286,14 +352,13 @@
     "nri_seats": "5% of total intake",
     "nri_fee_range": "$3000-5000 per year"
   },
-
   "hostel": {
     "available": true,
     "compulsory": false,
     "total_hostels": 5,
     "boys_hostels": 3,
     "girls_hostels": 2,
-    "total_capacity": 1500,
+    "total_capacity": 1270,
     "mess_meals_per_day": 4,
     "breakfast_time": "07:30 - 09:00 AM",
     "lunch_time": "12:30 - 02:00 PM",
@@ -301,17 +366,21 @@
     "boys_curfew": "08:30 PM (winter: 07:30 PM)",
     "girls_curfew": "06:30 PM (winter: 06:00 PM)"
   },
-
   "faculty": {
-    "total": "208+",
+    "total": "187",
     "student_teacher_ratio": "15:1 to 20:1",
     "departments": 15
   },
-
   "infrastructure": {
-    "campus_acres": 17,
-    "library_books": "80,000+",
-    "library_databases": ["IEEE", "Springer", "Elsevier", "ScienceDirect", "INDEST-AICTE"],
+    "campus_acres": 14,
+    "library_books": "100,231 volumes",
+    "library_databases": [
+      "IEEE",
+      "Springer",
+      "Elsevier",
+      "ScienceDirect",
+      "INDEST-AICTE"
+    ],
     "wifi": "Full campus including academic blocks and hostels",
     "auditoriums": [
       "Dulal Mitra Auditorium (AC)",
@@ -319,27 +388,52 @@
       "Albert Einstein Hall (AC Seminar Hall)"
     ]
   },
-
   "scholarships": [
-    {"name": "TFW", "details": "5% of total intake, full tuition fee waiver"},
-    {"name": "Swami Vivekananda", "details": "Rs. 60,000/year, West Bengal residents"},
-    {"name": "Kanyashree K3", "details": "Female students pursuing specific UG levels"},
-    {"name": "OASIS/Aikyashree", "details": "SC/ST/OBC and Minority students"}
+    {
+      "name": "TFW",
+      "details": "5% of total intake, full tuition fee waiver"
+    },
+    {
+      "name": "Swami Vivekananda",
+      "details": "Rs. 60,000/year, West Bengal residents"
+    },
+    {
+      "name": "Kanyashree K3",
+      "details": "Female students pursuing specific UG levels"
+    },
+    {
+      "name": "OASIS/Aikyashree",
+      "details": "SC/ST/OBC and Minority students"
+    }
   ],
-
   "events": [
-    {"name": "HORIZON", "type": "Tech Fest", "month": "February"},
-    {"name": "ZEAL", "type": "Cultural Fest", "month": "January"},
-    {"name": "Moksha", "type": "Freshers' Welcome", "month": "November"},
-    {"name": "Agomoni", "type": "Pre-Durga Puja", "month": "September"}
+    {
+      "name": "HORIZON",
+      "type": "Tech Fest",
+      "month": "February"
+    },
+    {
+      "name": "ZEAL",
+      "type": "Cultural Fest",
+      "month": "January"
+    },
+    {
+      "name": "Moksha",
+      "type": "Freshers' Welcome",
+      "month": "November"
+    },
+    {
+      "name": "Agomoni",
+      "type": "Pre-Durga Puja",
+      "month": "September"
+    }
   ],
-
   "backlog": {
     "description": "Backlog/arrear subjects can be cleared through supplementary examinations conducted by MAKAUT",
     "clearance_process": "Supplementary/arrear examination when notification is released by MAKAUT",
     "exam_form": "Fill exam form when MAKAUT releases supplementary exam notification",
-    "fee": "Prescribed examination fee as per MAKAUT norms (typically ₹500-1000 per subject)",
-    "consequences": "Until backlog is cleared, certain academic rules may apply — confirm with department",
+    "fee": "Prescribed examination fee as per MAKAUT norms (typically \u00e2\u201a\u00b9500-1000 per subject)",
+    "consequences": "Until backlog is cleared, certain academic rules may apply \u00e2\u20ac\u201d confirm with department",
     "support": "Contact your department or examination cell for specific guidance"
   }
 }

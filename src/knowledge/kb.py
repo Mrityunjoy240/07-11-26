@@ -49,14 +49,23 @@ def _select_snippet(
     if not units:
         return None
 
+    def _unit_match(unit: str) -> tuple[int, int]:
+        unit_terms = set(tokenize(unit))
+        exact = len(query_terms & unit_terms)
+        # "charge" should also credit "charges": count word-prefix matches.
+        prefix = sum(
+            1 for t in query_terms if len(t) >= 4 and any(w.startswith(t) for w in unit_terms)
+        )
+        return exact, prefix
+
     best_index = -1
-    best_score = 0
+    best_score = (0, 0)
     for i, unit in enumerate(units):
-        score = len(query_terms & set(tokenize(unit)))
+        score = _unit_match(unit)
         if score > best_score:
             best_score = score
             best_index = i
-    if best_index < 0 or best_score == 0:
+    if best_index < 0 or best_score == (0, 0):
         return None
 
     out = units[best_index]

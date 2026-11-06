@@ -4,18 +4,44 @@
   "last_modified": "2026-07-10",
   "current_academic_year": "2026-27",
   "program_files": {
-    "btech.json": { "programs": ["B.Tech"] },
-    "mba.json": { "programs": ["MBA", "MBA (Hospital Management)"] },
-    "mca.json": { "programs": ["MCA"] },
-    "mtech.json": { "programs": ["M.Tech"] },
-    "hostel.json": { "programs": [] }
+    "btech.json": {
+      "programs": [
+        "B.Tech"
+      ]
+    },
+    "mba.json": {
+      "programs": [
+        "MBA",
+        "MBA (Hospital Management)"
+      ]
+    },
+    "mca.json": {
+      "programs": [
+        "MCA"
+      ]
+    },
+    "mtech.json": {
+      "programs": [
+        "M.Tech"
+      ]
+    },
+    "hostel.json": {
+      "programs": []
+    }
   },
   "branch_mapping": {
-    "CSE": "B.Tech", "IT": "B.Tech", "ECE": "B.Tech",
-    "EE": "B.Tech", "AIML": "B.Tech", "DS": "B.Tech",
-    "CY": "B.Tech", "CSD": "B.Tech",
-    "ME": "B.Tech", "CE": "B.Tech",
-    "MBA": "MBA", "MBA-HM": "MBA (Hospital Management)",
+    "CSE": "B.Tech",
+    "IT": "B.Tech",
+    "ECE": "B.Tech",
+    "EE": "B.Tech",
+    "AIML": "B.Tech",
+    "DS": "B.Tech",
+    "CY": "B.Tech",
+    "CSD": "B.Tech",
+    "ME": "B.Tech",
+    "CE": "B.Tech",
+    "MBA": "MBA",
+    "MBA-HM": "MBA (Hospital Management)",
     "MCA": "MCA",
     "MTECH": "M.Tech"
   },
@@ -23,7 +49,7 @@
   "fallback_strategy": "previous_valid",
   "cache_ttl_seconds": 300,
   "fallback_defaults": {
-    "btech_range": "Rs. 4,29,100 to Rs. 6,17,700",
+    "btech_range": "Rs. 4,57,100 to Rs. 6,17,700",
     "contact_message": "Please contact the accounts office at 0343-2501353 for current fee details."
   }
 }
